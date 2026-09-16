@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #faf8f5; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; }
+  @media (min-width: 1080px) {
+    [data-nav-links] { display: flex !important; }
+    [data-nav-toggle] { display: none !important; }
+  }
+  @media (max-width: 960px) {
+    [data-cfg-shell] { grid-template-columns: minmax(0,1fr) !important; padding-bottom: 96px !important; }
+    [data-cfg-preview] { position: static !important; }
+    [data-cfg-nav-mobile] { display: flex !important; }
+  }
+</style>
+</helmet>
+
+<div style="font-family: 'Helvetica Neue', Arial, sans-serif; color: oklch(0.18 0.006 60); background: oklch(0.97 0.004 75); min-height: 100vh;">
+
+  <!-- NAV -->
+  <div style="position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: oklch(0.16 0.006 60 / 0.88); backdrop-filter: blur(10px); border-bottom: 1px solid oklch(0.32 0.006 60);">
+    <a href="Meisterworks Homepage.dc.html" style="display: flex; align-items: center; gap: 12px;">
+      <img src="assets/logo.jpg" alt="Meisterworks" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;" />
+      <span style="color: oklch(0.96 0.004 75); font-size: 15px; letter-spacing: 0.14em; font-weight: 500;">MEISTERWORKS</span>
+    </a>
+    <div style="display: none; gap: 22px; align-items: center;" data-nav-links="true">
+      <a href="Meisterworks Homepage.dc.html#deuren" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Deuren</a>
+      <a href="Inspiratie.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Inspiratie</a>
+      <a href="Reviews.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Reviews</a>
+      <a href="Snelle Offerte.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Snelle offerte</a>
+      <a href="Adviesgesprek Plannen.dc.html" style="padding: 9px 16px; border: 1px solid oklch(0.4 0.006 60); color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.03em; border-radius: 999px; white-space: nowrap;" style-hover="background: oklch(0.9 0.004 75 / 0.08);">Afspraak maken</a>
+    </div>
+    <button onClick="{{ toggleNav }}" style="display: block; background: none; border: none; cursor: pointer; padding: 6px; color: oklch(0.96 0.004 75);" data-nav-toggle="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine1Style }}"/><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine2Style }}"/><line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine3Style }}"/></svg>
+    </button>
+  </div>
+  <sc-if value="{{ navOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ navPanelStyle }} will-change: opacity;">
+      <a href="Meisterworks Homepage.dc.html#deuren" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px;">Deuren</a>
+      <a href="Inspiratie.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 40ms;">Inspiratie</a>
+      <a href="Reviews.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 80ms;">Reviews</a>
+      <a href="Snelle Offerte.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px;">Snelle offerte</a>
+      <a href="Adviesgesprek Plannen.dc.html" style="{{ navLinkAnim }} padding: 12px 22px; border: 1px solid oklch(0.4 0.006 60); color: oklch(0.92 0.004 75); font-size: 14px; text-align: center; border-radius: 999px; transition-delay: 120ms;">Afspraak maken</a>
+    </div>
+  </sc-if>
+
+  <!-- HEADER -->
+  <div style="max-width: 1320px; margin: 0 auto; padding: 32px 28px 0;">
+    <div style="font-size: 13px; color: oklch(0.5 0.008 60); margin-bottom: 20px;"><a href="Meisterworks Homepage.dc.html#deuren" style="border-bottom: 1px solid oklch(0.75 0.006 75); padding-bottom: 1px;">Deuren</a> &nbsp;/&nbsp; Configurator</div>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding-bottom: 24px; border-bottom: 1px solid oklch(0.88 0.006 75);">
+      <div>
+        <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 12px;">Configurator</div>
+        <h1 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(26px, 3.4vw, 38px); margin: 0; line-height: 1.15;">Stel uw deur samen.</h1>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 13px; color: oklch(0.5 0.008 60);">{{ progressLabel }}</div>
+        <div style="font-size: 12px; color: oklch(0.58 0.008 60); margin-top: 4px;">Gratis en zonder verplichtingen</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div style="max-width: 1320px; margin: 0 auto; padding: 22px 28px 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
+      <div style="font-size: 12px; color: oklch(0.45 0.008 60); font-weight: 600;">Voortgang</div>
+      <div style="font-size: 12px; color: oklch(0.55 0.008 60);">{{ progressPercent }}</div>
+    </div>
+    <div style="height: 5px; background: oklch(0.9 0.006 75); border-radius: 999px; overflow: hidden;">
+      <div style="{{ progressBarStyle }}"></div>
+    </div>
+  </div>
+
+  <!-- SHELL -->
+  <div data-cfg-shell="true" style="max-width: 1320px; margin: 0 auto; padding: 28px 28px 100px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 48px; align-items: start;">
+
+    <!-- PREVIEW -->
+    <div data-cfg-preview="true" style="position: sticky; top: 96px;">
+      <div style="background: oklch(1 0 0); border: 1px solid oklch(0.9 0.006 75); border-radius: 18px; padding: 28px; box-shadow: 0 1px 3px oklch(0 0 0 / 0.04);">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px;">
+          <div style="font-family: 'Newsreader', serif; font-size: 20px;">{{ productLabel }}</div>
+        </div>
+        <div style="background: oklch(0.965 0.004 75); border-radius: 12px; padding: 24px; display: flex; align-items: center; justify-content: center; min-height: 380px;">{{ previewSvg }}</div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
+          <sc-for list="{{ previewChips }}" as="chip" hint-placeholder-count="4">
+            <div style="display: flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; background: oklch(0.95 0.004 75); font-size: 12px; color: oklch(0.35 0.008 60);">
+              <div style="{{ chip.dotStyle }}"></div>{{ chip.label }}
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top: 22px; padding-top: 20px; border-top: 1px solid oklch(0.93 0.004 75);">
+          <button onClick="{{ toggleLiveSummary }}" style="display: flex; align-items: center; justify-content: space-between; width: 100%; background: none; border: none; cursor: pointer; padding: 0; font-family: inherit;">
+            <span style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.008 60);">Uw samenstelling</span>
+            <span style="font-size: 13px; color: oklch(0.5 0.008 60); transform: rotate({{ liveSummaryChevronDeg }}deg); transition: transform 0.2s ease;">⌄</span>
+          </button>
+          <sc-if value="{{ liveSummaryOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 12px;">
+              <sc-for list="{{ liveSummary }}" as="row" hint-placeholder-count="4">
+                <button onClick="{{ row.onEdit }}" style="{{ row.rowStyle }}">
+                  <span style="font-size: 12px; color: oklch(0.5 0.008 60);">{{ row.label }}</span>
+                  <span style="{{ row.valueStyle }}">{{ row.value }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <p style="font-size: 12px; color: oklch(0.55 0.008 60); line-height: 1.5; margin: 14px 2px 0;">Schematische weergave van uw samenstelling. Maatvoering en detaillering worden vóór productie samen met u gecontroleerd.</p>
+    </div>
+
+    <!-- ACCORDION -->
+    <div>
+      <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="7">
+        <div id="{{ sec.anchorId }}" style="{{ sec.wrapStyle }}">
+          <button onClick="{{ sec.onToggle }}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; background: none; border: none; cursor: pointer; padding: 0; text-align: left; font-family: inherit;">
+            <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+              <div style="{{ sec.dotStyle }}">{{ sec.dotContent }}</div>
+              <div style="min-width: 0;">
+                <div style="font-size: 15px; font-weight: 600; color: oklch(0.2 0.008 60);">{{ sec.title }}</div>
+                <sc-if value="{{ sec.hasSummary }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size: 12px; color: oklch(0.5 0.008 60); margin-top: 2px;">{{ sec.summaryValue }}</div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="{{ sec.chevronStyle }}">⌄</div>
+          </button>
+
+          <sc-if value="{{ sec.expanded }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 20px;">
+              <p style="color: oklch(0.42 0.008 60); font-size: 14px; line-height: 1.6; margin: 0 0 18px;">{{ sec.intro }}</p>
+
+              <sc-if value="{{ sec.isOptionBody }}" hint-placeholder-val="{{ false }}">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px;">
+                  <sc-for list="{{ sec.options }}" as="opt" hint-placeholder-count="3">
+                    <button onClick="{{ opt.onClick }}" style="{{ opt.cardStyle }}">
+                      <div style="{{ opt.thumbStyle }}"></div>
+                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div style="font-size: 14px; font-weight: 600; color: oklch(0.2 0.008 60); text-align: left;">{{ opt.label }}</div>
+                        <div style="{{ opt.tickStyle }}"></div>
+                      </div>
+                      <div style="font-size: 12px; color: oklch(0.5 0.008 60); line-height: 1.45; text-align: left;">{{ opt.desc }}</div>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ sec.isGroupBody }}" hint-placeholder-val="{{ false }}">
+                <sc-for list="{{ sec.groups }}" as="grp" hint-placeholder-count="2">
+                  <div style="{{ grp.wrapStyle }}">
+                    <button onClick="{{ grp.onToggle }}" style="display: flex; align-items: center; justify-content: space-between; width: 100%; background: none; border: none; cursor: pointer; padding: 0; margin-bottom: {{ grp.headerMargin }};">
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="{{ grp.checkStyle }}">{{ grp.checkContent }}</div>
+                        <div style="font-size: 13px; font-weight: 600; color: oklch(0.3 0.008 60);">{{ grp.title }}</div>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="font-size: 13px; color: oklch(0.5 0.008 60);">{{ grp.currentLabel }}</div>
+                        <div style="{{ grp.chevronStyle }}">⌄</div>
+                      </div>
+                    </button>
+                    <sc-if value="{{ grp.expanded }}" hint-placeholder-val="{{ true }}">
+                      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px;">
+                        <sc-for list="{{ grp.options }}" as="opt" hint-placeholder-count="3">
+                          <button onClick="{{ opt.onClick }}" style="{{ opt.cardStyle }}">
+                            <div style="{{ opt.thumbStyle }}"></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                              <div style="font-size: 14px; font-weight: 600; color: oklch(0.2 0.008 60); text-align: left;">{{ opt.label }}</div>
+                              <div style="{{ opt.tickStyle }}"></div>
+                            </div>
+                            <div style="font-size: 12px; color: oklch(0.5 0.008 60); line-height: 1.45; text-align: left;">{{ opt.desc }}</div>
+                          </button>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </sc-if>
+
+              <sc-if value="{{ sec.isVlakBody }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px;">
+                  <sc-for list="{{ sec.vlakPresets }}" as="preset" hint-placeholder-count="4">
+                    <button onClick="{{ preset.onClick }}" style="{{ preset.style }}">{{ preset.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px;">
+                  <div style="border: 1px solid oklch(0.88 0.006 75); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                      <div style="font-size: 14px; font-weight: 600; color: oklch(0.2 0.008 60);">Liggers</div>
+                      <div style="font-size: 12px; color: oklch(0.5 0.008 60);">Horizontale onderverdeling</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <button onClick="{{ sec.liggersMinus }}" style="{{ sec.stepperBtnStyle }}">–</button>
+                      <div style="width: 22px; text-align: center; font-size: 15px; font-weight: 600;">{{ sec.liggers }}</div>
+                      <button onClick="{{ sec.liggersPlus }}" style="{{ sec.stepperBtnStyle }}">+</button>
+                    </div>
+                  </div>
+                  <div style="border: 1px solid oklch(0.88 0.006 75); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                      <div style="font-size: 14px; font-weight: 600; color: oklch(0.2 0.008 60);">Staanders deur</div>
+                      <div style="font-size: 12px; color: oklch(0.5 0.008 60);">Verticale onderverdeling</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <button onClick="{{ sec.staandersMinus }}" style="{{ sec.stepperBtnStyle }}">–</button>
+                      <div style="width: 22px; text-align: center; font-size: 15px; font-weight: 600;">{{ sec.staanders }}</div>
+                      <button onClick="{{ sec.staandersPlus }}" style="{{ sec.stepperBtnStyle }}">+</button>
+                    </div>
+                  </div>
+                  <sc-if value="{{ sec.isPanelStaandersStep }}" hint-placeholder-val="{{ false }}">
+                    <div style="border: 1px solid oklch(0.88 0.006 75); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between;">
+                      <div>
+                        <div style="font-size: 14px; font-weight: 600; color: oklch(0.2 0.008 60);">Staanders zijpanelen</div>
+                        <div style="font-size: 12px; color: oklch(0.5 0.008 60);">Onafhankelijk van de deur</div>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <button onClick="{{ sec.panelStaandersMinus }}" style="{{ sec.stepperBtnStyle }}">–</button>
+                        <div style="width: 22px; text-align: center; font-size: 15px; font-weight: 600;">{{ sec.panelStaanders }}</div>
+                        <button onClick="{{ sec.panelStaandersPlus }}" style="{{ sec.stepperBtnStyle }}">+</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+                <p style="font-size: 12px; color: oklch(0.55 0.008 60); line-height: 1.5; margin: 16px 0 0;">Liggers worden automatisch op zowel de deur als de zijpanelen toegepast.</p>
+                <button onClick="{{ sec.onConfirm }}" style="{{ sec.confirmStyle }}">{{ sec.confirmLabel }}</button>
+              </sc-if>
+
+              <sc-if value="{{ sec.isMaatBody }}" hint-placeholder-val="{{ false }}">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px;">
+                  <sc-for list="{{ sec.bayWidthFields }}" as="bf" hint-placeholder-count="2">
+                    <label style="display: flex; flex-direction: column; gap: 8px;">
+                      <span style="font-size: 13px; color: oklch(0.35 0.008 60);">{{ bf.label }} — breedte (mm)</span>
+                      <input type="number" value="{{ bf.value }}" onChange="{{ bf.onChange }}" min="300" max="3000" step="10" style="padding: 13px 14px; border: 1px solid oklch(0.85 0.006 75); border-radius: 10px; font-size: 15px; font-family: inherit; color: oklch(0.2 0.008 60); background: oklch(1 0 0);" />
+                    </label>
+                  </sc-for>
+                  <label style="display: flex; flex-direction: column; gap: 8px;">
+                    <span style="font-size: 13px; color: oklch(0.35 0.008 60);">Hoogte opening (mm)</span>
+                    <input type="number" value="{{ sec.hoogte }}" onChange="{{ sec.onHoogte }}" min="1500" max="4000" step="10" style="padding: 13px 14px; border: 1px solid oklch(0.85 0.006 75); border-radius: 10px; font-size: 15px; font-family: inherit; color: oklch(0.2 0.008 60); background: oklch(1 0 0);" />
+                  </label>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 18px;">
+                  <span style="font-size: 13px; color: oklch(0.5 0.008 60);">Totale breedte:</span>
+                  <span style="font-size: 15px; font-weight: 600; color: oklch(0.2 0.008 60);">{{ sec.totalWidthLabel }}</span>
+                </div>
+                <p style="font-size: 13px; color: oklch(0.5 0.008 60); line-height: 1.6; margin: 10px 0 18px;">Indicatieve maten volstaan. We meten uw opening altijd zelf in voordat we in productie gaan.</p>
+                <button onClick="{{ sec.onConfirm }}" style="{{ sec.confirmStyle }}">{{ sec.confirmLabel }}</button>
+              </sc-if>
+
+              <sc-if value="{{ sec.isOverzichtBody }}" hint-placeholder-val="{{ false }}">
+                <div style="border: 1px solid oklch(0.88 0.006 75); border-radius: 14px; overflow: hidden; background: oklch(1 0 0);">
+                  <sc-for list="{{ sec.summaryRows }}" as="row" hint-placeholder-count="7">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 18px; border-bottom: 1px solid oklch(0.94 0.004 75);">
+                      <div style="font-size: 13px; color: oklch(0.5 0.008 60);">{{ row.label }}</div>
+                      <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="font-size: 14px; color: oklch(0.2 0.008 60); text-align: right;">{{ row.value }}</div>
+                        <button onClick="{{ row.onEdit }}" style="background: none; border: none; cursor: pointer; padding: 4px; font-size: 12px; color: oklch(0.45 0.008 60); text-decoration: underline;">Wijzig</button>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px;">
+                  <a href="Adviesgesprek Plannen.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 15px 30px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 14px; font-weight: 500; letter-spacing: 0.03em; border-radius: 999px; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14); transition: transform 0.15s ease, filter 0.15s ease;" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97);">Offerte aanvragen<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+                  <a href="Adviesgesprek Plannen.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 15px 30px; border: 1px solid oklch(0.7 0.006 75); color: oklch(0.25 0.008 60); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, background 0.15s ease;" style-hover="background: oklch(0.5 0.006 60 / 0.08);" style-active="transform: scale(0.97);">Afspraak maken</a>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-cfg-nav-mobile="true" style="display: none; flex-direction: column; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: oklch(1 0 0 / 0.97); backdrop-filter: blur(10px); border-top: 1px solid oklch(0.88 0.006 75); box-shadow: 0 -2px 12px oklch(0 0 0 / 0.06);">
+    <button onClick="{{ toggleSummary }}" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 9px 14px; border-radius: 999px; background: oklch(0.96 0.004 75); border: 1px solid oklch(0.9 0.006 75); cursor: pointer; font-family: inherit;">
+      <span style="font-size: 12px; color: oklch(0.35 0.008 60); font-weight: 600;">Bekijk uw samenstelling</span>
+      <span style="font-size: 12px; color: oklch(0.5 0.008 60);">{{ progressPercent }} ⌃</span>
+    </button>
+    <button onClick="{{ goToNextUnanswered }}" style="{{ mobilePrimaryStyle }}">{{ mobilePrimaryLabel }}</button>
+  </div>
+
+  <sc-if value="{{ summaryOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeSummary }}" style="position: fixed; inset: 0; z-index: 70; background: oklch(0.14 0.006 60 / 0.45); display: flex; align-items: flex-end;">
+      <div style="width: 100%; max-height: 82vh; overflow-y: auto; background: oklch(0.99 0.002 75); border-radius: 18px 18px 0 0; padding: 22px 20px calc(28px + env(safe-area-inset-bottom));">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px;">
+          <div style="font-family: 'Newsreader', serif; font-size: 20px;">Uw samenstelling</div>
+          <button onClick="{{ closeSummary }}" style="background: none; border: none; cursor: pointer; font-size: 22px; line-height: 1; color: oklch(0.45 0.008 60); padding: 4px;">×</button>
+        </div>
+        <div style="background: oklch(0.965 0.004 75); border-radius: 12px; padding: 16px; margin-bottom: 20px;">{{ previewSvg }}</div>
+        <sc-for list="{{ liveSummary }}" as="row" hint-placeholder-count="5">
+          <button onClick="{{ row.onEdit }}" style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px; width: 100%; padding: 12px 0; background: none; border: none; border-bottom: 1px solid oklch(0.93 0.004 75); cursor: pointer; font-family: inherit; text-align: left;">
+            <span style="font-size: 13px; color: oklch(0.5 0.008 60);">{{ row.label }}</span>
+            <span style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 14px; color: oklch(0.2 0.008 60); font-weight: 600; text-align: right;">{{ row.value }}</span>
+              <span style="font-size: 11px; color: oklch(0.55 0.008 60); text-decoration: underline;">Wijzig</span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {},
+  &quot;accentColor&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#a67c52&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#a67c52&quot;, &quot;#3f4a3d&quot;, &quot;#5c3a3a&quot;], &quot;section&quot;: &quot;Merk&quot;}
+}">
+function navAnimStyles(navOpen) {
+  const panel = `position: fixed; top: 73px; left: 0; right: 0; bottom: 0; background: oklch(0.14 0.006 60 / 0.97); backdrop-filter: blur(16px); display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 40px 32px; z-index: 55; visibility: ${navOpen ? 'visible' : 'hidden'}; opacity: ${navOpen ? 1 : 0}; transition: opacity 0.3s ease, visibility 0.3s ease;`;
+  const link = `opacity: ${navOpen ? 1 : 0}; transform: translateY(${navOpen ? 0 : -10}px); transition: opacity 0.3s cubic-bezier(.22,1,.36,1), transform 0.3s cubic-bezier(.22,1,.36,1);`;
+  const line1 = `transform-box: fill-box; transform-origin: center; transition: transform 0.3s ease; transform: ${navOpen ? 'translateY(6px) rotate(45deg)' : 'translateY(0) rotate(0)'};`;
+  const line2 = `transition: opacity 0.2s ease; opacity: ${navOpen ? 0 : 1};`;
+  const line3 = `transform-box: fill-box; transform-origin: center; transition: transform 0.3s ease; transform: ${navOpen ? 'translateY(-6px) rotate(-45deg)' : 'translateY(0) rotate(0)'};`;
+  return { navPanelStyle: panel, navLinkAnim: link, navIconLine1Style: line1, navIconLine2Style: line2, navIconLine3Style: line3 };
+}
+
+const PRODUCTS = [
+  { id: 'enkele', label: 'Enkele deur', desc: 'Eén vast kader, één beweegbaar vlak.', img: 'assets/pivot-door-slats.jpg', leaves: 1, hasMech: true, hasGreep: true, sideMode: 'optional' },
+  { id: 'enkele-paneel', label: 'Enkele deur met vast paneel', desc: 'Eén deur, verlengd met vast glas.', img: 'assets/hero-open-door.jpg', leaves: 1, hasMech: true, hasGreep: true, sideMode: 'required' },
+  { id: 'dubbele', label: 'Dubbele deur', desc: 'Twee vlakken, één brede opening.', img: 'assets/double-doors-black.jpg', leaves: 2, hasMech: true, hasGreep: true, sideMode: 'optional' },
+  { id: 'dubbele-paneel', label: 'Dubbele deur met vast paneel', desc: 'Twee vlakken, aangevuld met vast glas.', img: 'assets/arched-bronze-door.jpg', leaves: 2, hasMech: true, hasGreep: true, sideMode: 'required' },
+  { id: 'paneel', label: 'Vast paneel', desc: 'Een vlak dat niet beweegt, en dat ook niet hoeft.', img: 'assets/sliding-wall-herringbone.jpg', leaves: 0, hasMech: false, hasGreep: false, sideMode: 'count' },
+  { id: 'wand', label: 'Complete scheidingswand', desc: 'Ruimtes scheiden zonder ze te sluiten.', img: 'assets/detail-green.jpg', leaves: 1, hasMech: true, hasGreep: true, sideMode: 'count-fixed' },
+];
+
+const MECHANISMEN = [
+  { id: 'taats', label: 'Taatsdeur', desc: 'Draait om een verzonken as, los van het kozijn.' },
+  { id: 'scharnier', label: 'Scharnierdeur', desc: 'Klassieke bediening op verzonken scharnieren.' },
+  { id: 'schuif', label: 'Schuifdeur', desc: 'Loopt geluidloos langs een verzonken rail.' },
+];
+
+const SIDE_OPTIONAL = [
+  { id: 'geen', label: 'Geen zijpaneel', desc: 'Standaard — de deur vult de volledige opening.', left: 0, right: 0 },
+  { id: 'links', label: 'Paneel links', desc: 'Eén vast paneel links van de deur.', left: 1, right: 0 },
+  { id: 'rechts', label: 'Paneel rechts', desc: 'Eén vast paneel rechts van de deur.', left: 0, right: 1 },
+  { id: 'beide', label: 'Panelen beide zijden', desc: 'Vaste panelen links én rechts.', left: 1, right: 1 },
+];
+const SIDE_REQUIRED = [
+  { id: 'links', label: 'Paneel links', desc: 'Het vaste paneel komt links van de deur.', left: 1, right: 0 },
+  { id: 'rechts', label: 'Paneel rechts', desc: 'Het vaste paneel komt rechts van de deur.', left: 0, right: 1 },
+  { id: 'beide', label: 'Panelen beide zijden', desc: 'Vaste panelen links én rechts.', left: 1, right: 1 },
+];
+const SIDE_COUNT = [
+  { id: 'een', label: 'Enkel paneel', desc: 'Eén vast paneel.', left: 0, right: 0, panels: 1 },
+  { id: 'twee', label: 'Twee panelen', desc: 'Twee panelen aaneengesloten.', left: 0, right: 0, panels: 2 },
+  { id: 'drie', label: 'Drie of meer panelen', desc: 'Drie panelen aaneengesloten.', left: 0, right: 0, panels: 3 },
+];
+const SIDE_COUNT_FIXED = [
+  { id: 'geen', label: 'Geen vast paneel', desc: 'Alleen het bewegende deel.', left: 0, right: 0 },
+  { id: 'een', label: 'Eén vast paneel', desc: 'Eén vast paneel naast de doorgang.', left: 0, right: 1 },
+  { id: 'twee', label: 'Twee vaste panelen', desc: 'Vaste panelen aan beide zijden.', left: 1, right: 1 },
+];
+
+const VLAK_PRESETS = [
+  { id: 'geen', label: 'Zonder onderverdeling', liggers: 0, staanders: 0 },
+  { id: 'een-ligger', label: 'Eén ligger', liggers: 1, staanders: 0 },
+  { id: 'twee-liggers', label: 'Twee liggers', liggers: 2, staanders: 0 },
+  { id: 'raster', label: 'Liggers en staanders', liggers: 1, staanders: 2 },
+];
+
+const KLEUREN = [
+  { id: 'zwart', label: 'Zwart (RAL 9005)', desc: 'Standaard, mat afgewerkt.', hex: '#1c1c1c' },
+  { id: 'brons', label: 'Brons', desc: 'Warme metallic designkleur.', hex: '#6b5340' },
+  { id: 'bosgroen', label: 'Bosgroen', desc: 'Diepe groene designkleur.', hex: '#2f3d33' },
+  { id: 'bordeaux', label: 'Bordeaux', desc: 'Donkerrode designkleur.', hex: '#4a2328' },
+];
+
+const GLAS = [
+  { id: 'helder', label: 'Helder', desc: 'Volledig doorzicht.', fill: '#dfe7e6', opacity: 0.55, pattern: 'none' },
+  { id: 'getint', label: 'Getint (brons / grijs)', desc: 'Vermindert doorzicht en weerkaatsing.', fill: '#9a8974', opacity: 0.6, pattern: 'none' },
+  { id: 'vormglas', label: 'Vormglas (canal / kathedraal)', desc: 'Gestructureerd glas, privacy met licht.', fill: '#d3ddda', opacity: 0.7, pattern: 'reeded' },
+];
+
+const GREPEN = [
+  { id: 'hoek', label: 'Hoekgreep', desc: 'Standaard — verzonken in de hoek van het profiel.' },
+  { id: 'u', label: 'U-greep', desc: 'Ronde opgelegde greep, goed grijpbaar.' },
+  { id: 'stang', label: 'Lange stang', desc: 'Verticale stang over bijna de volledige hoogte.' },
+];
+
+const STEP_ORDER = ['product', 'mechanisme', 'zij', 'vlak', 'maat', 'opties', 'overzicht'];
+
+function nextStepId(fromId, product) {
+  let i = STEP_ORDER.indexOf(fromId) + 1;
+  while (i < STEP_ORDER.length) {
+    const id = STEP_ORDER[i];
+    if (id === 'mechanisme' && !product.hasMech) { i++; continue; }
+    return id;
+  }
+  return 'overzicht';
+}
+
+function sideOptionsFor(product) {
+  if (product.sideMode === 'required') return SIDE_REQUIRED;
+  if (product.sideMode === 'count') return SIDE_COUNT;
+  if (product.sideMode === 'count-fixed') return SIDE_COUNT_FIXED;
+  return SIDE_OPTIONAL;
+}
+
+function sideStepCopy(product) {
+  if (product.sideMode === 'count') return { title: 'Hoeveel panelen sluit u aaneen?', intro: 'Een vast paneel kan alleen staan, of aaneengesloten worden met extra panelen tot de gewenste breedte.' };
+  if (product.sideMode === 'count-fixed') return { title: 'Hoeveel vaste panelen naast de doorgang?', intro: 'Naast het bewegende deel bepaalt u hoeveel vaste panelen de rest van de breedte invullen.' };
+  if (product.sideMode === 'required') return { title: 'Aan welke kant komt het vaste paneel?', intro: 'Dit model combineert de deur altijd met een vast paneel. Kies aan welke zijde het paneel komt.' };
+  return { title: 'Wilt u een vast paneel naast de deur?', intro: 'Past de deur niet precies in de opening, dan vullen we het verschil met een vast paneel.' };
+}
+
+const MECH_DIAGRAMS = {
+  taats: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
+    <rect width="200" height="110" fill="#f4f2ef"/>
+    <rect x="4" y="48" width="56" height="16" fill="#b9b4ad"/>
+    <rect x="140" y="48" width="56" height="16" fill="#b9b4ad"/>
+    <line x1="92" y1="12" x2="92" y2="100" stroke="#c9483a" stroke-width="1" stroke-dasharray="4 3"/>
+    <line x1="60" y1="56" x2="140" y2="56" stroke="#ddd8d0" stroke-width="7" stroke-linecap="round"/>
+    <line x1="63" y1="87" x2="92" y2="56" stroke="#ddd8d0" stroke-width="7" stroke-linecap="round"/>
+    <line x1="92" y1="56" x2="130" y2="18" stroke="#2f4a63" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="92" cy="56" r="5" fill="#c9483a"/>
+    <circle cx="128" cy="20" r="4" fill="#2b2b2b"/>
+    <path d="M148 28 A 56 56 0 0 1 148 84" stroke="#c9483a" stroke-width="2" fill="none"/>
+    <path d="M144 32 l6 -7 l3 9 z" fill="#c9483a"/>
+    <path d="M144 80 l9 -2 l-3 9 z" fill="#c9483a"/>
+  </svg>`,
+  scharnier: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
+    <rect width="200" height="110" fill="#f4f2ef"/>
+    <rect x="4" y="48" width="58" height="16" fill="#b9b4ad"/>
+    <rect x="148" y="48" width="48" height="16" fill="#b9b4ad"/>
+    <line x1="62" y1="56" x2="148" y2="56" stroke="#ddd8d0" stroke-width="7" stroke-linecap="round"/>
+    <line x1="62" y1="56" x2="136" y2="14" stroke="#2f4a63" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="62" cy="56" r="5" fill="#c9483a"/>
+    <circle cx="134" cy="16" r="4" fill="#2b2b2b"/>
+    <path d="M152 34 A 88 88 0 0 0 150 56" stroke="#c9483a" stroke-width="2" fill="none"/>
+    <path d="M148 38 l7 -6 l2 9 z" fill="#c9483a"/>
+  </svg>`,
+  schuif: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
+    <rect width="200" height="110" fill="#f4f2ef"/>
+    <rect x="4" y="48" width="48" height="16" fill="#b9b4ad"/>
+    <rect x="148" y="48" width="48" height="16" fill="#b9b4ad"/>
+    <line x1="6" y1="38" x2="194" y2="38" stroke="#9c968e" stroke-width="2"/>
+    <rect x="60" y="51" width="80" height="10" rx="2" fill="#2f4a63"/>
+    <rect x="66" y="44" width="5" height="24" rx="2.5" fill="#2b2b2b"/>
+    <line x1="52" y1="78" x2="22" y2="78" stroke="#c9483a" stroke-width="2"/>
+    <path d="M20 78 l9 -4 v8 z" fill="#c9483a"/>
+    <line x1="148" y1="78" x2="178" y2="78" stroke="#c9483a" stroke-width="2"/>
+    <path d="M180 78 l-9 -4 v8 z" fill="#c9483a"/>
+  </svg>`,
+};
+
+const DIR_DIAGRAMS = {
+  'draai-links': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
+    <rect width="200" height="110" fill="#f4f2ef"/>
+    <rect x="4" y="48" width="58" height="16" fill="#b9b4ad"/>
+    <rect x="148" y="48" width="48" height="16" fill="#b9b4ad"/>
+    <line x1="62" y1="56" x2="148" y2="56" stroke="#ddd8d0" stroke-width="7" stroke-linecap="round"/>
+    <line x1="62" y1="56" x2="136" y2="14" stroke="#2f4a63" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="62" cy="56" r="5" fill="#c9483a"/>
+    <circle cx="134" cy="16" r="4" fill="#2b2b2b"/>
+    <path d="M152 34 A 88 88 0 0 0 150 56" stroke="#c9483a" stroke-width="2" fill="none"/>
+    <path d="M148 38 l7 -6 l2 9 z" fill="#c9483a"/>
+  </svg>`,
+  'draai-rechts': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
+    <rect width="200" height="110" fill="#f4f2ef"/>
+    <rect x="4" y="48" width="48" height="16" fill="#b9b4ad"/>
+    <rect x="138" y="48" width="58" height="16" fill="#b9b4ad"/>
+    <line x1="52" y1="56" x2="138" y2="56" stroke="#ddd8d0" stroke-width="7" stroke-linecap="round"/>
+    <line x1="138" y1="56" x2="64" y2="14" stroke="#2f4a63" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="138" cy="56" r="5" fill="#c9483a"/>
+    <circle cx="66" cy="16" r="4" fill="#2b2b2b"/>
+    <path d="M48 34 A 88 88 0 0 1 50 56" stroke="#c9483a" stroke-width="2" fill="none"/>
+    <path d="M52 38 l-7 -6 l-2 9 z" fill="#c9483a"/>
+  </svg>`,
+  'schuif-links': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
+    <rect width="200" height="110" fill="#f4f2ef"/>
+    <rect x="4" y="48" width="48" height="16" fill="#b9b4ad"/>
+    <rect x="148" y="48" width="48" height="16" fill="#b9b4ad"/>
+    <line x1="6" y1="38" x2="194" y2="38" stroke="#9c968e" stroke-width="2"/>
+    <rect x="60" y="51" width="80" height="10" rx="2" fill="#2f4a63"/>
+    <rect x="66" y="44" width="5" height="24" rx="2.5" fill="#2b2b2b"/>
+    <line x1="52" y1="78" x2="22" y2="78" stroke="#c9483a" stroke-width="2.5"/>
+    <path d="M20 78 l10 -5 v10 z" fill="#c9483a"/>
+  </svg>`,
+  'schuif-rechts': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
+    <rect width="200" height="110" fill="#f4f2ef"/>
+    <rect x="4" y="48" width="48" height="16" fill="#b9b4ad"/>
+    <rect x="148" y="48" width="48" height="16" fill="#b9b4ad"/>
+    <line x1="6" y1="38" x2="194" y2="38" stroke="#9c968e" stroke-width="2"/>
+    <rect x="60" y="51" width="80" height="10" rx="2" fill="#2f4a63"/>
+    <rect x="129" y="44" width="5" height="24" rx="2.5" fill="#2b2b2b"/>
+    <line x1="148" y1="78" x2="178" y2="78" stroke="#c9483a" stroke-width="2.5"/>
+    <path d="M180 78 l-10 -5 v10 z" fill="#c9483a"/>
+  </svg>`,
+};
+
+function svgToBg(svg, size) {
+  const uri = `url("data:image/svg+xml,${encodeURIComponent(svg.replace(/\s+/g, ' '))}")`;
+  return `height: ${size || 96}px; border-radius: 9px; background-image: ${uri}; background-size: cover; background-position: center; background-repeat: no-repeat;`;
+}
+function mechThumb(id) { return svgToBg(MECH_DIAGRAMS[id] || MECH_DIAGRAMS.taats); }
+function dirThumb(key) { return svgToBg(DIR_DIAGRAMS[key] || DIR_DIAGRAMS['draai-links']); }
+
+function zijThumb(opt, product) {
+  const bays = [];
+  if (product.sideMode === 'count') {
+    for (let i = 0; i < (opt.panels || 1); i++) bays.push({ type: 'panel', w: 1 });
+  } else {
+    for (let i = 0; i < (opt.left || 0); i++) bays.push({ type: 'panel', w: 0.62 });
+    for (let i = 0; i < product.leaves; i++) bays.push({ type: 'door', w: 1 });
+    for (let i = 0; i < (opt.right || 0); i++) bays.push({ type: 'panel', w: 0.62 });
+  }
+  if (!bays.length) bays.push({ type: 'panel', w: 1 });
+
+  const VB_W = 170, VB_H = 200, pad = 12, gap = 3;
+  const totalW = bays.reduce((a, b) => a + b.w, 0);
+  const avail = VB_W - pad * 2 - gap * (bays.length - 1);
+  const H = VB_H - pad * 2;
+
+  let x = pad;
+  let parts = `<rect width="${VB_W}" height="${VB_H}" fill="#f4f2ef"/>`;
+  bays.forEach(b => {
+    const w = avail * (b.w / totalW);
+    const isDoor = b.type === 'door';
+    parts += `<rect x="${x}" y="${pad}" width="${w}" height="${H}" fill="${isDoor ? '#ffffff' : '#e3e9e8'}" stroke="#2f4a63" stroke-width="${isDoor ? 4 : 3}"/>`;
+    if (isDoor) {
+      parts += `<circle cx="${x + w - 9}" cy="${pad + H / 2}" r="2.6" fill="#2f4a63"/>`;
+    } else {
+      parts += `<text x="${x + w / 2}" y="${pad + H - 9}" text-anchor="middle" font-size="8" fill="#2f4a63" fill-opacity="0.55" font-family="monospace">VAST</text>`;
+    }
+    x += w + gap;
+  });
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VB_W} ${VB_H}">${parts}</svg>`;
+  const uri = `url("data:image/svg+xml,${encodeURIComponent(svg.replace(/\s+/g, ' '))}")`;
+  return `height: 150px; border-radius: 9px; background-color: #f4f2ef; background-image: ${uri}; background-size: contain; background-position: center; background-repeat: no-repeat;`;
+}
+
+class Component extends DCLogic {
+  state = {
+    navOpen: false,
+    openSection: 'product',
+    productId: 'enkele',
+    mechanisme: 'taats',
+    zij: null,
+    richting: 'links',
+    liggers: 0,
+    staanders: 0,
+    panelStaanders: 0,
+    bayWidths: {},
+    hoogte: 2300,
+    kleur: 'zwart',
+    glas: 'helder',
+    greep: 'hoek',
+    groupOpen: {},
+    answered: {},
+    summaryOpen: false,
+    liveSummaryOpen: false,
+  };
+
+  get product() { return PRODUCTS.find(p => p.id === this.state.productId) || PRODUCTS[0]; }
+
+  get zijChoice() {
+    const opts = sideOptionsFor(this.product);
+    return opts.find(o => o.id === this.state.zij) || opts[0];
+  }
+
+  scrollToSection(id) {
+    requestAnimationFrame(() => {
+      const el = typeof document !== 'undefined' ? document.getElementById('cfg-section-' + id) : null;
+      if (!el || typeof window === 'undefined') return;
+      const rect = el.getBoundingClientRect();
+      const target = window.scrollY + rect.top - 110;
+      window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+    });
+  }
+
+  openAndScroll(id) {
+    this.setState({ openSection: id });
+    this.scrollToSection(id);
+  }
+
+  advanceFrom(fromId) {
+    const next = nextStepId(fromId, this.product);
+    this.setState({ openSection: next });
+    this.scrollToSection(next);
+  }
+
+  toggleSection(id) {
+    this.setState(s => ({ openSection: s.openSection === id ? null : id }));
+  }
+
+  mark(key, value) {
+    this.setState(s => ({ [key]: value, answered: { ...s.answered, [key]: true } }));
+  }
+
+  isConfirmed(stepId) {
+    const p = this.product;
+    const a = this.state.answered;
+    if (stepId === 'product') return !!a.product;
+    if (stepId === 'mechanisme') return !p.hasMech || (!!a.mechanisme && !!a.richting);
+    if (stepId === 'zij') return !!a.zij;
+    if (stepId === 'vlak') return !!a.vlak;
+    if (stepId === 'maat') return !!a.maat;
+    if (stepId === 'opties') return !!a.kleur && !!a.glas && (!p.hasGreep || !!a.greep);
+    return false;
+  }
+
+  firstUnconfirmed() {
+    for (const id of STEP_ORDER) {
+      if (id === 'overzicht') continue;
+      if (id === 'mechanisme' && !this.product.hasMech) continue;
+      if (!this.isConfirmed(id)) return id;
+    }
+    return 'overzicht';
+  }
+
+  bays() {
+    const p = this.product;
+    const z = this.zijChoice;
+    const out = [];
+    if (p.sideMode === 'count') {
+      for (let i = 0; i < (z.panels || 1); i++) out.push({ type: 'panel', key: 'c' + i, label: (z.panels || 1) > 1 ? `Paneel ${i + 1}` : 'Paneel', defaultWidth: 800 });
+      return out;
+    }
+    for (let i = 0; i < (z.left || 0); i++) out.push({ type: 'panel', key: 'left', label: 'Paneel links', defaultWidth: 700 });
+    for (let i = 0; i < p.leaves; i++) out.push({ type: 'door', key: 'door' + i, label: p.leaves === 2 ? `Deur ${i + 1}` : 'Deur', defaultWidth: p.leaves === 2 ? 900 : 1000 });
+    for (let i = 0; i < (z.right || 0); i++) out.push({ type: 'panel', key: 'right', label: 'Paneel rechts', defaultWidth: 700 });
+    return out;
+  }
+
+  bayWidth(bay) { return this.state.bayWidths[bay.key] ?? bay.defaultWidth; }
+  totalWidth() { return this.bays().reduce((sum, b) => sum + this.bayWidth(b), 0) || 1000; }
+
+  buildPreview() {
+    const kleur = KLEUREN.find(k => k.id === this.state.kleur) || KLEUREN[0];
+    const glas = GLAS.find(g => g.id === this.state.glas) || GLAS[0];
+    const bays = this.bays();
+
+    const totalMm = this.totalWidth();
+    const ratio = Math.max(0.28, Math.min(1.6, totalMm / this.state.hoogte));
+    const H = 300;
+    const minW = Math.min(400, 54 * bays.length + 14);
+    const W = Math.max(minW, Math.min(400, H * ratio));
+    const x0 = (440 - W) / 2 + 26;
+    const y0 = 36;
+    const frame = 7;
+    const mullion = 4.5;
+
+    const e = [];
+    const key = (n) => 'k' + n;
+    let ki = 0;
+
+    e.push(React.createElement('rect', { key: key(ki++), x: x0, y: y0, width: W, height: H, fill: 'none', stroke: kleur.hex, strokeWidth: frame, rx: 2 }));
+
+    let cx = x0 + frame / 2;
+    bays.forEach((bay, i) => {
+      const bw = (W - frame) * (this.bayWidth(bay) / totalMm);
+      const gx = cx + mullion / 2;
+      const gy = y0 + frame / 2 + mullion / 2;
+      const gw = Math.max(6, bw - mullion);
+      const gh = H - frame - mullion;
+
+      e.push(React.createElement('rect', {
+        key: key(ki++), x: gx, y: gy, width: gw, height: gh,
+        fill: glas.fill, fillOpacity: glas.opacity, stroke: kleur.hex, strokeWidth: mullion,
+      }));
+
+      if (glas.pattern === 'reeded') {
+        for (let sx = gx + 6; sx < gx + gw - 2; sx += 7) {
+          e.push(React.createElement('line', { key: key(ki++), x1: sx, y1: gy + 2, x2: sx, y2: gy + gh - 2, stroke: '#ffffff', strokeOpacity: 0.5, strokeWidth: 1.5 }));
+        }
+      }
+
+      for (let l = 1; l <= this.state.liggers; l++) {
+        const ly = gy + (gh * l) / (this.state.liggers + 1);
+        e.push(React.createElement('line', { key: key(ki++), x1: gx, y1: ly, x2: gx + gw, y2: ly, stroke: kleur.hex, strokeWidth: mullion }));
+      }
+      const staanderCount = bay.type === 'panel' ? this.state.panelStaanders : this.state.staanders;
+      for (let s = 1; s <= staanderCount; s++) {
+        const sx = gx + (gw * s) / (staanderCount + 1);
+        e.push(React.createElement('line', { key: key(ki++), x1: sx, y1: gy, x2: sx, y2: gy + gh, stroke: kleur.hex, strokeWidth: mullion }));
+      }
+
+      if (bay.type === 'panel') {
+        e.push(React.createElement('text', { key: key(ki++), x: gx + gw / 2, y: gy + gh - 10, textAnchor: 'middle', fontSize: 9, fill: kleur.hex, fillOpacity: 0.55, fontFamily: 'monospace' }, 'VAST'));
+      }
+
+      if (bay.type === 'door' && this.product.hasGreep) {
+        const doorCount = bays.filter(b => b.type === 'door').length;
+        const doorIdx = bays.slice(0, i).filter(b => b.type === 'door').length;
+        const handleRight = doorCount > 1 ? doorIdx === 0 : this.state.richting === 'links';
+        const hx = handleRight ? gx + gw - 12 : gx + 12;
+        if (this.state.greep === 'stang') {
+          e.push(React.createElement('rect', { key: key(ki++), x: hx - 2.5, y: gy + gh * 0.16, width: 5, height: gh * 0.68, rx: 2.5, fill: kleur.hex }));
+        } else if (this.state.greep === 'u') {
+          e.push(React.createElement('rect', { key: key(ki++), x: hx - 3, y: gy + gh / 2 - 26, width: 6, height: 52, rx: 3, fill: kleur.hex }));
+          e.push(React.createElement('circle', { key: key(ki++), cx: hx, cy: gy + gh / 2 - 26, r: 3.4, fill: kleur.hex }));
+          e.push(React.createElement('circle', { key: key(ki++), cx: hx, cy: gy + gh / 2 + 26, r: 3.4, fill: kleur.hex }));
+        } else {
+          e.push(React.createElement('rect', { key: key(ki++), x: hx - 2, y: gy + gh / 2 - 15, width: 4, height: 30, rx: 2, fill: kleur.hex }));
+        }
+      }
+
+      if (bay.type === 'door' && this.product.hasMech) {
+        const flip = this.state.richting === 'rechts';
+        const hingeX = flip ? gx + gw - 11 : gx + 11;
+        const arrowDir = flip ? -1 : 1;
+        if (this.state.mechanisme === 'taats') {
+          e.push(React.createElement('circle', { key: key(ki++), cx: hingeX, cy: y0 + H - frame / 2 - 3, r: 3, fill: kleur.hex, fillOpacity: 0.75 }));
+          e.push(React.createElement('circle', { key: key(ki++), cx: hingeX, cy: y0 + frame / 2 + 3, r: 3, fill: kleur.hex, fillOpacity: 0.75 }));
+        } else if (this.state.mechanisme === 'schuif') {
+          e.push(React.createElement('line', { key: key(ki++), x1: x0, y1: y0 - 4, x2: x0 + W, y2: y0 - 4, stroke: kleur.hex, strokeWidth: 3, strokeOpacity: 0.6 }));
+          const ax = gx + gw / 2, ay = gy + gh / 2;
+          e.push(React.createElement('path', {
+            key: key(ki++),
+            d: arrowDir === 1 ? `M ${ax - 14} ${ay} h 28 m -6 -5 l 6 5 l -6 5` : `M ${ax + 14} ${ay} h -28 m 6 -5 l -6 5 l 6 5`,
+            stroke: kleur.hex, strokeOpacity: 0.5, strokeWidth: 2, fill: 'none',
+          }));
+        } else {
+          e.push(React.createElement('path', { key: key(ki++), d: `M ${hingeX - 3} ${gy + 10} v 14 M ${hingeX - 3} ${gy + gh - 24} v 14`, stroke: kleur.hex, strokeWidth: 3.5, strokeOpacity: 0.75 }));
+        }
+      }
+
+      cx += bw;
+    });
+
+    const dimColor = '#555';
+    const badge = (cx2, cy2, text2, rw) => {
+      e.push(React.createElement('rect', { key: key(ki++), x: cx2 - rw / 2, y: cy2 - 9, width: rw, height: 18, rx: 3, fill: '#2b2b2b' }));
+      e.push(React.createElement('text', { key: key(ki++), x: cx2, y: cy2 + 4, textAnchor: 'middle', fontSize: 10, fill: '#fff', fontFamily: 'monospace' }, text2));
+    };
+    const dimY = y0 - 16;
+    e.push(React.createElement('line', { key: key(ki++), x1: x0, y1: dimY, x2: x0 + W, y2: dimY, stroke: dimColor, strokeWidth: 1 }));
+    e.push(React.createElement('line', { key: key(ki++), x1: x0, y1: dimY - 4, x2: x0, y2: dimY + 4, stroke: dimColor, strokeWidth: 1 }));
+    e.push(React.createElement('line', { key: key(ki++), x1: x0 + W, y1: dimY - 4, x2: x0 + W, y2: dimY + 4, stroke: dimColor, strokeWidth: 1 }));
+    badge(x0 + W / 2, dimY, `${totalMm}`, 38);
+
+    const dimX = x0 + W + 30;
+    e.push(React.createElement('line', { key: key(ki++), x1: dimX, y1: y0, x2: dimX, y2: y0 + H, stroke: dimColor, strokeWidth: 1 }));
+    e.push(React.createElement('line', { key: key(ki++), x1: dimX - 4, y1: y0, x2: dimX + 4, y2: y0, stroke: dimColor, strokeWidth: 1 }));
+    e.push(React.createElement('line', { key: key(ki++), x1: dimX - 4, y1: y0 + H, x2: dimX + 4, y2: y0 + H, stroke: dimColor, strokeWidth: 1 }));
+    badge(dimX, y0 + H / 2, `${this.state.hoogte}`, 40);
+
+    if (this.state.liggers > 0) {
+      const gh0 = H - frame - mullion;
+      const gy0 = y0 + frame / 2 + mullion / 2;
+      for (let l = 1; l <= this.state.liggers; l++) {
+        const ly = gy0 + (gh0 * l) / (this.state.liggers + 1);
+        const posMm = Math.round(this.state.hoogte * (1 - l / (this.state.liggers + 1)));
+        badge(x0 - 30, ly, `${posMm}`, 40);
+        e.push(React.createElement('line', { key: key(ki++), x1: x0 - 8, y1: ly, x2: x0, y2: ly, stroke: dimColor, strokeWidth: 1 }));
+      }
+    }
+
+    return React.createElement('svg', { viewBox: '0 0 520 420', width: '100%', style: { maxHeight: 380, display: 'block' } }, e);
+  }
+
+  buildGroups(groupKey, defs, accent, cardStyle, tickStyle) {
+    const openIdx = this.state.groupOpen[groupKey] ?? 0;
+    return defs.map((d, gi) => {
+      const answered = !!this.state.answered[d.key];
+      const expanded = openIdx === gi;
+      return {
+        title: d.title,
+        currentLabel: answered ? d.current.label : '',
+        expanded,
+        wrapStyle: `margin-bottom: 14px; border: 1px solid ${expanded ? 'oklch(0.85 0.006 75)' : 'oklch(0.9 0.006 75)'}; border-radius: 14px; padding: 16px 18px; background: ${answered && !expanded ? 'oklch(0.98 0.003 75)' : 'oklch(1 0 0)'}; transition: background 0.2s ease;`,
+        headerMargin: expanded ? '16px' : '0px',
+        checkStyle: `width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; background: ${answered ? accent : 'oklch(0.9 0.006 75)'}; color: ${answered ? 'oklch(0.14 0.006 60)' : 'oklch(0.55 0.008 60)'};`,
+        checkContent: answered ? '✓' : '',
+        chevronStyle: `font-size: 14px; color: oklch(0.5 0.008 60); transform: rotate(${expanded ? 180 : 0}deg); transition: transform 0.2s ease;`,
+        onToggle: () => this.setState(s => ({ groupOpen: { ...s.groupOpen, [groupKey]: expanded ? -1 : gi } })),
+        options: d.list.map(o => ({
+          label: o.label, desc: o.desc,
+          cardStyle: cardStyle(o.id === this.state[d.key]), tickStyle: tickStyle(o.id === this.state[d.key]),
+          thumbStyle: d.thumb(o),
+          onClick: () => {
+            this.setState(s => ({ [d.key]: o.id, answered: { ...s.answered, [d.key]: true } }));
+            const nextIdx = gi + 1;
+            if (nextIdx < defs.length) {
+              this.setState(s => ({ groupOpen: { ...s.groupOpen, [groupKey]: nextIdx } }));
+            } else {
+              this.setState(s => ({ groupOpen: { ...s.groupOpen, [groupKey]: -1 } }));
+              this.advanceFrom(groupKey);
+            }
+          },
+        })),
+      };
+    });
+  }
+
+  renderVals() {
+    const p = this.product;
+    const kleur = KLEUREN.find(k => k.id === this.state.kleur) || KLEUREN[0];
+    const glas = GLAS.find(g => g.id === this.state.glas) || GLAS[0];
+    const mech = MECHANISMEN.find(m => m.id === this.state.mechanisme) || MECHANISMEN[0];
+    const greep = GREPEN.find(g => g.id === this.state.greep) || GREPEN[0];
+    const accent = this.props.accentColor ?? '#a67c52';
+    const bays = this.bays();
+    const vlakLabel = this.state.liggers === 0 && this.state.staanders === 0
+      ? 'Zonder onderverdeling'
+      : `${this.state.liggers} ligger${this.state.liggers === 1 ? '' : 's'}, ${this.state.staanders} staander${this.state.staanders === 1 ? '' : 's'}`;
+
+    const cardStyle = (sel) => `display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 14px; cursor: pointer; font-family: inherit; text-align: left; background: ${sel ? 'oklch(1 0 0)' : 'oklch(0.985 0.002 75)'}; border: 1.5px solid ${sel ? accent : 'oklch(0.88 0.006 75)'}; box-shadow: ${sel ? '0 2px 12px oklch(0 0 0 / 0.07)' : 'none'}; transition: border-color 0.15s ease, box-shadow 0.15s ease;`;
+    const tickStyle = (sel) => `width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid ${sel ? accent : 'oklch(0.8 0.006 75)'}; background: ${sel ? accent : 'transparent'}; box-shadow: ${sel ? 'inset 0 0 0 3px oklch(1 0 0)' : 'none'};`;
+    const imgThumb = (src) => `height: 96px; border-radius: 9px; background-image: url('${src}'); background-size: cover; background-position: center;`;
+
+    const isSchuifMech = this.state.mechanisme === 'schuif';
+    const DIR_LIST = isSchuifMech
+      ? [{ id: 'links', label: 'Naar links', desc: 'De deur schuift naar links open.', dia: 'schuif-links' }, { id: 'rechts', label: 'Naar rechts', desc: 'De deur schuift naar rechts open.', dia: 'schuif-rechts' }]
+      : [{ id: 'links', label: 'Linksdraaiend', desc: 'Scharnier links, greep rechts.', dia: 'draai-links' }, { id: 'rechts', label: 'Rechtsdraaiend', desc: 'Scharnier rechts, greep links.', dia: 'draai-rechts' }];
+
+    const vlakPresetStyle = (sel) => `padding: 8px 16px; border-radius: 999px; font-family: inherit; font-size: 13px; cursor: pointer; border: 1px solid ${sel ? accent : 'oklch(0.85 0.006 75)'}; background: ${sel ? accent + '1a' : 'transparent'}; color: ${sel ? 'oklch(0.25 0.008 60)' : 'oklch(0.45 0.008 60)'};`;
+    const confirmStyle = `margin-top: 18px; padding: 12px 24px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; border: none; background: ${accent}; color: oklch(0.14 0.006 60);`;
+
+    const sideCopy = sideStepCopy(p);
+    const zijOpts = sideOptionsFor(p);
+    const curZij = this.zijChoice;
+
+    const SECTION_DEFS = [
+      { id: 'product', title: 'Uw product', intro: 'Kies het model dat bij uw opening past. U kunt dit later nog aanpassen.', summary: p.label },
+      p.hasMech ? { id: 'mechanisme', title: 'Type mechanisme', intro: 'Alle mechanismen worden verzonken gemonteerd — er is geen zichtbaar scharnier of rail.', summary: `${mech.label} · ${this.state.richting === 'links' ? (isSchuifMech ? 'naar links' : 'linksdraaiend') : (isSchuifMech ? 'naar rechts' : 'rechtsdraaiend')}` } : null,
+      { id: 'zij', title: 'Zijpanelen', intro: sideCopy.intro, summary: curZij.label },
+      { id: 'vlak', title: 'Vlakverdeling', intro: 'Het aantal liggers en staanders bepaalt hoe het glas wordt opgedeeld — van rustig en open tot fijn geraamd.', summary: vlakLabel },
+      { id: 'maat', title: 'Afmeting', intro: 'Vul de breedte per vlak en de hoogte van de opening in millimeters in.', summary: `${this.totalWidth()} × ${this.state.hoogte} mm` },
+      { id: 'opties', title: 'Kleur, glas en afwerking', intro: 'Kies de kleur coating, het glas en (indien van toepassing) de handgreep.', summary: `${kleur.label} · ${glas.label}${p.hasGreep ? ' · ' + greep.label : ''}` },
+      { id: 'overzicht', title: 'Overzicht & aanvraag', intro: 'Controleer uw keuzes. Wijzig wat u wilt, of stuur de samenstelling direct naar ons door.', summary: null },
+    ].filter(Boolean);
+
+    const a = this.state.answered;
+    const summaryRows = [
+      a.product ? { label: 'Product', value: p.label, onEdit: () => this.openAndScroll('product') } : null,
+      (p.hasMech && a.mechanisme && a.richting) ? { label: 'Mechanisme', value: `${mech.label} (${this.state.richting === 'links' ? (isSchuifMech ? 'naar links' : 'linksdraaiend') : this.state.richting === 'rechts' ? (isSchuifMech ? 'naar rechts' : 'rechtsdraaiend') : 'n.t.b.'})`, onEdit: () => this.openAndScroll('mechanisme') } : null,
+      a.zij ? { label: 'Zijpanelen', value: curZij.label, onEdit: () => this.openAndScroll('zij') } : null,
+      a.vlak ? { label: 'Vlakverdeling', value: vlakLabel, onEdit: () => this.openAndScroll('vlak') } : null,
+      a.maat ? { label: 'Afmeting', value: `${this.totalWidth()} × ${this.state.hoogte} mm`, onEdit: () => this.openAndScroll('maat') } : null,
+      a.kleur ? { label: 'Kleur coating', value: kleur.label, onEdit: () => this.openAndScroll('opties') } : null,
+      a.glas ? { label: 'Glassoort', value: glas.label, onEdit: () => this.openAndScroll('opties') } : null,
+      (p.hasGreep && a.greep) ? { label: 'Handgreep', value: greep.label, onEdit: () => this.openAndScroll('opties') } : null,
+    ].filter(Boolean);
+
+    const chips = [
+      { label: kleur.label, dotStyle: `width: 11px; height: 11px; border-radius: 50%; background: ${kleur.hex};` },
+      { label: glas.label, dotStyle: `width: 11px; height: 11px; border-radius: 3px; background: ${glas.fill};` },
+      { label: vlakLabel, dotStyle: `width: 11px; height: 11px; border-radius: 2px; border: 1.5px solid oklch(0.5 0.008 60);` },
+    ];
+    if (p.hasMech) chips.unshift({ label: mech.label, dotStyle: `width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid oklch(0.5 0.008 60);` });
+
+    const confirmedCount = SECTION_DEFS.filter(s => s.id !== 'overzicht' && this.isConfirmed(s.id)).length;
+    const totalCount = SECTION_DEFS.length - 1;
+    const nextUnanswered = this.firstUnconfirmed();
+    const allDone = nextUnanswered === 'overzicht';
+
+    const sections = SECTION_DEFS.map(def => {
+      const confirmed = def.id !== 'overzicht' && this.isConfirmed(def.id);
+      const expanded = this.state.openSection === def.id;
+      const wrapStyle = `margin-bottom: 14px; border: 1px solid ${expanded ? 'oklch(0.82 0.006 75)' : 'oklch(0.9 0.006 75)'}; border-radius: 16px; padding: 18px 20px; background: ${confirmed && !expanded ? 'oklch(0.98 0.003 75)' : 'oklch(1 0 0)'}; box-shadow: ${expanded ? '0 2px 14px oklch(0 0 0 / 0.06)' : 'none'}; transition: background 0.2s ease, box-shadow 0.2s ease;`;
+      const dotStyle = `width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; background: ${confirmed ? accent : expanded ? 'oklch(0.16 0.006 60)' : 'oklch(0.9 0.006 75)'}; color: ${confirmed ? 'oklch(0.14 0.006 60)' : expanded ? 'oklch(0.97 0.004 75)' : 'oklch(0.55 0.008 60)'};`;
+      const dotContent = confirmed ? '✓' : String(STEP_ORDER.indexOf(def.id) + 1);
+      const chevronStyle = `font-size: 15px; color: oklch(0.5 0.008 60); transform: rotate(${expanded ? 180 : 0}deg); transition: transform 0.2s ease; flex-shrink: 0;`;
+
+      const sec = {
+        id: def.id,
+        anchorId: 'cfg-section-' + def.id,
+        title: def.title,
+        intro: def.intro,
+        hasSummary: !!def.summary && confirmed,
+        summaryValue: def.summary || '',
+        expanded,
+        wrapStyle, dotStyle, dotContent, chevronStyle,
+        onToggle: () => this.toggleSection(def.id),
+        isOptionBody: false, isGroupBody: false, isVlakBody: false, isMaatBody: false, isOverzichtBody: false,
+      };
+
+      if (def.id === 'product') {
+        sec.isOptionBody = true;
+        sec.options = PRODUCTS.map(o => ({
+          label: o.label, desc: o.desc,
+          cardStyle: cardStyle(o.id === this.state.productId), tickStyle: tickStyle(o.id === this.state.productId),
+          thumbStyle: imgThumb(o.img),
+          onClick: () => {
+            this.setState(s => ({ productId: o.id, zij: null, bayWidths: {}, answered: { ...s.answered, product: true } }));
+            this.advanceFrom('product');
+          },
+        }));
+      } else if (def.id === 'mechanisme') {
+        sec.isGroupBody = true;
+        sec.groups = this.buildGroups('mechanisme', [
+          { key: 'mechanisme', title: 'Type mechanisme', list: MECHANISMEN, current: mech, thumb: (o) => mechThumb(o.id) },
+          { key: 'richting', title: isSchuifMech ? 'Schuifrichting' : 'Draairichting', list: DIR_LIST, current: DIR_LIST.find(d => d.id === this.state.richting) || DIR_LIST[0], thumb: (o) => dirThumb(o.dia) },
+        ], accent, cardStyle, tickStyle);
+      } else if (def.id === 'zij') {
+        sec.isOptionBody = true;
+        sec.options = zijOpts.map(o => ({
+          label: o.label, desc: o.desc,
+          cardStyle: cardStyle(o.id === curZij.id), tickStyle: tickStyle(o.id === curZij.id),
+          thumbStyle: zijThumb(o, p),
+          onClick: () => { this.mark('zij', o.id); this.advanceFrom('zij'); },
+        }));
+      } else if (def.id === 'vlak') {
+        sec.isVlakBody = true;
+        sec.isPanelStaandersStep = bays.some(b => b.type === 'panel');
+        sec.vlakPresets = VLAK_PRESETS.map(o => ({
+          label: o.label,
+          style: vlakPresetStyle(this.state.liggers === o.liggers && this.state.staanders === o.staanders),
+          onClick: () => this.setState({ liggers: o.liggers, staanders: o.staanders }),
+        }));
+        sec.liggers = this.state.liggers;
+        sec.staanders = this.state.staanders;
+        sec.panelStaanders = this.state.panelStaanders;
+        sec.stepperBtnStyle = `width: 28px; height: 28px; border-radius: 50%; border: 1px solid oklch(0.8 0.006 75); background: oklch(1 0 0); cursor: pointer; font-size: 15px; font-family: inherit; color: oklch(0.3 0.008 60); line-height: 1;`;
+        sec.liggersMinus = () => this.setState(s => ({ liggers: Math.max(0, s.liggers - 1) }));
+        sec.liggersPlus = () => this.setState(s => ({ liggers: Math.min(5, s.liggers + 1) }));
+        sec.staandersMinus = () => this.setState(s => ({ staanders: Math.max(0, s.staanders - 1) }));
+        sec.staandersPlus = () => this.setState(s => ({ staanders: Math.min(5, s.staanders + 1) }));
+        sec.panelStaandersMinus = () => this.setState(s => ({ panelStaanders: Math.max(0, s.panelStaanders - 1) }));
+        sec.panelStaandersPlus = () => this.setState(s => ({ panelStaanders: Math.min(5, s.panelStaanders + 1) }));
+        sec.confirmStyle = confirmStyle;
+        sec.confirmLabel = 'Bevestigen en doorgaan →';
+        sec.onConfirm = () => { this.mark('vlak', true); this.advanceFrom('vlak'); };
+      } else if (def.id === 'maat') {
+        sec.isMaatBody = true;
+        sec.bayWidthFields = bays.map(b => ({
+          label: b.label,
+          value: this.bayWidth(b),
+          onChange: (ev) => this.setState(s => ({ bayWidths: { ...s.bayWidths, [b.key]: Number(ev.target.value) || 0 } })),
+        }));
+        sec.hoogte = this.state.hoogte;
+        sec.onHoogte = (ev) => this.setState({ hoogte: Number(ev.target.value) || 0 });
+        sec.totalWidthLabel = `${this.totalWidth()} mm`;
+        sec.confirmStyle = confirmStyle;
+        sec.confirmLabel = 'Bevestigen en doorgaan →';
+        sec.onConfirm = () => { this.mark('maat', true); this.advanceFrom('maat'); };
+      } else if (def.id === 'opties') {
+        sec.isGroupBody = true;
+        const groupDefs = [
+          { key: 'kleur', title: 'Kleur coating', list: KLEUREN, current: kleur, thumb: (o) => `height: 96px; border-radius: 9px; background: ${o.hex};` },
+          { key: 'glas', title: 'Glassoort', list: GLAS, current: glas, thumb: (o) => o.pattern === 'reeded' ? `height: 96px; border-radius: 9px; background: repeating-linear-gradient(90deg, ${o.fill} 0 5px, oklch(1 0 0 / 0.6) 5px 7px);` : `height: 96px; border-radius: 9px; background: ${o.fill};` },
+        ];
+        if (p.hasGreep) groupDefs.push({ key: 'greep', title: 'Handgreep', list: GREPEN, current: greep, thumb: () => `height: 96px; border-radius: 9px; background: oklch(0.93 0.006 75);` });
+        sec.groups = this.buildGroups('opties', groupDefs, accent, cardStyle, tickStyle);
+      } else if (def.id === 'overzicht') {
+        sec.isOverzichtBody = true;
+        sec.summaryRows = summaryRows;
+      }
+
+      return sec;
+    });
+
+    return {
+      ...navAnimStyles(this.state.navOpen),
+      navOpen: this.state.navOpen,
+      toggleNav: () => this.setState(s => ({ navOpen: !s.navOpen })),
+      accentColor: accent,
+      productLabel: p.label,
+      previewSvg: this.buildPreview(),
+      previewChips: chips,
+      sections,
+      progressLabel: allDone ? 'Alle stappen ingevuld' : `${confirmedCount} van ${totalCount} stappen ingevuld`,
+      progressPercent: `${Math.round((confirmedCount / totalCount) * 100)}%`,
+      progressBarStyle: `height: 100%; border-radius: 999px; background: ${accent}; width: ${Math.max(4, (confirmedCount / totalCount) * 100)}%; transition: width 0.35s ease;`,
+      liveSummary: summaryRows.map(r => ({
+        label: r.label, value: r.value, onEdit: r.onEdit,
+        rowStyle: 'display: flex; align-items: baseline; justify-content: space-between; gap: 14px; width: 100%; padding: 7px 0; background: none; border: none; border-bottom: 1px solid oklch(0.95 0.004 75); cursor: pointer; font-family: inherit; text-align: left;',
+        valueStyle: 'font-size: 12px; color: oklch(0.25 0.008 60); font-weight: 600; text-align: right;',
+      })),
+      summaryOpen: this.state.summaryOpen,
+      toggleSummary: () => this.setState(s => ({ summaryOpen: !s.summaryOpen })),
+      liveSummaryOpen: this.state.liveSummaryOpen,
+      liveSummaryChevronDeg: this.state.liveSummaryOpen ? 180 : 0,
+      toggleLiveSummary: () => this.setState(s => ({ liveSummaryOpen: !s.liveSummaryOpen })),
+      closeSummary: () => this.setState({ summaryOpen: false }),
+      goToNextUnanswered: () => this.openAndScroll(nextUnanswered),
+      mobilePrimaryLabel: allDone ? 'Naar overzicht' : 'Volgende stap',
+      mobilePrimaryStyle: `padding: 13px 26px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 500; border: none; background: ${accent}; color: oklch(0.14 0.006 60); box-shadow: 0 2px 10px oklch(0 0 0 / 0.14); width: 100%;`,
+    };
+  }
+}
+</script>
+</body>
+</html>

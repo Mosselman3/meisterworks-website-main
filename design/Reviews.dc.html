@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #faf8f5; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; }
+  @media (min-width: 1080px) {
+    [data-nav-links] { display: flex !important; }
+    [data-nav-toggle] { display: none !important; }
+  }
+  @media (max-width: 900px) {
+    [data-wall-cols] { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  }
+</style>
+</helmet>
+
+<div style="font-family: 'Helvetica Neue', Arial, sans-serif; color: oklch(0.18 0.006 60); background: oklch(0.97 0.004 75); overflow-x: hidden;">
+
+  <!-- NAV -->
+  <div style="position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: oklch(0.16 0.006 60 / 0.88); backdrop-filter: blur(10px); border-bottom: 1px solid oklch(0.32 0.006 60);">
+    <a href="Meisterworks Homepage.dc.html" style="display: flex; align-items: center; gap: 12px;">
+      <img src="assets/logo.jpg" alt="Meisterworks" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;" />
+      <span style="color: oklch(0.96 0.004 75); font-size: 15px; letter-spacing: 0.14em; font-weight: 500;">MEISTERWORKS</span>
+    </a>
+    <div style="display: none; gap: 22px; align-items: center;" data-nav-links="true">
+      <a href="Meisterworks Homepage.dc.html#deuren" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Deuren</a>
+      <a href="Meisterworks Homepage.dc.html#projecten" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Projecten</a>
+      <a href="Inspiratie.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Inspiratie</a>
+      <a href="Reviews.dc.html" style="color: {{ accentColor }}; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Reviews</a>
+      <a href="Snelle Offerte.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Snelle offerte</a>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="Adviesgesprek Plannen.dc.html" style="padding: 9px 16px; border: 1px solid oklch(0.4 0.006 60); color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.03em; border-radius: 999px; white-space: nowrap; transition: transform 0.15s ease, background 0.15s ease;" style-hover="background: oklch(0.9 0.004 75 / 0.08);" style-active="transform: scale(0.97);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Afspraak maken</a>
+        <a href="Configurator.dc.html" style="padding: 10px 22px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 13px; letter-spacing: 0.05em; font-weight: 500; border-radius: 999px; white-space: nowrap; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Deur samenstellen</a>
+      </div>
+    </div>
+    <button onClick="{{ toggleNav }}" style="display: block; background: none; border: none; cursor: pointer; padding: 6px; color: oklch(0.96 0.004 75);" data-nav-toggle="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine1Style }} will-change: transform;"/><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine2Style }} will-change: opacity;"/><line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine3Style }} will-change: transform;"/></svg>
+    </button>
+  </div>
+  
+    <div style="{{ navPanelStyle }} will-change: opacity;">
+      <a href="Meisterworks Homepage.dc.html#deuren" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 0ms;">Deuren</a>
+      <a href="Meisterworks Homepage.dc.html#projecten" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 40ms;">Projecten</a>
+      <a href="Inspiratie.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 80ms;">Inspiratie</a>
+      <a href="Reviews.dc.html" style="{{ navLinkAnim }} color: {{ accentColor }}; font-size: 15px; transition-delay: 120ms;">Reviews</a>
+      <a href="Snelle Offerte.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px;">Snelle offerte</a>
+      <a href="Adviesgesprek Plannen.dc.html" style="padding: 12px 22px; border: 1px solid oklch(0.4 0.006 60); color: oklch(0.92 0.004 75); font-size: 14px; text-align: center; border-radius: 999px; transition: transform 0.15s ease, background 0.15s ease;" style-hover="background: oklch(0.9 0.004 75 / 0.08);" style-active="transform: scale(0.97);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Afspraak maken</a>
+      <a href="Configurator.dc.html" style="padding: 12px 22px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 14px; text-align: center; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Deur samenstellen</a>
+    </div>
+  
+
+  <!-- HEADER -->
+  <div style="max-width: 1280px; margin: 0 auto; padding: 72px 28px 40px; text-align: center;">
+    <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 16px;">Reviews</div>
+    <h1 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(30px, 4.4vw, 46px); margin: 0 0 20px; line-height: 1.15;">52 klanten, één beoordeling.</h1>
+    <div style="display: inline-flex; align-items: center; gap: 14px; padding: 14px 26px; background: oklch(1 0 0); border-radius: 999px; box-shadow: 0 1px 3px oklch(0 0 0 / 0.06);">
+      <span style="font-family: 'Newsreader', serif; font-size: 26px;">4.9</span>
+      <span style="color: {{ accentColor }}; font-size: 15px; letter-spacing: 0.1em;">★★★★★</span>
+      <span style="color: oklch(0.5 0.008 60); font-size: 13px; border-left: 1px solid oklch(0.85 0.006 75); padding-left: 14px;">52 reviews op Google</span>
+    </div>
+  </div>
+
+  <!-- PARALLAX WALL A -->
+  <div ref="{{ wallARef }}" style="position: relative; max-width: 1280px; margin: 0 auto; padding: 20px 28px 40px; height: 900px; overflow: hidden;">
+    <div data-wall-cols="true" style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 20px; height: 100%;">
+      <sc-for list="{{ wallAColumns }}" as="col" hint-placeholder-count="4">
+        <div ref="{{ col.ref }}" style="display: flex; flex-direction: column; gap: 20px; position: relative;">
+          <sc-for list="{{ col.reviews }}" as="review" hint-placeholder-count="4">
+            <div style="background: oklch(1 0 0); border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px oklch(0 0 0 / 0.05);">
+              <div style="color: {{ accentColor }}; font-size: 13px; letter-spacing: 0.1em; margin-bottom: 12px;">{{ review.stars }}</div>
+              <p style="font-family: 'Newsreader', serif; font-size: 15px; line-height: 1.55; color: oklch(0.25 0.008 60); margin: 0 0 16px;">"{{ review.quote }}"</p>
+              <div style="font-size: 13px; font-weight: 600; color: oklch(0.2 0.008 60);">{{ review.name }}</div>
+              <div style="font-size: 12px; color: oklch(0.55 0.008 60);">Google review · {{ review.time }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 60px; background: linear-gradient(180deg, oklch(0.97 0.004 75), transparent); pointer-events: none;"></div>
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(0deg, oklch(0.97 0.004 75), transparent); pointer-events: none;"></div>
+  </div>
+
+  <!-- CTA 1 -->
+  <div style="background: oklch(0.16 0.006 60); padding: 80px 28px; text-align: center;">
+    <div style="max-width: 640px; margin: 0 auto;">
+      <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(26px, 3.4vw, 36px); color: oklch(0.97 0.004 75); margin: 0 0 18px; line-height: 1.25;">Zo praten klanten over ons. Wilt u weten hoe dat bij u zou werken?</h2>
+      <p style="color: oklch(0.65 0.008 75); font-size: 15px; line-height: 1.6; margin: 0 0 32px;">Plan een vrijblijvend adviesgesprek, of stel direct uw deur samen.</p>
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="Configurator.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 15px 30px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 14px; letter-spacing: 0.03em; font-weight: 500; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Deur samenstellen<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a href="Adviesgesprek Plannen.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 15px 30px; border: 1px solid oklch(0.4 0.006 60); color: oklch(0.92 0.004 75); font-size: 14px; letter-spacing: 0.03em; font-weight: 500; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;" style-hover="background: oklch(0.5 0.006 60 / 0.1);" style-active="transform: scale(0.97); background: oklch(0.5 0.006 60 / 0.16);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Adviesgesprek plannen<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARALLAX WALL B -->
+  <div ref="{{ wallBRef }}" style="position: relative; max-width: 1280px; margin: 0 auto; padding: 60px 28px 40px; height: 900px; overflow: hidden;">
+    <div data-wall-cols="true" style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 20px; height: 100%;">
+      <sc-for list="{{ wallBColumns }}" as="col" hint-placeholder-count="4">
+        <div ref="{{ col.ref }}" style="display: flex; flex-direction: column; gap: 20px; position: relative;">
+          <sc-for list="{{ col.reviews }}" as="review" hint-placeholder-count="4">
+            <div style="background: oklch(1 0 0); border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px oklch(0 0 0 / 0.05);">
+              <div style="color: {{ accentColor }}; font-size: 13px; letter-spacing: 0.1em; margin-bottom: 12px;">{{ review.stars }}</div>
+              <p style="font-family: 'Newsreader', serif; font-size: 15px; line-height: 1.55; color: oklch(0.25 0.008 60); margin: 0 0 16px;">"{{ review.quote }}"</p>
+              <div style="font-size: 13px; font-weight: 600; color: oklch(0.2 0.008 60);">{{ review.name }}</div>
+              <div style="font-size: 12px; color: oklch(0.55 0.008 60);">Google review · {{ review.time }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 60px; background: linear-gradient(180deg, oklch(0.97 0.004 75), transparent); pointer-events: none;"></div>
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(0deg, oklch(0.97 0.004 75), transparent); pointer-events: none;"></div>
+  </div>
+
+  <!-- CTA 2 (FINAL) -->
+  <div style="background: {{ accentColor }}; padding: 90px 28px; text-align: center;">
+    <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 4vw, 44px); color: oklch(0.14 0.006 60); margin: 0 0 20px; line-height: 1.1;">Voeg uw eigen verhaal toe.</h2>
+    <p style="color: oklch(0.22 0.03 60); font-size: 16px; margin: 0 0 36px;">Bekijk eerst wat mogelijk is, of ga direct verder.</p>
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <a href="Configurator.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 16px 34px; background: oklch(0.14 0.006 60); color: oklch(0.97 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Deur samenstellen<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a href="Adviesgesprek Plannen.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 16px 34px; border: 1px solid oklch(0.14 0.006 60 / 0.5); color: oklch(0.14 0.006 60); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;" style-hover="background: oklch(0.5 0.006 60 / 0.1);" style-active="transform: scale(0.97); background: oklch(0.5 0.006 60 / 0.16);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Adviesgesprek plannen<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background: oklch(0.13 0.006 60); padding: 64px 28px 32px;">
+    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; padding-bottom: 40px; border-bottom: 1px solid oklch(0.28 0.006 60);">
+      <div>
+        <img src="assets/logo.jpg" alt="Meisterworks" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-bottom: 16px;" />
+        <div style="color: oklch(0.55 0.008 75); font-size: 13px; line-height: 1.6; max-width: 220px;">Maatwerk in metaal. Stalen en glazen deuren, volledig naar wens ontworpen en vervaardigd.</div>
+      </div>
+      <div>
+        <div style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px;">Navigatie</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="Meisterworks Homepage.dc.html#deuren" style="color: oklch(0.6 0.008 75); font-size: 14px;">Deuren</a>
+          <a href="Meisterworks Homepage.dc.html#projecten" style="color: oklch(0.6 0.008 75); font-size: 14px;">Projecten</a>
+          <a href="Inspiratie.dc.html" style="color: oklch(0.6 0.008 75); font-size: 14px;">Inspiratie</a>
+          <a href="Reviews.dc.html" style="color: oklch(0.6 0.008 75); font-size: 14px;">Reviews</a>
+          <a href="Snelle Offerte.dc.html" style="color: oklch(0.6 0.008 75); font-size: 14px;">Snelle offerte</a>
+        </div>
+      </div>
+      <div>
+        <div style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px;">Contact</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="mailto:info@meisterworks.nl" style="color: oklch(0.6 0.008 75); font-size: 14px;">info@meisterworks.nl</a>
+          <div style="color: oklch(0.6 0.008 75); font-size: 14px;">Atelier op afspraak, Nederland</div>
+        </div>
+      </div>
+    </div>
+    <div style="max-width: 1280px; margin: 24px auto 0; color: oklch(0.4 0.008 60); font-size: 12px;">© Meisterworks — Maatwerk in metaal.</div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {},
+  &quot;accentColor&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#a67c52&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#a67c52&quot;, &quot;#3f4a3d&quot;, &quot;#5c3a3a&quot;], &quot;section&quot;: &quot;Merk&quot;}
+}">
+const RAW_REVIEWS = [
+  ['Melissa Vijgen', 5, '7 months ago', 'Wij hebben een bronzen stalen deur op maat laten maken door Meisterworks en zijn echt ontzettend blij met het resultaat. Vanaf het eerste contact tot en met de montage verliep alles soepel.'],
+  ['Thorsten Lamerigts', 5, '4 months ago', 'Zeer tevreden met de stalen taatsdeuren die Rens heeft gemaakt. De kwaliteit en het vakmanschap zijn echt top en je ziet en voelt dat alles met zorg en precisie is gemaakt.'],
+  ['Kenny Faassen', 5, '4 months ago', 'Wij zijn super tevreden over MeisterWorks! Ze hebben bij ons een op maat gemaakte stalen taatsdeur geplaatst en het hele traject is echt top verlopen.'],
+  ['Julie Vossen', 5, '3 months ago', 'Heel erg tevreden over onze nieuwe deur en trapleuningen!'],
+  ['Bart Janssen', 5, '3 months ago', 'Wij zijn heel erg tevreden over zowel de kwaliteit van de deur, als ook het gehele proces vooraf. Rens komt alle afspraken keurig na, geeft zeer goed advies, en levert perfecte kwaliteit! Bedankt!'],
+  ['monique meisters', 5, '8 months ago', 'Super mooie kwaliteitsdeuren geplaatst, volledig op wens gemaakt dus deuren die niemand anders heeft! Heel netjes gewerkt, alles opgeruimd en geheel volgens afspraak.'],
+  ['Adi Taman', 5, '8 months ago', 'Rens heeft uitstekend en een mooi product afgeleverd en gemonteerd. Samen met zijn vader verzorgd te werk gegaan. Het ontwerp is overgenomen van een bestaande deur.'],
+  ['Niels Janssen', 5, '2 months ago', 'Heel blij met onze stalen taatsdeur met ribglas. Het is een echte eyecatcher en maakt de ruimte helemaal af!'],
+  ['Remco Mees', 5, '4 months ago', 'Echt heel mooi gemaakt door Rens. Helemaal naar wens ontworpen! Kwaliteit is echt heel goed, een echte aanrader!'],
+  ['Rik', 5, '5 months ago', 'Rens heeft bij ons een stalen deur, een trapleuning en kapstok gemaakt. Alles in dezelfde bronscoating. Ziet er super uit. Aanrader!'],
+  ['Bram Olij', 5, '7 months ago', 'Super tevreden met het resultaat. Rens is top in communicatie, goede prijs en een prachtig resultaat. En daarnaast ook nog een snelle levering. Zeker een aanrader!!'],
+  ['Wendy Houben', 5, '2 years ago', 'Recent stalen deuren laten plaatsen. Meisterworks levert kwaliteit en service van begin tot einde. Na inmeten snel voorzien van een prijsopgave.'],
+  ['Anouk Hamelink', 5, '8 months ago', 'Onlangs lieten wij een stalen deur maken en plaatsen door MeisterWorks. We zijn superblij met het resultaat. De communicatie verliep vlot, het plaatsen ging snel en netjes.'],
+  ['Michiel Beeren', 5, '9 months ago', 'We zijn ontzettend blij met de taatsdeur. Het ziet er prachtig uit en heel sjiek. Rens heeft ons goed geadviseerd en meegedacht over wat in onze situatie het beste werkt.'],
+  ['Linda Rademakers', 5, 'a year ago', 'Wij hebben 2 stalen deuren laten plaatsen door Meisterworks. Zeer tevreden over de manier van werken, dat is tegenwoordig niet meer vanzelfsprekend.'],
+  ['Veerle Rijvers', 5, '10 months ago', 'Wij zijn ontzettend blij met onze prachtige taatsdeuren! De samenwerking met Rens verliep heel prettig — hij dacht goed mee in het ontwerpproces.'],
+  ['Paul en Laura', 5, 'a year ago', 'Kwalitatief goede taatsdeur en balustrade voor een betaalbare prijs met een hele goede service besteld bij Meisterworks. Communicatie verliep snel en duidelijk.'],
+  ['E vD', 5, '3 months ago', 'Super netjes gewerkt! Fijne, duidelijke en snelle communicatie. Mooi product. Voldoet zeker aan de verwachtingen.'],
+  ['Lucinda Coumans', 5, '9 months ago', 'Na 2 jaar verbouwen de eerste vakman die zijn afspraken volledig nakomt, goed communiceert, alles netjes op tijd levert, en een prachtige taatsdeur heeft gemaakt. Top!'],
+  ['Kieran Kentrup', 5, 'a year ago', 'Heel blij met de door MeisterWorks geleverde op maat gemaakte taatsdeur. Past perfect en mooi afgewerkt design.'],
+  ['Desiree van Benthem', 5, '2 years ago', 'Prachtig wandrek door Rens volledig naar wens gemaakt. Erg prettige communicatie en super prijs-kwaliteit verhouding! Kan Meisterworks aan iedereen aanbevelen!'],
+  ['Lara Pijls', 5, '11 months ago', 'Goed advies en goede service, met een prachtig resultaat. Echt vakmanschap. Wij zijn heel tevreden!'],
+  ['mw janssen', 5, '2 years ago', 'Super mooie bronzen stalen deur gemaakt door Meisterworks Weert. Zeer correcte monteurs, vriendelijk en rustig werken, werkplek netjes achtergelaten. Zeer tevreden.'],
+  ['Jack Blom', 5, '2 years ago', 'Bent u op zoek naar een mooie deur, dan is ons advies: ga naar MeisterWorks! Maar hij maakt ook andere leuke dingen.'],
+  ['Len Heuts - Van der Meer', 5, '3 years ago', 'Wij zijn erg tevreden over de op maat gemaakte trapleuning. Van zeer goede kwaliteit en de montage was binnen no time verricht.'],
+  ['Gerard van Kessel', 5, 'a year ago', 'Meisterworks heeft bij ons een prachtige taatsdeur geleverd. Perfect passend en precies naar onze wens. Alles was mogelijk.'],
+  ['John van der Aa', 4, '3 years ago', 'Fijn bedrijf om mee samen te werken. Rens denkt mee en brengt goede ideeën naar voren, en werkt secuur en netjes.'],
+  ['Julian Freudenberg', 5, '2 years ago', 'Ik raad het iedereen aan om je project door Rens van MeisterWorks te laten doen! Ik heb nu 3 projecten door hen laten doen, en het resultaat mag er zijn!'],
+  ['Dave Wierts', 5, '2 years ago', 'Rens heeft voor ons een wandrek gemaakt. Wij waren op zoek naar iets wat niet in de winkel verkrijgbaar was. Rens heeft dit helemaal naar onze wensen op maat gemaakt.'],
+  ['Thanee Aldenhoven', 5, 'a year ago', 'Ontzettend blij met onze prachtige deuren van MeisterWorks! Service is ook top, afspraken worden nagekomen en communicatie is prettig.'],
+  ['Stan', 5, '2 years ago', 'Rens heeft een prachtige taatsdeur voor ons gemaakt. De communicatie liep heel soepel en we zijn super tevreden over het resultaat!'],
+  ['Chris Mommers', 5, '8 months ago', '5 sterren voor de goede communicatie en het nakomen van de afspraken. Veel mogelijkheden met betrekking tot ontwerpen en kleuren, zeker een aanrader!'],
+  ['Yvonne Lacroix', 5, '2 years ago', 'Prachtige deuren in ons nieuwe huis geplaatst. Proces verliep voorspoedig, afspraken goed nagekomen. Heel blij met dit vakwerk.'],
+  ['Ivy Williams', 5, 'a year ago', 'Top kwaliteit. Gezellige mannen die verstand van hun vak hebben. Super mooie deur. Wij zijn blij.'],
+  ['Ashley Knops', 5, '3 years ago', 'Wij hebben Rens een foto van een dressoir laten zien wat wij erg mooi vonden — deze heeft hij super nagemaakt! Alles is perfect afgewerkt.'],
+  ['Peter Schaufeli', 5, 'a year ago', 'Topservice waarin goed advies, vakmanschap en uitstekende prijs samenkomen! Rens bedankt!'],
+  ['Axel Kanters', 5, '3 years ago', 'Meisterworks heeft bij mij 3 dubbele stalen deuren gemaakt en een enkele, op de meeste plaatsen in bestaande kozijnen. Het is echt vakwerk en het resultaat is prachtig!'],
+  ['Beau Eggen', 5, '2 years ago', 'Top service, mooie afwerking en helemaal naar mijn wens. Ik koos een taatsdeur in een donkergouden kleur die niet snel gekozen wordt — ook dit kon Meisterworks realiseren.'],
+  ['Debby Deuss', 5, '3 years ago', 'Heel blij met de taatsdeuren die Rens heeft gemaakt. Erg vriendelijke jongen. Doet veel moeite om het goed te doen.'],
+  ['Vera', 5, 'a year ago', 'Prachtige deur, goede communicatie en top maatwerk!'],
+];
+
+function toStars(n) { return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n); }
+const REVIEWS = RAW_REVIEWS.map(([name, rating, time, quote]) => ({ name, time, quote, stars: toStars(rating) }));
+
+function buildColumns(list, numCols) {
+  const cols = Array.from({ length: numCols }, () => []);
+  list.forEach((r, i) => cols[i % numCols].push(r));
+  return cols;
+}
+const COLUMNS_A = buildColumns(REVIEWS.slice(0, 20), 4);
+const COLUMNS_B = buildColumns(REVIEWS.slice(20, 41), 4);
+const SPEEDS = [1, -1, 1.3, -1.3];
+
+function navAnimStyles(navOpen) {
+  const panel = `position: fixed; top: 73px; left: 0; right: 0; bottom: 0; background: oklch(0.14 0.006 60 / 0.97); backdrop-filter: blur(16px); display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 40px 32px; z-index: 55; visibility: ${navOpen ? 'visible' : 'hidden'}; opacity: ${navOpen ? 1 : 0}; transition: opacity 0.3s ease, visibility 0.3s ease;`;
+  const link = `opacity: ${navOpen ? 1 : 0}; transform: translateY(${navOpen ? 0 : -10}px); transition: opacity 0.3s cubic-bezier(.22,1,.36,1), transform 0.3s cubic-bezier(.22,1,.36,1);`;
+  const line1 = `transform-box: fill-box; transform-origin: center; transition: transform 0.3s ease; transform: ${navOpen ? 'translateY(6px) rotate(45deg)' : 'translateY(0) rotate(0)'};`;
+  const line2 = `transition: opacity 0.2s ease; opacity: ${navOpen ? 0 : 1};`;
+  const line3 = `transform-box: fill-box; transform-origin: center; transition: transform 0.3s ease; transform: ${navOpen ? 'translateY(-6px) rotate(-45deg)' : 'translateY(0) rotate(0)'};`;
+  return { navPanelStyle: panel, navLinkAnim: link, navIconLine1Style: line1, navIconLine2Style: line2, navIconLine3Style: line3 };
+}
+
+class Component extends DCLogic {
+  state = { navOpen: false };
+
+  constructor(props) {
+    super(props);
+    this.wallARef = React.createRef();
+    this.wallBRef = React.createRef();
+    this.colARefs = COLUMNS_A.map(() => React.createRef());
+    this.colBRefs = COLUMNS_B.map(() => React.createRef());
+  }
+
+  componentDidMount() {
+    const loop = () => { this.handleScroll(); this._rafId = requestAnimationFrame(loop); };
+    this._rafId = requestAnimationFrame(loop);
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this._rafId);
+  }
+
+  applyParallax(wallRef, colRefs) {
+    const el = wallRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const vh = window.innerHeight || 900;
+    const progress = Math.max(-1, Math.min(1, ((vh - rect.top) / (vh + rect.height)) * 2 - 1));
+    colRefs.forEach((ref, i) => {
+      if (ref.current) ref.current.style.transform = `translateY(${progress * -60 * SPEEDS[i % SPEEDS.length]}px)`;
+    });
+  }
+
+  handleScroll() {
+    this.applyParallax(this.wallARef, this.colARefs);
+    this.applyParallax(this.wallBRef, this.colBRefs);
+  }
+
+  renderVals() {
+    return {
+      navOpen: this.state.navOpen,
+      toggleNav: () => this.setState(s => ({ navOpen: !s.navOpen })),
+      ...navAnimStyles(this.state.navOpen),
+      accentColor: this.props.accentColor ?? '#a67c52',
+      wallARef: this.wallARef,
+      wallBRef: this.wallBRef,
+      wallAColumns: COLUMNS_A.map((reviews, i) => ({ ref: this.colARefs[i], reviews })),
+      wallBColumns: COLUMNS_B.map((reviews, i) => ({ ref: this.colBRefs[i], reviews })),
+    };
+  }
+}
+</script>
+</body>
+</html>

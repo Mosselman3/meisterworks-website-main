@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #faf8f5; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; }
+  @media (min-width: 1080px) {
+    [data-nav-links] { display: flex !important; }
+    [data-nav-toggle] { display: none !important; }
+  }
+  @media (max-width: 720px) {
+    [data-form-grid-2] { grid-template-columns: 1fr !important; }
+    [data-form-grid-3] { grid-template-columns: 1fr !important; }
+  }
+</style>
+</helmet>
+
+<div style="font-family: 'Helvetica Neue', Arial, sans-serif; color: oklch(0.18 0.006 60); background: oklch(0.97 0.004 75); min-height: 100vh;">
+
+  <!-- NAV -->
+  <div style="position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: oklch(0.16 0.006 60 / 0.88); backdrop-filter: blur(10px); border-bottom: 1px solid oklch(0.32 0.006 60);">
+    <a href="Meisterworks Homepage.dc.html" style="display: flex; align-items: center; gap: 12px;">
+      <img src="assets/logo.jpg" alt="Meisterworks" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;" />
+      <span style="color: oklch(0.96 0.004 75); font-size: 15px; letter-spacing: 0.14em; font-weight: 500;">MEISTERWORKS</span>
+    </a>
+    <div style="display: none; gap: 22px; align-items: center;" data-nav-links="true">
+      <a href="Meisterworks Homepage.dc.html#deuren" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Deuren</a>
+      <a href="Inspiratie.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Inspiratie</a>
+      <a href="Reviews.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Reviews</a>
+      <a href="Snelle Offerte.dc.html" style="color: {{ accentColor }}; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Snelle offerte</a>
+      <a href="Configurator.dc.html" style="padding: 10px 22px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 13px; letter-spacing: 0.05em; font-weight: 500; border-radius: 999px; white-space: nowrap; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);">Deur samenstellen</a>
+    </div>
+    <button onClick="{{ toggleNav }}" style="display: block; background: none; border: none; cursor: pointer; padding: 6px; color: oklch(0.96 0.004 75);" data-nav-toggle="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine1Style }}"/><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine2Style }}"/><line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine3Style }}"/></svg>
+    </button>
+  </div>
+  <sc-if value="{{ navOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ navPanelStyle }}">
+      <a href="Meisterworks Homepage.dc.html#deuren" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px;">Deuren</a>
+      <a href="Inspiratie.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 40ms;">Inspiratie</a>
+      <a href="Reviews.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 80ms;">Reviews</a>
+      <a href="Snelle Offerte.dc.html" style="{{ navLinkAnim }} color: {{ accentColor }}; font-size: 15px; transition-delay: 120ms;">Snelle offerte</a>
+      <a href="Configurator.dc.html" style="{{ navLinkAnim }} padding: 12px 22px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 14px; text-align: center; border-radius: 999px; transition-delay: 160ms;">Deur samenstellen</a>
+    </div>
+  </sc-if>
+
+  <!-- HEADER -->
+  <div style="max-width: 760px; margin: 0 auto; padding: 48px 28px 0;">
+    <div style="font-size: 13px; color: oklch(0.5 0.008 60); margin-bottom: 20px;"><a href="Meisterworks Homepage.dc.html" style="border-bottom: 1px solid oklch(0.75 0.006 75); padding-bottom: 1px;">Home</a> &nbsp;/&nbsp; Snelle offerte</div>
+    <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Snelle offerte</div>
+    <h1 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 4vw, 40px); margin: 0 0 14px; line-height: 1.15;">Vertel ons wat u nodig heeft.</h1>
+    <p style="color: oklch(0.42 0.008 60); font-size: 15px; line-height: 1.6; max-width: 520px; margin: 0 0 36px;">Liever geen configurator doorlopen? Vul dit korte formulier in en we nemen binnen één werkdag contact met u op met een vrijblijvende offerte.</p>
+  </div>
+
+  <!-- FORM -->
+  <div style="max-width: 760px; margin: 0 auto; padding: 0 28px 80px;">
+    <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+      <div style="background: oklch(1 0 0); border: 1px solid oklch(0.88 0.006 75); border-radius: 18px; padding: 48px 32px; text-align: center;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: {{ accentColor }}1a; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="{{ accentColor }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="font-family: 'Newsreader', serif; font-size: 22px; margin-bottom: 10px;">Bedankt voor uw aanvraag</div>
+        <p style="color: oklch(0.45 0.008 60); font-size: 14px; line-height: 1.6; max-width: 380px; margin: 0 auto;">We hebben uw gegevens ontvangen en nemen binnen één werkdag contact met u op.</p>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+      <form onSubmit="{{ handleSubmit }}" style="background: oklch(1 0 0); border: 1px solid oklch(0.88 0.006 75); border-radius: 18px; padding: 36px 32px; display: flex; flex-direction: column; gap: 26px;">
+
+        <div>
+          <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.4 0.008 60); margin-bottom: 16px;">Uw gegevens</div>
+          <div data-form-grid-3="true" style="display: grid; grid-template-columns: 0.7fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <label style="display: flex; flex-direction: column; gap: 7px;">
+              <span style="{{ labelStyle }}">Aanhef</span>
+              <select value="{{ aanhef }}" onChange="{{ onAanhef }}" style="{{ inputStyle }}">
+                <option value="">Kies</option>
+                <option value="mevrouw">Mevrouw</option>
+                <option value="meneer">Meneer</option>
+              </select>
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 7px;">
+              <span style="{{ labelStyle }}">Voornaam</span>
+              <input type="text" required="true" value="{{ voornaam }}" onChange="{{ onVoornaam }}" style="{{ inputStyle }}" placeholder="Voornaam" />
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 7px;">
+              <span style="{{ labelStyle }}">Achternaam</span>
+              <input type="text" required="true" value="{{ achternaam }}" onChange="{{ onAchternaam }}" style="{{ inputStyle }}" placeholder="Achternaam" />
+            </label>
+          </div>
+
+          <div data-form-grid-2="true" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <label style="display: flex; flex-direction: column; gap: 7px;">
+              <span style="{{ labelStyle }}">E-mailadres</span>
+              <input type="email" required="true" value="{{ email }}" onChange="{{ onEmail }}" style="{{ inputStyle }}" placeholder="naam@email.nl" />
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 7px;">
+              <span style="{{ labelStyle }}">Telefoonnummer</span>
+              <div style="display: flex; gap: 8px;">
+                <select value="{{ landcode }}" onChange="{{ onLandcode }}" style="{{ inputStyle }} width: 116px; padding-left: 10px; padding-right: 6px; flex-shrink: 0;">
+                  <sc-for list="{{ countryOptions }}" as="c" hint-placeholder-count="5">
+                    <option value="{{ c.code }}">{{ c.label }}</option>
+                  </sc-for>
+                </select>
+                <input type="tel" required="true" value="{{ telefoon }}" onChange="{{ onTelefoon }}" style="{{ inputStyle }}" placeholder="6 12345678" />
+              </div>
+            </label>
+          </div>
+
+          <label style="display: flex; flex-direction: column; gap: 7px;">
+            <span style="{{ labelStyle }}">Adres</span>
+            <input type="text" required="true" value="{{ woonplaats }}" onChange="{{ onWoonplaats }}" style="{{ inputStyle }}" placeholder="Postcode en huisnummer" />
+          </label>
+        </div>
+
+        <div style="height: 1px; background: oklch(0.93 0.004 75);"></div>
+
+        <div>
+          <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.4 0.008 60); margin-bottom: 16px;">Uw aanvraag</div>
+          <label style="display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px;">
+            <span style="{{ labelStyle }}">Offerte voor</span>
+            <select value="{{ product }}" onChange="{{ onProduct }}" style="{{ inputStyle }}">
+              <option value="">Kies een product</option>
+              <sc-for list="{{ productOptions }}" as="p" hint-placeholder-count="6">
+                <option value="{{ p }}">{{ p }}</option>
+              </sc-for>
+            </select>
+          </label>
+
+          <label style="display: flex; flex-direction: column; gap: 7px;">
+            <span style="{{ labelStyle }}">Bijlage toevoegen (optioneel)</span>
+            <label for="offerte-bijlage-input" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; height: 128px; border: 1.5px dashed oklch(0.78 0.008 60); border-radius: 12px; background: oklch(0.98 0.003 75); cursor: pointer; text-align: center; padding: 12px;" style-hover="border-color: {{ accentColor }}; background: oklch(0.97 0.004 75);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0l-4 4m4-4l4 4M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="oklch(0.45 0.008 60)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size: 13px; color: oklch(0.35 0.008 60); font-weight: 500;">{{ fileLabel }}</span>
+              <span style="font-size: 12px; color: oklch(0.55 0.008 60);">Klik om te bladeren, of sleep een bestand hierheen</span>
+              <input id="offerte-bijlage-input" type="file" onChange="{{ onFile }}" style="position: absolute; width: 1px; height: 1px; opacity: 0;" />
+            </label>
+          </label>
+        </div>
+
+        <div style="height: 1px; background: oklch(0.93 0.004 75);"></div>
+
+        <label style="display: flex; flex-direction: column; gap: 7px;">
+          <span style="{{ labelStyle }}">Opmerkingen of bijzonderheden</span>
+          <textarea value="{{ opmerkingen }}" onChange="{{ onOpmerkingen }}" rows="4" style="{{ inputStyle }} resize: vertical; font-family: inherit; line-height: 1.5; padding-top: 12px;" placeholder="Bijv. gewenste afmetingen, planning, of andere wensen"></textarea>
+        </label>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 6px;">
+          <p style="font-size: 12px; color: oklch(0.55 0.008 60); margin: 0; max-width: 300px; line-height: 1.5;">Liever direct zien wat u samenstelt? <a href="Configurator.dc.html" style="text-decoration: underline;">Gebruik de configurator</a>.</p>
+          <button type="submit" style="display: inline-flex; align-items: center; gap: 8px; padding: 15px 32px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 14px; font-weight: 500; letter-spacing: 0.03em; border: none; border-radius: 999px; cursor: pointer; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14); transition: transform 0.15s ease, filter 0.15s ease;" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97);">Verzenden<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </form>
+    </sc-if>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background: oklch(0.13 0.006 60); padding: 64px 28px 32px;">
+    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; padding-bottom: 40px; border-bottom: 1px solid oklch(0.28 0.006 60);">
+      <div>
+        <img src="assets/logo.jpg" alt="Meisterworks" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-bottom: 16px;" />
+        <div style="color: oklch(0.55 0.008 75); font-size: 13px; line-height: 1.6; max-width: 220px;">Maatwerk in metaal. Stalen en glazen deuren, volledig naar wens ontworpen en vervaardigd.</div>
+      </div>
+      <div>
+        <div style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px;">Navigatie</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="Meisterworks Homepage.dc.html#deuren" style="color: oklch(0.6 0.008 75); font-size: 14px;">Deuren</a>
+          <a href="Inspiratie.dc.html" style="color: oklch(0.6 0.008 75); font-size: 14px;">Inspiratie</a>
+          <a href="Reviews.dc.html" style="color: oklch(0.6 0.008 75); font-size: 14px;">Reviews</a>
+          <a href="Snelle Offerte.dc.html" style="color: oklch(0.6 0.008 75); font-size: 14px;">Snelle offerte</a>
+        </div>
+      </div>
+      <div>
+        <div style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px;">Contact</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="mailto:info@meisterworks.nl" style="color: oklch(0.6 0.008 75); font-size: 14px;">info@meisterworks.nl</a>
+          <div style="color: oklch(0.6 0.008 75); font-size: 14px;">Atelier op afspraak, Nederland</div>
+        </div>
+      </div>
+      <div>
+        <div style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px;">Volg ons</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="#" style="color: oklch(0.6 0.008 75); font-size: 14px;">Instagram</a>
+          <a href="Reviews.dc.html" style="color: oklch(0.6 0.008 75); font-size: 14px;">Google Reviews</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width: 1280px; margin: 24px auto 0; color: oklch(0.4 0.008 60); font-size: 12px;">© Meisterworks — Maatwerk in metaal.</div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {},
+  &quot;accentColor&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#a67c52&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#a67c52&quot;, &quot;#3f4a3d&quot;, &quot;#5c3a3a&quot;], &quot;section&quot;: &quot;Merk&quot;}
+}">
+const PRODUCTS = ['Enkele deur', 'Enkele deur met vast paneel', 'Dubbele deur', 'Dubbele deur met vast paneel', 'Vast paneel', 'Complete scheidingswand'];
+const COUNTRIES = [
+  { code: '+31', label: '🇳🇱 +31' },
+  { code: '+32', label: '🇧🇪 +32' },
+  { code: '+49', label: '🇩🇪 +49' },
+  { code: '+33', label: '🇫🇷 +33' },
+  { code: '+44', label: '🇬🇧 +44' },
+];
+
+function navAnimStyles(navOpen) {
+  const panel = `position: fixed; top: 73px; left: 0; right: 0; bottom: 0; background: oklch(0.14 0.006 60 / 0.97); backdrop-filter: blur(16px); display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 40px 32px; z-index: 55; visibility: ${navOpen ? 'visible' : 'hidden'}; opacity: ${navOpen ? 1 : 0}; transition: opacity 0.3s ease, visibility 0.3s ease;`;
+  const link = `opacity: ${navOpen ? 1 : 0}; transform: translateY(${navOpen ? 0 : -10}px); transition: opacity 0.3s cubic-bezier(.22,1,.36,1), transform 0.3s cubic-bezier(.22,1,.36,1);`;
+  const line1 = `transform-box: fill-box; transform-origin: center; transition: transform 0.3s ease; transform: ${navOpen ? 'translateY(6px) rotate(45deg)' : 'translateY(0) rotate(0)'};`;
+  const line2 = `transition: opacity 0.2s ease; opacity: ${navOpen ? 0 : 1};`;
+  const line3 = `transform-box: fill-box; transform-origin: center; transition: transform 0.3s ease; transform: ${navOpen ? 'translateY(-6px) rotate(-45deg)' : 'translateY(0) rotate(0)'};`;
+  return { navPanelStyle: panel, navLinkAnim: link, navIconLine1Style: line1, navIconLine2Style: line2, navIconLine3Style: line3 };
+}
+
+class Component extends DCLogic {
+  state = {
+    navOpen: false,
+    submitted: false,
+    aanhef: '', voornaam: '', achternaam: '', email: '',
+    landcode: '+31', telefoon: '', woonplaats: '',
+    product: '', opmerkingen: '', fileName: '',
+  };
+
+  set(key) { return (ev) => this.setState({ [key]: ev.target.value }); }
+  toggle(key) { return (ev) => this.setState({ [key]: ev.target.checked }); }
+
+  renderVals() {
+    const accent = this.props.accentColor ?? '#a67c52';
+    const inputStyle = 'padding: 13px 14px; border: 1px solid oklch(0.85 0.006 75); border-radius: 10px; font-size: 15px; font-family: inherit; color: oklch(0.2 0.008 60); background: oklch(1 0 0); width: 100%;';
+    const labelStyle = 'font-size: 13px; color: oklch(0.4 0.008 60);';
+
+    return {
+      ...navAnimStyles(this.state.navOpen),
+      navOpen: this.state.navOpen,
+      toggleNav: () => this.setState(s => ({ navOpen: !s.navOpen })),
+      accentColor: accent,
+      submitted: this.state.submitted,
+      notSubmitted: !this.state.submitted,
+      inputStyle, labelStyle,
+      countryOptions: COUNTRIES,
+      productOptions: PRODUCTS,
+      aanhef: this.state.aanhef, onAanhef: this.set('aanhef'),
+      voornaam: this.state.voornaam, onVoornaam: this.set('voornaam'),
+      achternaam: this.state.achternaam, onAchternaam: this.set('achternaam'),
+      email: this.state.email, onEmail: this.set('email'),
+      landcode: this.state.landcode, onLandcode: this.set('landcode'),
+      telefoon: this.state.telefoon, onTelefoon: this.set('telefoon'),
+      woonplaats: this.state.woonplaats, onWoonplaats: this.set('woonplaats'),
+      product: this.state.product, onProduct: this.set('product'),
+      opmerkingen: this.state.opmerkingen, onOpmerkingen: this.set('opmerkingen'),
+      fileLabel: this.state.fileName || 'Foto of document toevoegen',
+      onFile: (ev) => this.setState({ fileName: ev.target.files && ev.target.files[0] ? ev.target.files[0].name : '' }),
+      handleSubmit: (ev) => { ev.preventDefault(); this.setState({ submitted: true }); },
+    };
+  }
+}
+</script>
+</body>
+</html>

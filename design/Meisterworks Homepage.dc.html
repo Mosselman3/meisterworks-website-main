@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #faf8f5; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; }
+  @media (min-width: 1080px) {
+    [data-nav-links] { display: flex !important; }
+    [data-nav-toggle] { display: none !important; }
+  }
+  @media (max-width: 860px) {
+    [data-split-row] { grid-template-columns: minmax(0,1fr) !important; gap: 32px !important; }
+    [data-split-row] > * { order: 0 !important; }
+  }
+  @keyframes marqueeLeft { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes marqueeRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+  @media (max-width: 760px) {
+    [data-trust-grid] { grid-template-columns: 1fr !important; gap: 20px !important; }
+    [data-trust-divider] { display: none !important; }
+  }
+</style>
+</helmet>
+
+<div style="--accent: {{ accentColor }}; font-family: 'Helvetica Neue', Arial, sans-serif; color: oklch(0.18 0.006 60); background: oklch(0.97 0.004 75); overflow-x: hidden;">
+
+  <!-- NAV -->
+  <div style="position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: oklch(0.16 0.006 60 / 0.88); backdrop-filter: blur(10px); border-bottom: 1px solid oklch(0.32 0.006 60);">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <img src="assets/logo.jpg" alt="Meisterworks" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;" />
+      <span style="color: oklch(0.96 0.004 75); font-size: 15px; letter-spacing: 0.14em; font-weight: 500;">MEISTERWORKS</span>
+    </div>
+    <div style="display: none; gap: 24px; align-items: center;" data-nav-links="true">
+      <a href="#deuren" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;" style-hover="color: {{ accentColor }};">Deuren</a>
+      <a href="#projecten" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;" style-hover="color: {{ accentColor }};">Projecten</a>
+      <a href="Inspiratie.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Inspiratie</a>
+      <a href="#vakmanschap" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;" style-hover="color: {{ accentColor }};">Vakmanschap</a>
+      <a href="Reviews.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;" style-hover="color: {{ accentColor }};">Reviews</a>
+      <a href="Snelle Offerte.dc.html" style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">Snelle offerte</a>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="Adviesgesprek Plannen.dc.html" style="padding: 9px 16px; border: 1px solid oklch(0.4 0.006 60); color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.03em; border-radius: 999px; white-space: nowrap; transition: transform 0.15s ease, background 0.15s ease;" style-hover="background: oklch(0.9 0.004 75 / 0.08);" style-active="transform: scale(0.97);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Afspraak maken</a>
+        <a href="Configurator.dc.html" style="padding: 10px 22px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 13px; letter-spacing: 0.05em; font-weight: 500; border-radius: 999px; white-space: nowrap; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Deur samenstellen</a>
+      </div>
+    </div>
+    <button onClick="{{ toggleNav }}" style="display: block; background: none; border: none; cursor: pointer; padding: 6px; color: oklch(0.96 0.004 75);" data-nav-toggle="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine1Style }} will-change: transform;"/><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine2Style }} will-change: opacity;"/><line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.6" style="{{ navIconLine3Style }} will-change: transform;"/></svg>
+    </button>
+  </div>
+  
+    <div style="{{ navPanelStyle }} will-change: opacity;">
+      <a href="#deuren" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 0ms;">Deuren</a>
+      <a href="#projecten" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 40ms;">Projecten</a>
+      <a href="Inspiratie.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 80ms;">Inspiratie</a>
+      <a href="#vakmanschap" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 120ms;">Vakmanschap</a>
+      <a href="Reviews.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px; transition-delay: 160ms;">Reviews</a>
+      <a href="Snelle Offerte.dc.html" style="{{ navLinkAnim }} color: oklch(0.92 0.004 75); font-size: 15px;">Snelle offerte</a>
+      <a href="Adviesgesprek Plannen.dc.html" style="padding: 12px 22px; border: 1px solid oklch(0.4 0.006 60); color: oklch(0.92 0.004 75); font-size: 14px; text-align: center; border-radius: 999px; transition: transform 0.15s ease, background 0.15s ease;" style-hover="background: oklch(0.9 0.004 75 / 0.08);" style-active="transform: scale(0.97);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Afspraak maken</a>
+      <a href="Configurator.dc.html" style="padding: 12px 22px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 14px; text-align: center; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Deur samenstellen</a>
+    </div>
+  
+
+  <!-- HERO -->
+  <div style="position: relative; min-height: 88vh; display: flex; align-items: flex-end;">
+    <img src="assets/hero-open-door.jpg" alt="Stalen taatsdeur, geopend" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;" />
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, oklch(0.14 0.006 60 / 0.15) 0%, oklch(0.12 0.006 60 / 0.35) 55%, oklch(0.1 0.006 60 / 0.82) 100%); z-index: 1;"></div>
+    <div style="position: relative; z-index: 2; padding: 0 28px 72px; max-width: 780px;">
+      <div style="color: {{ accentColor }}; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 18px; font-weight: 500;">Maatwerk in staal &amp; glas</div>
+      <h1 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(38px, 6vw, 72px); line-height: 1.05; color: oklch(0.98 0.004 75); margin: 0 0 22px;">Deuren op maat,<br/>gemaakt om te blijven.</h1>
+      <p style="font-size: clamp(15px, 2vw, 18px); line-height: 1.6; color: oklch(0.88 0.004 75); max-width: 520px; margin: 0 0 34px;">Elke deur wordt volledig naar uw wensen ontworpen en met de hand vervaardigd — van eerste schets tot montage.</p>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <a href="Adviesgesprek Plannen.dc.html" style="padding: 15px 30px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 14px; letter-spacing: 0.03em; font-weight: 500; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Ontwerp uw deur</a>
+        <a href="#projecten" style="padding: 15px 30px; border: 1px solid oklch(0.8 0.004 75 / 0.6); color: oklch(0.96 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;" style-hover="background: oklch(0.5 0.006 60 / 0.1);" style-active="transform: scale(0.97); background: oklch(0.5 0.006 60 / 0.16);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Bekijk projecten</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRUST BAR -->
+  <div style="background: oklch(0.16 0.006 60); padding: 48px 28px;">
+    <div data-trust-grid="true" style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: auto 1px minmax(0,1fr) auto; align-items: center; gap: 36px;">
+      <div style="display: flex; align-items: center; gap: 18px;">
+        <div style="font-family: 'Newsreader', serif; font-size: 48px; color: oklch(0.98 0.004 75); line-height: 1;">{{ reviewScore }}</div>
+        <div>
+          <div style="color: {{ accentColor }}; font-size: 16px; letter-spacing: 0.1em; margin-bottom: 4px;">★★★★★</div>
+          <div style="color: oklch(0.75 0.004 75); font-size: 13px;">{{ reviewCount }} beoordelingen op Google</div>
+        </div>
+      </div>
+      <div data-trust-divider="true" style="width: 1px; height: 56px; background: oklch(0.32 0.006 60);"></div>
+      <div style="position: relative; min-height: 84px;">
+        <sc-for list="{{ reviewSlides }}" as="slide" hint-placeholder-count="4">
+          <div style="{{ slide.style }}">
+            <p style="font-family: 'Newsreader', serif; font-style: italic; font-size: 18px; color: oklch(0.92 0.004 75); margin: 0 0 10px; line-height: 1.5;">"{{ slide.quote }}"</p>
+            <div style="color: oklch(0.58 0.008 75); font-size: 13px;">— {{ slide.name }}, {{ slide.context }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <a href="Reviews.dc.html" style="color: oklch(0.85 0.004 75); font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 1px solid oklch(0.4 0.006 60); padding-bottom: 4px; white-space: nowrap; align-self: start; margin-top: 4px;">Alle reviews →</a>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div id="deuren" style="padding: 100px 28px 60px; max-width: 1280px; margin: 0 auto;">
+    <div style="text-align: center; max-width: 620px; margin: 0 auto 56px;">
+      <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Ons aanbod</div>
+      <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(30px, 4vw, 44px); margin: 0 0 16px; line-height: 1.15;">Zes producten. Eindeloos maatwerk.</h2>
+      <p style="color: oklch(0.42 0.008 60); font-size: 16px; line-height: 1.6; margin: 0;">We houden het assortiment klein, zodat elk model tot in de puntjes is uitgewerkt.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: oklch(0.88 0.006 75); border: 1px solid oklch(0.88 0.006 75);">
+      <a href="Deur - Enkele deur.dc.html" style="background: oklch(0.97 0.004 75); display: flex; flex-direction: column;">
+        <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: 14px;"><img src="assets/pivot-door-slats.jpg" alt="Enkele deur in stalen kozijn" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+        <div style="padding: 26px 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px;">
+            <div style="font-family: 'Newsreader', serif; font-size: 22px;">Enkele deur</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0; color: oklch(0.5 0.008 60);"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="color: oklch(0.45 0.008 60); font-size: 14px; line-height: 1.55;">Eén vast kader, één beweegbaar vlak, oneindig maatwerk.</div>
+        </div>
+      </a>
+      <a href="Deur - Enkele deur met vast paneel.dc.html" style="background: oklch(0.97 0.004 75); display: flex; flex-direction: column;">
+        <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: 14px;"><img src="assets/hero-open-door.jpg" alt="Enkele deur met vast paneel" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+        <div style="padding: 26px 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px;">
+            <div style="font-family: 'Newsreader', serif; font-size: 22px;">Enkele deur met vast paneel</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0; color: oklch(0.5 0.008 60);"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="color: oklch(0.45 0.008 60); font-size: 14px; line-height: 1.55;">Voor openingen die net iets breder zijn dan één deurvlak.</div>
+        </div>
+      </a>
+      <a href="Deur - Dubbele deur.dc.html" style="background: oklch(0.97 0.004 75); display: flex; flex-direction: column;">
+        <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: 14px;"><img src="assets/double-doors-black.jpg" alt="Dubbele deur in stalen profiel" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+        <div style="padding: 26px 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px;">
+            <div style="font-family: 'Newsreader', serif; font-size: 22px;">Dubbele deur</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0; color: oklch(0.5 0.008 60);"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="color: oklch(0.45 0.008 60); font-size: 14px; line-height: 1.55;">Twee vlakken, één brede opening.</div>
+        </div>
+      </a>
+      <a href="Deur - Dubbele deur met vast paneel.dc.html" style="background: oklch(0.97 0.004 75); display: flex; flex-direction: column;">
+        <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: 14px;"><img src="assets/arched-bronze-door.jpg" alt="Dubbele deur met vast paneel" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+        <div style="padding: 26px 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px;">
+            <div style="font-family: 'Newsreader', serif; font-size: 22px;">Dubbele deur met vast paneel</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0; color: oklch(0.5 0.008 60);"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="color: oklch(0.45 0.008 60); font-size: 14px; line-height: 1.55;">Voor de breedste openingen, aangevuld met vast glas.</div>
+        </div>
+      </a>
+      <a href="Deur - Vast paneel.dc.html" style="background: oklch(0.97 0.004 75); display: flex; flex-direction: column;">
+        <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: 14px;"><img src="assets/sliding-wall-herringbone.jpg" alt="Vast glazen paneel" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+        <div style="padding: 26px 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px;">
+            <div style="font-family: 'Newsreader', serif; font-size: 22px;">Vast paneel</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0; color: oklch(0.5 0.008 60);"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="color: oklch(0.45 0.008 60); font-size: 14px; line-height: 1.55;">Een vlak dat niet beweegt, en dat ook niet hoeft.</div>
+        </div>
+      </a>
+      <a href="Deur - Complete scheidingswand.dc.html" style="background: oklch(0.97 0.004 75); display: flex; flex-direction: column;">
+        <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: 14px;"><img src="assets/detail-green.jpg" alt="Complete scheidingswand" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+        <div style="padding: 26px 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px;">
+            <div style="font-family: 'Newsreader', serif; font-size: 22px;">Complete scheidingswand</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0; color: oklch(0.5 0.008 60);"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="color: oklch(0.45 0.008 60); font-size: 14px; line-height: 1.55;">Ruimtes scheiden zonder ze te sluiten.</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- WHY CUSTOM -->
+  <div ref="{{ whyCustomRef }}" style="background: oklch(0.14 0.006 60); padding: 110px 28px 90px;">
+    <div style="max-width: 1280px; margin: 0 auto;">
+      <div style="color: oklch(0.5 0.008 75); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 28px;">— Waarom maatwerk</div>
+      <p style="font-family: 'Newsreader', serif; font-size: clamp(24px, 3.4vw, 38px); line-height: 1.5; max-width: 920px; margin: 0;">
+        <sc-for list="{{ whyCustomWords }}" as="w" hint-placeholder-count="60"><span style="{{ w.style }}">{{ w.text }} </span></sc-for>
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 64px;">
+        <div style="aspect-ratio: 3/4; overflow: hidden; border-radius: 14px;"><img src="assets/double-doors-black.jpg" alt="Stalen glaswand op maat" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+        <div style="aspect-ratio: 3/4; overflow: hidden; border-radius: 14px;"><img src="assets/detail-green.jpg" alt="Detail poedercoating" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+        <div style="aspect-ratio: 3/4; overflow: hidden; border-radius: 14px;"><img src="assets/arched-bronze-door.jpg" alt="Stalen draaideur op maat" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURED STORY -->
+  <div data-split-row="true" style="padding: 100px 28px; max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 64px; align-items: center;">
+    <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: 14px;"><img src="assets/hero-open-door.jpg" alt="Stalen taatsdeur bij Anouk Hamelink" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+    <div>
+      <div style="color: {{ accentColor }}; font-size: 13px; letter-spacing: 0.1em; margin-bottom: 18px;">★★★★★ &nbsp;&middot;&nbsp; <span style="color: oklch(0.5 0.01 60);">Uitgelicht verhaal</span></div>
+      <p style="font-family: 'Newsreader', serif; font-style: italic; font-size: clamp(22px, 2.6vw, 30px); line-height: 1.45; color: oklch(0.2 0.008 60); margin: 0 0 28px;">"Na 2 jaar verbouwen de eerste vakman die zijn afspraken volledig nakomt, goed communiceert, alles netjes op tijd levert, niets beschadigt bij het plaatsen en bovendien een prachtige taatsdeur heeft gemaakt volledig naar onze wensen. Top!"</p>
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div style="width: 46px; height: 46px; border-radius: 50%; background: {{ accentColor }}; color: oklch(0.14 0.006 60); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; flex-shrink: 0;">L</div>
+        <div>
+          <div style="font-size: 15px; font-weight: 600; color: oklch(0.18 0.006 60);">Lucinda Coumans</div>
+          <div style="font-size: 13px; color: oklch(0.5 0.008 60);">Taatsdeur &nbsp;&middot;&nbsp; Google review</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS DETAIL -->
+  <div id="projecten">
+    <div style="background: oklch(0.97 0.004 75); padding: 90px 28px;">
+      <div data-split-row="true" style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 56px; align-items: center;">
+        <div>
+          <img src="assets/mw-mark-black.png" alt="" style="width: 20px; height: 20px; object-fit: contain; margin-bottom: 14px; opacity: 0.85;" />
+          <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Meest gekozen</div>
+          <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 20px; line-height: 1.15;">Enkele deur</h2>
+          <p style="color: oklch(0.42 0.008 60); font-size: 16px; line-height: 1.7; margin: 0 0 32px;">Onze meest gekozen oplossing: één vast stalen kader, één beweegbaar vlak, en een groot aantal keuzes die samen bepalen hoe hij eruitziet en aanvoelt.</p>
+          <a href="Deur - Enkele deur.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px; background: oklch(0.16 0.006 60); color: oklch(0.97 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Bekijk enkele deur<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div style="aspect-ratio: 4/3; overflow: hidden; border-radius: 14px;"><img src="assets/pivot-door-slats.jpg" alt="Enkele deur in stalen kozijn" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+      </div>
+    </div>
+
+    <div style="background: oklch(0.16 0.006 60); padding: 90px 28px;">
+      <div data-split-row="true" style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 56px; align-items: center;">
+        <div style="order: 2;">
+          <img src="assets/mw-mark-white.png" alt="" style="width: 20px; height: 20px; object-fit: contain; margin-bottom: 14px; opacity: 0.85;" />
+          <div style="color: oklch(0.55 0.008 75); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Voor bredere openingen</div>
+          <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 3.6vw, 40px); color: oklch(0.97 0.004 75); margin: 0 0 20px; line-height: 1.15;">Enkele deur met vast paneel</h2>
+          <p style="color: oklch(0.65 0.008 75); font-size: 16px; line-height: 1.7; margin: 0 0 32px;">Wanneer een enkele deur de opening niet vult, voegen we een vast paneel toe: hetzelfde profiel en dezelfde afwerking, zonder mechanisme.</p>
+          <a href="Deur - Enkele deur met vast paneel.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 14px; letter-spacing: 0.03em; font-weight: 500; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Bekijk met vast paneel<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div style="order: 1; aspect-ratio: 4/3; overflow: hidden; border-radius: 14px;"><img src="assets/hero-open-door.jpg" alt="Enkele deur met vast glazen paneel" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+      </div>
+    </div>
+
+    <div style="background: oklch(0.93 0.006 75); padding: 90px 28px;">
+      <div data-split-row="true" style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 56px; align-items: center;">
+        <div>
+          <img src="assets/mw-mark-black.png" alt="" style="width: 20px; height: 20px; object-fit: contain; margin-bottom: 14px; opacity: 0.85;" />
+          <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Voor de brede doorgang</div>
+          <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 20px; line-height: 1.15;">Dubbele deur</h2>
+          <p style="color: oklch(0.42 0.008 60); font-size: 16px; line-height: 1.7; margin: 0 0 32px;">Voor brede doorgangen: twee identieke deurvlakken die samen open- en dichtgaan, symmetrisch of ieder in eigen tempo.</p>
+          <a href="Deur - Dubbele deur.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px; background: oklch(0.16 0.006 60); color: oklch(0.97 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Bekijk dubbele deur<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div style="aspect-ratio: 4/3; overflow: hidden; border-radius: 14px;"><img src="assets/double-doors-black.jpg" alt="Dubbele deur in stalen profiel" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+      </div>
+    </div>
+
+    <div style="background: oklch(0.97 0.004 75); padding: 90px 28px;">
+      <div data-split-row="true" style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 56px; align-items: center;">
+        <div style="order: 2;">
+          <img src="assets/mw-mark-black.png" alt="" style="width: 20px; height: 20px; object-fit: contain; margin-bottom: 14px; opacity: 0.85;" />
+          <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Voor de breedste opening</div>
+          <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 20px; line-height: 1.15;">Dubbele deur met vast paneel</h2>
+          <p style="color: oklch(0.42 0.008 60); font-size: 16px; line-height: 1.7; margin: 0 0 32px;">Voor de breedste openingen: twee bewegende deurvlakken, aangevuld met een vast paneel dat de volledige breedte afmaakt.</p>
+          <a href="Deur - Dubbele deur met vast paneel.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px; background: oklch(0.16 0.006 60); color: oklch(0.97 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Bekijk met vast paneel<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div style="order: 1; aspect-ratio: 4/3; overflow: hidden; border-radius: 14px;"><img src="assets/arched-bronze-door.jpg" alt="Dubbele deur met vast paneel" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+      </div>
+    </div>
+
+    <div style="background: oklch(0.16 0.006 60); padding: 90px 28px;">
+      <div data-split-row="true" style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 56px; align-items: center;">
+        <div>
+          <img src="assets/mw-mark-white.png" alt="" style="width: 20px; height: 20px; object-fit: contain; margin-bottom: 14px; opacity: 0.85;" />
+          <div style="color: oklch(0.55 0.008 75); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Licht zonder beweging</div>
+          <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 3.6vw, 40px); color: oklch(0.97 0.004 75); margin: 0 0 20px; line-height: 1.15;">Vast paneel</h2>
+          <p style="color: oklch(0.65 0.008 75); font-size: 16px; line-height: 1.7; margin: 0 0 32px;">Ons eenvoudigste product: hetzelfde stalen profiel en glas als onze deuren, zonder mechanisme — puur voor licht en indeling.</p>
+          <a href="Deur - Vast paneel.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px; background: {{ accentColor }}; color: oklch(0.14 0.006 60); font-size: 14px; letter-spacing: 0.03em; font-weight: 500; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Bekijk vast paneel<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div style="aspect-ratio: 4/3; overflow: hidden; border-radius: 14px;"><img src="assets/sliding-wall-herringbone.jpg" alt="Vast glazen paneel" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+      </div>
+    </div>
+
+    <div style="background: oklch(0.93 0.006 75); padding: 90px 28px;">
+      <div data-split-row="true" style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 56px; align-items: center;">
+        <div style="order: 2;">
+          <img src="assets/mw-mark-black.png" alt="" style="width: 20px; height: 20px; object-fit: contain; margin-bottom: 14px; opacity: 0.85;" />
+          <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Scheiden zonder te sluiten</div>
+          <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 20px; line-height: 1.15;">Complete scheidingswand</h2>
+          <p style="color: oklch(0.42 0.008 60); font-size: 16px; line-height: 1.7; margin: 0 0 32px;">Een modulaire wand van stalen profielen en glas: schuivende panelen voor doorgang, gecombineerd met vaste panelen waar geen doorgang nodig is.</p>
+          <a href="Deur - Complete scheidingswand.dc.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px; background: oklch(0.16 0.006 60); color: oklch(0.97 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Bekijk scheidingswand<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H9M19 5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div style="order: 1; aspect-ratio: 4/3; overflow: hidden; border-radius: 14px;"><img src="assets/detail-green.jpg" alt="Complete scheidingswand detail" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRAFTSMANSHIP -->
+  <div id="vakmanschap" style="padding: 100px 28px; max-width: 1280px; margin: 0 auto;">
+    <div data-split-row="true" style="display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 64px; align-items: center;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div style="aspect-ratio: 1/1; overflow: hidden; border-radius: 14px;"><img src="assets/welding-detail.jpg" alt="Lassen aan een stalen kader" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+        <div style="aspect-ratio: 1/1; overflow: hidden; border-radius: 14px; align-self: end;"><img src="assets/detail-maroon.jpg" alt="Detail lasnaad, bordeaux" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+      </div>
+      <div>
+        <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Vakmanschap</div>
+        <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 22px; line-height: 1.15;">Gemaakt in het atelier, niet van de plank.</h2>
+        <p style="color: oklch(0.4 0.008 60); font-size: 16px; line-height: 1.7; margin: 0 0 18px;">Staal wordt op maat gezaagd, gelast en met de hand nagewerkt tot elke naad recht en glad is. Pas daarna gaat een deur in de poedercoating — in een kleur die specifiek voor uw project wordt gemengd.</p>
+        <p style="color: oklch(0.4 0.008 60); font-size: 16px; line-height: 1.7; margin: 0;">Dat proces kost meer tijd dan een deur van de plank. Het resultaat is een deur die decennia meegaat, in een afwerking die nergens anders te vinden is.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEWS -->
+  <div id="reviews" ref="{{ reviewsSectionRef }}" style="background: oklch(0.16 0.006 60); padding: 100px 0; overflow: hidden;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 0 28px;">
+      <div style="text-align: center; max-width: 620px; margin: 0 auto 56px;">
+        <div style="color: oklch(0.55 0.008 75); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Reviews</div>
+        <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(30px, 4vw, 44px); color: oklch(0.97 0.004 75); margin: 0 0 16px; line-height: 1.15;">Wat klanten zeggen</h2>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+          <span style="color: {{ accentColor }}; font-size: 18px; letter-spacing: 0.1em;">★★★★★</span>
+          <span style="color: oklch(0.65 0.008 75); font-size: 14px;">{{ reviewScore }} · {{ reviewCount }} reviews op Google</span>
+        </div>
+      </div>
+    </div>
+
+    <div ref="{{ reviewsRow1Ref }}" style="width: 100%; overflow: hidden; mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent); margin-bottom: 22px;">
+      <div style="display: flex; gap: 20px; width: max-content; animation: marqueeLeft 46s linear infinite;" style-hover="animation-play-state: paused;">
+        <sc-for list="{{ reviewsRow1 }}" as="review" hint-placeholder-count="8">
+          <div style="flex: 0 0 320px; background: oklch(0.97 0.004 75); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 38px; height: 38px; border-radius: 50%; background: {{ accentColor }}; color: oklch(0.14 0.006 60); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">{{ review.initial }}</div>
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: oklch(0.18 0.006 60);">{{ review.name }}</div>
+                <div style="font-size: 12px; color: oklch(0.5 0.008 60);">{{ review.context }}</div>
+              </div>
+            </div>
+            <div style="color: {{ accentColor }}; font-size: 13px; letter-spacing: 0.1em;">★★★★★</div>
+            <p style="font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: oklch(0.28 0.008 60); line-height: 1.55; margin: 0;">"{{ review.quote }}"</p>
+            <div style="font-size: 11px; color: oklch(0.55 0.008 60);">Google review · {{ review.time }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div ref="{{ reviewsRow2Ref }}" style="width: 100%; overflow: hidden; mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);">
+      <div style="display: flex; gap: 20px; width: max-content; animation: marqueeRight 52s linear infinite;" style-hover="animation-play-state: paused;">
+        <sc-for list="{{ reviewsRow2 }}" as="review" hint-placeholder-count="8">
+          <div style="flex: 0 0 320px; background: oklch(0.97 0.004 75); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 38px; height: 38px; border-radius: 50%; background: {{ accentColor }}; color: oklch(0.14 0.006 60); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">{{ review.initial }}</div>
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: oklch(0.18 0.006 60);">{{ review.name }}</div>
+                <div style="font-size: 12px; color: oklch(0.5 0.008 60);">{{ review.context }}</div>
+              </div>
+            </div>
+            <div style="color: {{ accentColor }}; font-size: 13px; letter-spacing: 0.1em;">★★★★★</div>
+            <p style="font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: oklch(0.28 0.008 60); line-height: 1.55; margin: 0;">"{{ review.quote }}"</p>
+            <div style="font-size: 11px; color: oklch(0.55 0.008 60);">Google review · {{ review.time }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIGURATOR TEASER -->
+  <sc-if value="{{ showConfiguratorTeaser }}" hint-placeholder-val="{{ true }}">
+    <div style="padding: 100px 28px; max-width: 1000px; margin: 0 auto; text-align: center;">
+      <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Binnenkort</div>
+      <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 20px; line-height: 1.15;">Stel uw eigen deur samen.</h2>
+      <p style="color: oklch(0.4 0.008 60); font-size: 16px; line-height: 1.7; max-width: 560px; margin: 0 auto 48px;">We bouwen een configurator waarmee u type, afmetingen en afwerking direct zelf kunt bepalen. Tot die tijd stellen we uw deur samen in een persoonlijk adviesgesprek.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; text-align: left; margin-bottom: 48px;">
+        <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
+          <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">01</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Kies het type deur</div>
+        </div>
+        <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
+          <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">02</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Bepaal afmetingen en afwerking</div>
+        </div>
+        <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
+          <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">03</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Ontvang een richtprijs</div>
+        </div>
+      </div>
+      <a href="Adviesgesprek Plannen.dc.html" style="display: inline-block; padding: 15px 30px; background: oklch(0.16 0.006 60); color: oklch(0.97 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Plan een adviesgesprek</a>
+    </div>
+  </sc-if>
+
+  <!-- FINAL CTA -->
+  <div id="offerte" style="background: {{ accentColor }}; padding: 90px 28px; text-align: center;">
+    <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(30px, 4.2vw, 48px); color: oklch(0.14 0.006 60); margin: 0 0 20px; line-height: 1.1;">Klaar om te beginnen?</h2>
+    <p style="color: oklch(0.22 0.03 60); font-size: 16px; margin: 0 0 36px;">Vraag een vrijblijvende offerte aan, of plan een adviesgesprek in het atelier.</p>
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <a href="#" style="padding: 16px 34px; background: oklch(0.14 0.006 60); color: oklch(0.97 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Offerte aanvragen</a>
+      <a href="#" style="padding: 16px 34px; border: 1px solid oklch(0.14 0.006 60 / 0.5); color: oklch(0.14 0.006 60); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;" style-hover="background: oklch(0.5 0.006 60 / 0.1);" style-active="transform: scale(0.97); background: oklch(0.5 0.006 60 / 0.16);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Adviesgesprek plannen</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background: oklch(0.13 0.006 60); padding: 64px 28px 32px;">
+    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; padding-bottom: 40px; border-bottom: 1px solid oklch(0.28 0.006 60);">
+      <div>
+        <img src="assets/logo.jpg" alt="Meisterworks" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-bottom: 16px;" />
+        <div style="color: oklch(0.55 0.008 75); font-size: 13px; line-height: 1.6; max-width: 220px;">Maatwerk in metaal. Stalen en glazen deuren, volledig naar wens ontworpen en vervaardigd.</div>
+      </div>
+      <div>
+        <div style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px;">Navigatie</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="#deuren" style="color: oklch(0.6 0.008 75); font-size: 14px;">Deuren</a>
+          <a href="#projecten" style="color: oklch(0.6 0.008 75); font-size: 14px;">Projecten</a>
+          <a href="#vakmanschap" style="color: oklch(0.6 0.008 75); font-size: 14px;">Vakmanschap</a>
+          <a href="Reviews.dc.html" style="color: oklch(0.6 0.008 75); font-size: 14px;">Reviews</a>
+          <a href="Snelle Offerte.dc.html" style="color: oklch(0.6 0.008 75); font-size: 14px;">Snelle offerte</a>
+        </div>
+      </div>
+      <div>
+        <div style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px;">Contact</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="mailto:info@meisterworks.nl" style="color: oklch(0.6 0.008 75); font-size: 14px;">info@meisterworks.nl</a>
+          <div style="color: oklch(0.6 0.008 75); font-size: 14px;">Atelier op afspraak, Nederland</div>
+        </div>
+      </div>
+      <div>
+        <div style="color: oklch(0.9 0.004 75); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px;">Volg ons</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="#" style="color: oklch(0.6 0.008 75); font-size: 14px;">Instagram</a>
+          <a href="#reviews" style="color: oklch(0.6 0.008 75); font-size: 14px;">Google Reviews</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width: 1280px; margin: 24px auto 0; color: oklch(0.4 0.008 60); font-size: 12px;">© Meisterworks — Maatwerk in metaal.</div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {},
+  &quot;accentColor&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#a67c52&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#a67c52&quot;, &quot;#3f4a3d&quot;, &quot;#5c3a3a&quot;], &quot;section&quot;: &quot;Merk&quot;},
+  &quot;reviewScore&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 4.9, &quot;tsType&quot;: &quot;number&quot;, &quot;min&quot;: 4.0, &quot;max&quot;: 5.0, &quot;step&quot;: 0.1, &quot;section&quot;: &quot;Reviews&quot;},
+  &quot;reviewCount&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 138, &quot;tsType&quot;: &quot;number&quot;, &quot;min&quot;: 1, &quot;section&quot;: &quot;Reviews&quot;},
+  &quot;showConfiguratorTeaser&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Secties&quot;}
+}">
+const REVIEWS_A = [
+  { initial: 'M', name: 'Melissa Vijgen', context: 'Google review', quote: 'Wij hebben een bronzen stalen deur op maat laten maken door Meisterworks en zijn echt ontzettend blij met het resultaat.', time: '7 maanden geleden' },
+  { initial: 'T', name: 'Thorsten Lamerigts', context: 'Google review', quote: 'Zeer tevreden met de stalen taatsdeuren die Rens heeft gemaakt. De kwaliteit en het vakmanschap zijn echt top.', time: '4 maanden geleden' },
+  { initial: 'K', name: 'Kenny Faassen', context: 'Google review', quote: 'Ze hebben bij ons een op maat gemaakte stalen taatsdeur geplaatst en het hele traject is echt top verlopen.', time: '4 maanden geleden' },
+  { initial: 'N', name: 'Niels Janssen', context: 'Google review', quote: 'Heel blij met onze stalen taatsdeur met ribglas. Het is een echte eyecatcher en maakt de ruimte helemaal af!', time: '2 maanden geleden' },
+];
+const REVIEWS_B = [
+  { initial: 'A', name: 'Anouk Hamelink', context: 'Google review', quote: 'We zijn superblij met het resultaat. De communicatie verliep vlot. Het plaatsen ging snel en netjes.', time: '8 maanden geleden' },
+  { initial: 'V', name: 'Veerle Rijvers', context: 'Google review', quote: 'De samenwerking met Rens verliep heel prettig — hij dacht goed mee in het ontwerpproces.', time: '10 maanden geleden' },
+  { initial: 'L', name: 'Lucinda Coumans', context: 'Google review', quote: 'De eerste vakman die zijn afspraken volledig nakomt, goed communiceert en niets beschadigt bij het plaatsen. Top!', time: '9 maanden geleden' },
+  { initial: 'A', name: 'Axel Kanters', context: 'Google review', quote: 'Meisterworks heeft bij mij 3 dubbele stalen deuren gemaakt en een enkele. Het is echt vakwerk.', time: '3 jaar geleden' },
+];
+
+const WHY_CUSTOM_TEXT = "Geen standaard, geen compromis. Een standaarddeur dwingt uw ruimte om zich aan te passen: aan een vaste kozijnmaat, een vaste kleur, een vaste indeling. Een maatwerkdeur werkt andersom — hij past zich aan uw opening, uw interieur en uw manier van leven aan. Van de dikte van het staalprofiel tot de kleur van de poedercoating: elke keuze wordt vooraf met u afgestemd en met de hand uitgevoerd in ons atelier.";
+const WHY_CUSTOM_WORDS = WHY_CUSTOM_TEXT.split(' ');
+
+const TRUST_QUOTES = [
+  { quote: 'Wij hebben een bronzen stalen deur op maat laten maken door Meisterworks en zijn echt ontzettend blij met het resultaat.', name: 'Melissa Vijgen', context: 'Google review' },
+  { quote: 'Zeer tevreden met de stalen taatsdeuren die Rens heeft gemaakt. De kwaliteit en het vakmanschap zijn echt top.', name: 'Thorsten Lamerigts', context: 'Google review' },
+  { quote: 'Wij zijn heel erg tevreden over zowel de kwaliteit van de deur, als ook het gehele proces vooraf.', name: 'Bart Janssen', context: 'Google review' },
+  { quote: 'Heel blij met onze stalen taatsdeur met ribglas. Het is een echte eyecatcher en maakt de ruimte helemaal af!', name: 'Niels Janssen', context: 'Google review' },
+];
+
+function navAnimStyles(navOpen) {
+  const panel = `position: fixed; top: 73px; left: 0; right: 0; bottom: 0; background: oklch(0.14 0.006 60 / 0.97); backdrop-filter: blur(16px); display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 40px 32px; z-index: 55; visibility: ${navOpen ? 'visible' : 'hidden'}; opacity: ${navOpen ? 1 : 0}; transition: opacity 0.3s ease, visibility 0.3s ease;`;
+  const link = `opacity: ${navOpen ? 1 : 0}; transform: translateY(${navOpen ? 0 : -10}px); transition: opacity 0.3s cubic-bezier(.22,1,.36,1), transform 0.3s cubic-bezier(.22,1,.36,1);`;
+  const line1 = `transform-box: fill-box; transform-origin: center; transition: transform 0.3s ease; transform: ${navOpen ? 'translateY(6px) rotate(45deg)' : 'translateY(0) rotate(0)'};`;
+  const line2 = `transition: opacity 0.2s ease; opacity: ${navOpen ? 0 : 1};`;
+  const line3 = `transform-box: fill-box; transform-origin: center; transition: transform 0.3s ease; transform: ${navOpen ? 'translateY(-6px) rotate(-45deg)' : 'translateY(0) rotate(0)'};`;
+  return { navPanelStyle: panel, navLinkAnim: link, navIconLine1Style: line1, navIconLine2Style: line2, navIconLine3Style: line3 };
+}
+
+class Component extends DCLogic {
+  state = { navOpen: false, activeReview: 0, whyCustomActive: 0 };
+
+  constructor(props) {
+    super(props);
+    this.reviewsSectionRef = React.createRef();
+    this.reviewsRow1Ref = React.createRef();
+    this.reviewsRow2Ref = React.createRef();
+    this.whyCustomRef = React.createRef();
+    this._onScroll = this.handleScroll.bind(this);
+  }
+
+  componentDidMount() {
+    const loop = () => { this.handleScroll(); this._rafId = requestAnimationFrame(loop); };
+    this._rafId = requestAnimationFrame(loop);
+    this._trustTimer = setInterval(() => {
+      this.setState(s => ({ activeReview: (s.activeReview + 1) % TRUST_QUOTES.length }));
+    }, 4500);
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this._rafId);
+    clearInterval(this._trustTimer);
+  }
+
+  handleScroll() {
+    const vh = window.innerHeight || 900;
+    const el = this.reviewsSectionRef.current;
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const progress = Math.max(-1, Math.min(1, ((vh - rect.top) / (vh + rect.height)) * 2 - 1));
+      if (this.reviewsRow1Ref.current) this.reviewsRow1Ref.current.style.transform = `translateY(${progress * -22}px)`;
+      if (this.reviewsRow2Ref.current) this.reviewsRow2Ref.current.style.transform = `translateY(${progress * 22}px)`;
+    }
+
+    const wc = this.whyCustomRef.current;
+    if (wc) {
+      const wrect = wc.getBoundingClientRect();
+      const reveal = Math.max(0, Math.min(1, (vh * 0.8 - wrect.top) / (wrect.height * 0.75)));
+      const activeCount = Math.round(reveal * WHY_CUSTOM_WORDS.length);
+      if (activeCount !== this.state.whyCustomActive) {
+        this.setState({ whyCustomActive: activeCount });
+      }
+    }
+  }
+
+  renderVals() {
+    return {
+      navOpen: this.state.navOpen,
+      toggleNav: () => this.setState(s => ({ navOpen: !s.navOpen })),
+      ...navAnimStyles(this.state.navOpen),
+      accentColor: this.props.accentColor ?? '#a67c52',
+      reviewScore: this.props.reviewScore ?? 4.9,
+      reviewCount: this.props.reviewCount ?? 138,
+      showConfiguratorTeaser: this.props.showConfiguratorTeaser ?? true,
+      reviewsSectionRef: this.reviewsSectionRef,
+      reviewsRow1Ref: this.reviewsRow1Ref,
+      reviewsRow2Ref: this.reviewsRow2Ref,
+      whyCustomRef: this.whyCustomRef,
+      whyCustomWords: WHY_CUSTOM_WORDS.map((text, i) => ({
+        text,
+        style: `color:${i < this.state.whyCustomActive ? 'oklch(0.95 0.004 75)' : 'oklch(0.4 0.008 60)'}; transition: color 0.25s ease;`,
+      })),
+      reviewsRow1: REVIEWS_A.concat(REVIEWS_A),
+      reviewsRow2: REVIEWS_B.concat(REVIEWS_B),
+      reviewSlides: TRUST_QUOTES.map((q, i) => ({
+        quote: q.quote,
+        name: q.name,
+        context: q.context,
+        style: `position:absolute; inset:0; opacity:${i === this.state.activeReview ? 1 : 0}; transform:translateY(${i === this.state.activeReview ? 0 : 6}px); transition:opacity 0.7s ease, transform 0.7s ease; pointer-events:${i === this.state.activeReview ? 'auto' : 'none'};`,
+      })),
+      reviewDots: TRUST_QUOTES.map((_, i) => ({
+        onClick: () => this.setState({ activeReview: i }),
+        style: `width:${i === this.state.activeReview ? 20 : 7}px; height:7px; border-radius:4px; border:none; cursor:pointer; padding:0; background:${i === this.state.activeReview ? (this.props.accentColor ?? '#a67c52') : 'oklch(0.34 0.006 60)'}; transition:width 0.3s ease, background 0.3s ease;`,
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>
