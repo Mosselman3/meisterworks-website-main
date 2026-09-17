@@ -1,7 +1,7 @@
 import { PRODUCTS, productPath } from "./site";
 
 export const REVIEW_SCORE = 4.9;
-export const REVIEW_COUNT = 138;
+export const REVIEW_COUNT = 52;
 
 export const HOME_PRODUCTS = [
   {

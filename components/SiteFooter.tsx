@@ -14,7 +14,7 @@ export function SiteFooter() {
             height={56}
             className="mb-4 rounded-full object-cover"
           />
-          <p className="max-w-[220px] text-[13px] leading-[1.6] text-[var(--muted-2)]">
+          <p className="max-w-[220px] text-[13px] leading-[1.6] text-[oklch(0.72_0.008_75)]">
             Maatwerk in metaal. Stalen en glazen deuren, volledig naar wens
             ontworpen en vervaardigd.
           </p>
@@ -24,19 +24,19 @@ export function SiteFooter() {
             Navigatie
           </div>
           <div className="flex flex-col gap-3">
-            <Link href={ROUTES.deuren} className="text-[14px] text-[oklch(0.6_0.008_75)]">
+            <Link href={ROUTES.deuren} className="footer-link">
               Deuren
             </Link>
-            <Link href={ROUTES.projecten} className="text-[14px] text-[oklch(0.6_0.008_75)]">
+            <Link href={ROUTES.projecten} className="footer-link">
               Projecten
             </Link>
-            <Link href={ROUTES.vakmanschap} className="text-[14px] text-[oklch(0.6_0.008_75)]">
+            <Link href={ROUTES.vakmanschap} className="footer-link">
               Vakmanschap
             </Link>
-            <Link href={ROUTES.reviews} className="text-[14px] text-[oklch(0.6_0.008_75)]">
+            <Link href={ROUTES.reviews} className="footer-link">
               Reviews
             </Link>
-            <Link href={ROUTES.offerte} className="text-[14px] text-[oklch(0.6_0.008_75)]">
+            <Link href={ROUTES.offerte} className="footer-link">
               Snelle offerte
             </Link>
           </div>
@@ -46,15 +46,10 @@ export function SiteFooter() {
             Contact
           </div>
           <div className="flex flex-col gap-3">
-            <a
-              href={`mailto:${CONTACT.email}`}
-              className="text-[14px] text-[oklch(0.6_0.008_75)]"
-            >
+            <a href={`mailto:${CONTACT.email}`} className="footer-link">
               {CONTACT.email}
             </a>
-            <div className="text-[14px] text-[oklch(0.6_0.008_75)]">
-              Atelier op afspraak, Nederland
-            </div>
+            <div className="footer-link">Atelier op afspraak, Nederland</div>
           </div>
         </div>
         <div>
@@ -66,17 +61,17 @@ export function SiteFooter() {
               href={CONTACT.instagram}
               target="_blank"
               rel="noreferrer"
-              className="text-[14px] text-[oklch(0.6_0.008_75)]"
+              className="footer-link"
             >
               Instagram
             </a>
-            <Link href={ROUTES.reviews} className="text-[14px] text-[oklch(0.6_0.008_75)]">
+            <Link href={ROUTES.reviews} className="footer-link">
               Google Reviews
             </Link>
           </div>
         </div>
       </div>
-      <div className="mx-auto mt-6 max-w-[var(--max-width)] text-[12px] text-[oklch(0.4_0.008_60)]">
+      <div className="mx-auto mt-6 max-w-[var(--max-width)] text-[12px] text-[oklch(0.62_0.008_60)]">
         © Meisterworks — Maatwerk in metaal.
       </div>
     </footer>

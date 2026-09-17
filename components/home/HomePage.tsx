@@ -72,17 +72,17 @@ export function HomePage() {
             is uitgewerkt.
           </p>
         </div>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-px border border-[oklch(0.88_0.006_75)] bg-[oklch(0.88_0.006_75)]">
+        <div className="home-product-grid">
           {HOME_PRODUCTS.map((product) => (
             <Link
               key={product.slug}
               href={product.href}
-              className="flex flex-col bg-[oklch(0.97_0.004_75)]"
+              className="home-product-card"
             >
               <CoverImage
                 src={product.image}
                 alt={product.alt}
-                className="aspect-[4/5]"
+                className="home-product-image aspect-[4/5]"
               />
               <div className="px-6 py-[26px]">
                 <div className="mb-2 flex items-center justify-between gap-2.5">

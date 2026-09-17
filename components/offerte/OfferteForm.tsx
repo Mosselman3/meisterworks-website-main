@@ -2,23 +2,15 @@
 
 import { type ChangeEvent, type FormEvent, useState } from "react";
 import Link from "next/link";
+import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
 import { ArrowIcon } from "@/components/ui";
 import { PRODUCTS, ROUTES } from "@/lib/site";
-
-const COUNTRIES = [
-  { code: "+31", label: "🇳🇱 +31" },
-  { code: "+32", label: "🇧🇪 +32" },
-  { code: "+49", label: "🇩🇪 +49" },
-  { code: "+33", label: "🇫🇷 +33" },
-  { code: "+44", label: "🇬🇧 +44" },
-];
 
 const INITIAL = {
   aanhef: "",
   voornaam: "",
   achternaam: "",
   email: "",
-  landcode: "+31",
   telefoon: "",
   woonplaats: "",
   product: "",
@@ -44,6 +36,10 @@ export function OfferteForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    if (!hasPhoneNumber(values.telefoon)) {
+      setError("Vul een geldig telefoonnummer in.");
+      return;
+    }
     try {
       const response = await fetch("/api/offerte", {
         method: "POST",
@@ -150,27 +146,13 @@ export function OfferteForm() {
           </label>
           <label className="flex flex-col gap-[7px]">
             <span className="field-label">Telefoonnummer</span>
-            <div className="flex gap-2">
-              <select
-                value={values.landcode}
-                onChange={update("landcode")}
-                className="field-input w-[116px] shrink-0 px-2.5 pr-1.5"
-              >
-                {COUNTRIES.map((country) => (
-                  <option key={country.code} value={country.code}>
-                    {country.label}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="tel"
-                required
-                value={values.telefoon}
-                onChange={update("telefoon")}
-                className="field-input"
-                placeholder="6 12345678"
-              />
-            </div>
+            <PhoneField
+              value={values.telefoon}
+              onChange={(telefoon) =>
+                setValues((current) => ({ ...current, telefoon }))
+              }
+              required
+            />
           </label>
         </div>
 
