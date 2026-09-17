@@ -283,7 +283,9 @@ img {
 
 .phone-field {
   display: flex;
+  align-items: center;
   width: 100%;
+  min-height: 46px;
   border: 1px solid oklch(0.85 0.006 75);
   border-radius: 10px;
   background: oklch(1 0 0);
@@ -294,47 +296,64 @@ img {
   outline: 2px solid oklch(0.18 0.006 60);
   outline-offset: 2px;
 }
-.phone-field-country {
+.phone-field .react-international-phone-country-selector {
+  position: relative;
   display: flex;
+  align-self: stretch;
+}
+.phone-field .react-international-phone-country-selector-button,
+.phone-field-country {
+  display: flex !important;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  align-self: stretch;
   flex-shrink: 0;
-  height: 46px;
-  padding: 0 12px 0 14px;
-  border: none;
-  border-right: 1px solid oklch(0.9 0.006 75);
-  background: transparent;
+  width: 46px;
+  min-height: 44px;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 10px 0 0 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: oklch(0.28 0.008 60);
-  border-radius: 10px 0 0 10px;
 }
-.phone-field-country:hover {
-  background: oklch(0.97 0.004 75);
+.phone-field-country:hover,
+.phone-field .react-international-phone-country-selector-button:hover {
+  background: oklch(0.97 0.004 75) !important;
 }
-.phone-field-iso {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+.phone-field .react-international-phone-country-selector-button__dropdown-arrow {
+  display: none;
+}
+.phone-field .react-international-phone-country-selector-button:not(.phone-field-country) {
+  display: none !important;
+}
+.phone-field-prefix {
+  flex-shrink: 0;
+  padding: 0 2px 0 0;
+  color: oklch(0.4 0.008 60);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 .phone-field-number {
   flex: 1;
   min-width: 0;
-  height: 46px;
-  padding: 0 14px;
-  border: none;
-  background: transparent;
-  font-size: 15px;
+  height: 44px;
+  padding: 0 14px 0 8px !important;
+  border: none !important;
+  border-radius: 0 10px 10px 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 15px !important;
   font-family: inherit;
   color: oklch(0.2 0.008 60);
-  border-radius: 0 10px 10px 0;
+  outline: none !important;
 }
 .phone-field-number:focus {
-  outline: none;
-}
-.phone-field .react-international-phone-country-selector {
-  position: relative;
-}
-.phone-field .react-international-phone-country-selector-button:not(.phone-field-country) {
-  display: none;
+  outline: none !important;
+  box-shadow: none !important;
 }
 .phone-field .react-international-phone-country-selector-dropdown {
   top: calc(100% + 6px);
@@ -443,7 +462,7 @@ img {
   font-size: 13px;
 }
 
-.cfg-quote-form input:not([type="file"]),
+.cfg-quote-form input:not([type="file"]):not(.phone-field-number),
 .cfg-quote-form select,
 .cfg-quote-form textarea {
   width: 100%;
@@ -461,16 +480,11 @@ img {
   line-height: 1.5;
 }
 
-.cfg-quote-form input:focus,
+.cfg-quote-form input:not([type="file"]):not(.phone-field-number):focus,
 .cfg-quote-form select:focus,
 .cfg-quote-form textarea:focus {
   outline: 2px solid oklch(0.18 0.006 60);
   outline-offset: 2px;
-}
-
-.cfg-quote-form .phone-field-number {
-  border: none;
-  padding: 0 13px;
 }
 
 .cfg-quote-divider {

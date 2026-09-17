@@ -1,6 +1,5 @@
 "use client";
 
-import { useId } from "react";
 import {
   CountrySelector,
   FlagImage,
@@ -19,13 +18,12 @@ export function PhoneField({
   onChange: (phone: string) => void;
   required?: boolean;
 }) {
-  const labelId = useId();
   const { inputValue, handlePhoneValueChange, inputRef, country, setCountry } =
     usePhoneInput({
       defaultCountry: "nl",
       value,
       preferredCountries: [...PREFERRED],
-      forceDialCode: true,
+      disableDialCodeAndPrefix: true,
       onChange: ({ phone }) => onChange(phone),
     });
 
@@ -40,7 +38,7 @@ export function PhoneField({
             {...rootProps}
             type="button"
             className="phone-field-country"
-            aria-labelledby={labelId}
+            aria-label={`Land: ${country.name}`}
           >
             <FlagImage
               iso2={country.iso2}
@@ -48,27 +46,12 @@ export function PhoneField({
               className="phone-field-flag"
               alt=""
             />
-            <span id={labelId} className="phone-field-iso">
-              {country.iso2.toUpperCase()}
-            </span>
-            <svg
-              width="10"
-              height="10"
-              viewBox="0 0 12 12"
-              fill="none"
-              aria-hidden
-            >
-              <path
-                d="M2.5 4.5L6 8L9.5 4.5"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
           </button>
         )}
       />
+      <span className="phone-field-prefix" aria-hidden>
+        +{country.dialCode}
+      </span>
       <input
         ref={inputRef}
         className="phone-field-number"
@@ -79,7 +62,7 @@ export function PhoneField({
         autoComplete="tel"
         name="telefoon"
         required={required}
-        placeholder="+31 6 12345678"
+        placeholder="6 12345678"
         aria-label="Telefoonnummer"
       />
     </div>
