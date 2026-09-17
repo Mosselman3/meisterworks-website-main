@@ -381,6 +381,209 @@ img {
   background: oklch(0.96 0.004 75);
 }
 
+.cfg-quote-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  border: 1px solid oklch(0.88 0.006 75);
+  border-radius: 14px;
+  background: oklch(1 0 0);
+}
+
+.cfg-quote-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: oklch(0.4 0.008 60);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cfg-quote-heading span {
+  color: oklch(0.55 0.008 60);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.cfg-quote-grid-3,
+.cfg-quote-grid-2 {
+  display: grid;
+  gap: 14px;
+}
+
+.cfg-quote-grid-3 {
+  grid-template-columns: 0.7fr 1fr 1fr;
+}
+
+.cfg-quote-grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.cfg-quote-form > label,
+.cfg-quote-form .cfg-quote-grid-3 > label,
+.cfg-quote-form .cfg-quote-grid-2 > label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: oklch(0.4 0.008 60);
+  font-size: 13px;
+}
+
+.cfg-file-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: oklch(0.4 0.008 60);
+  font-size: 13px;
+}
+
+.cfg-quote-form input:not([type="file"]),
+.cfg-quote-form select,
+.cfg-quote-form textarea {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid oklch(0.85 0.006 75);
+  border-radius: 10px;
+  background: oklch(1 0 0);
+  color: oklch(0.2 0.008 60);
+  font: inherit;
+  font-size: 14px;
+}
+
+.cfg-quote-form textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.cfg-quote-form input:focus,
+.cfg-quote-form select:focus,
+.cfg-quote-form textarea:focus {
+  outline: 2px solid oklch(0.18 0.006 60);
+  outline-offset: 2px;
+}
+
+.cfg-quote-form .phone-field-number {
+  border: none;
+  padding: 0 13px;
+}
+
+.cfg-quote-divider {
+  height: 1px;
+  background: oklch(0.93 0.004 75);
+}
+
+.cfg-file-input {
+  display: flex;
+  min-height: 104px;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1.5px dashed oklch(0.78 0.008 60);
+  border-radius: 10px;
+  background: oklch(0.98 0.003 75);
+  color: oklch(0.4 0.008 60);
+  text-align: center;
+}
+
+.cfg-file-input:hover {
+  border-color: var(--accent);
+  background: oklch(0.97 0.004 75);
+}
+
+.cfg-file-input span {
+  color: oklch(0.3 0.008 60);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.cfg-file-input small {
+  color: oklch(0.55 0.008 60);
+  font-size: 12px;
+}
+
+.cfg-file-input input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.cfg-quote-error {
+  margin: 0;
+  color: oklch(0.45 0.12 25);
+  font-size: 13px;
+}
+
+.cfg-quote-submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.cfg-quote-submit p {
+  max-width: 390px;
+  margin: 0;
+  color: oklch(0.55 0.008 60);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cfg-quote-submit button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: oklch(0.14 0.006 60);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cfg-quote-success {
+  padding: 44px 28px;
+  border: 1px solid oklch(0.88 0.006 75);
+  border-radius: 14px;
+  background: oklch(1 0 0);
+  text-align: center;
+}
+
+.cfg-quote-success-icon {
+  display: flex;
+  width: 52px;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--accent) 10%, transparent);
+}
+
+.cfg-quote-success-title {
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+.cfg-quote-success p {
+  max-width: 400px;
+  margin: 0 auto;
+  color: oklch(0.45 0.008 60);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 @media (max-width: 860px) {
   [data-split-row] {
     grid-template-columns: minmax(0, 1fr) !important;
@@ -404,6 +607,13 @@ img {
   .home-product-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 16px;
+  }
+  .cfg-quote-form {
+    padding: 20px;
+  }
+  .cfg-quote-grid-3,
+  .cfg-quote-grid-2 {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 .btn-accent-lg {

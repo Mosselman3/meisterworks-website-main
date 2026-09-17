@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { QuoteForm } from "@/components/configurator/QuoteForm";
 import {
   useCallback,
   useMemo,
@@ -1071,46 +1072,8 @@ export function Configurator() {
               </div>
             ))}
           </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 14,
-              flexWrap: "wrap",
-              marginTop: 28,
-            }}
-          >
-            <Link
-              href={ROUTES.afspraak}
-              className="btn-accent"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "15px 30px",
-                fontSize: 14,
-                letterSpacing: "0.03em",
-              }}
-            >
-              Offerte aanvragen
-              <ArrowIcon />
-            </Link>
-            <Link
-              href={ROUTES.afspraak}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "15px 30px",
-                border: "1px solid oklch(0.7 0.006 75)",
-                color: "oklch(0.25 0.008 60)",
-                fontSize: 14,
-                letterSpacing: "0.03em",
-                borderRadius: 999,
-                transition: "transform 0.15s ease, background 0.15s ease",
-              }}
-            >
-              Afspraak maken
-            </Link>
+          <div style={{ marginTop: 28 }}>
+            <QuoteForm summaryRows={summaryRows} />
           </div>
         </>
       );
@@ -1830,16 +1793,3 @@ function StepperField({
   );
 }
 
-function ArrowIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M5 19L19 5M19 5H9M19 5V15"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
