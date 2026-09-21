@@ -11,6 +11,10 @@ import {
 } from "@/lib/products";
 import { ROUTES, getProduct } from "@/lib/site";
 
+const GRID_IMAGE_SIZES = "(min-width: 900px) 33vw, 50vw";
+const RELATED_IMAGE_SIZES =
+  "(min-width: 1100px) 20vw, (min-width: 900px) 33vw, 50vw";
+
 function StepIntro({
   kicker,
   title,
@@ -117,15 +121,16 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
             title={page.mechanism.title}
             body={page.mechanism.body}
           />
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-7">
+          <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
             {page.mechanism.options.map((option) => (
               <div key={option.title}>
                 <CoverImage
                   src={option.image}
                   alt={option.alt}
                   className="mb-[18px] aspect-[4/5]"
+                  sizes={GRID_IMAGE_SIZES}
                 />
-                <div className="font-serif-display mb-2 text-[20px]">
+                <div className="font-serif-display mb-2 text-[16px] min-[560px]:text-[20px]">
                   {option.title}
                 </div>
                 <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
@@ -144,7 +149,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
           title={page.sides.title}
           body={page.sides.body}
         />
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-5">
+        <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-[repeat(auto-fit,minmax(180px,1fr))] min-[900px]:gap-5">
           {page.sides.options.map((option) => (
             <div key={option.title}>
               <CoverImage
@@ -152,6 +157,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
                 alt={option.alt}
                 className="mb-3 aspect-[4/3]"
                 radius={12}
+                sizes={GRID_IMAGE_SIZES}
               />
               <div className="text-[14px] text-[oklch(0.25_0.008_60)]">
                 {option.title}
@@ -169,7 +175,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
             title="Het ritme van liggers en staanders."
             body={page.vlakBody}
           />
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-5">
+          <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-4 min-[900px]:gap-5">
             {VLAK_OPTIONS.map((option) => (
               <div key={option.title}>
                 <CoverImage
@@ -177,6 +183,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
                   alt={option.alt}
                   className="mb-3 aspect-[4/3]"
                   radius={12}
+                  sizes={GRID_IMAGE_SIZES}
                 />
                 <div className="text-[14px] text-[oklch(0.25_0.008_60)]">
                   {option.title}
@@ -218,7 +225,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
               <div className="mb-4 text-[13px] tracking-[0.08em] text-[oklch(0.55_0.008_75)] uppercase">
                 Designkleuren uit de catalogus
               </div>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-4">
+              <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3">
                 {COLOR_CATALOG.map((color) => (
                   <div key={color.title}>
                     <CoverImage
@@ -226,6 +233,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
                       alt={color.alt}
                       className="mb-2.5 aspect-square"
                       radius={12}
+                      sizes={GRID_IMAGE_SIZES}
                     />
                     <div className="text-[13px] text-[oklch(0.9_0.004_75)]">
                       {color.title}
@@ -249,7 +257,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
           title="Hoeveel de deur laat zien."
           body="Van volledig doorzicht tot een vlak dat vooral licht doorlaat. Al ons glas is veiligheidsglas."
         />
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-6">
+        <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-6">
           {GLASS_OPTIONS.map((option) => (
             <div key={option.title}>
               <div
@@ -263,7 +271,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
                   {option.label}
                 </div>
               </div>
-              <div className="font-serif-display mb-1.5 text-[19px]">
+              <div className="font-serif-display mb-1.5 text-[16px] min-[560px]:text-[19px]">
                 {option.title}
               </div>
               <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
@@ -283,15 +291,16 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
               title="Het detail dat u dagelijks vastpakt."
               body="Elke greep wordt in dezelfde afwerking als het kader geleverd."
             />
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-7">
+            <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
               {HANDLE_OPTIONS.map((option) => (
                 <div key={option.title}>
                   <CoverImage
                     src={option.image}
                     alt={option.alt}
                     className="mb-3.5 aspect-[4/5]"
+                    sizes={GRID_IMAGE_SIZES}
                   />
-                  <div className="font-serif-display mb-1.5 text-[19px]">
+                  <div className="font-serif-display mb-1.5 text-[16px] min-[560px]:text-[19px]">
                     {option.title}
                   </div>
                   <div className="mb-2 text-[13px] text-[oklch(0.5_0.008_60)]">
@@ -316,7 +325,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
           <h2 className="font-serif-display m-0 mb-8 text-[clamp(24px,3vw,32px)] leading-[1.2] font-medium">
             Bekijk ook onze andere modellen.
           </h2>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-5">
+          <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[1100px]:grid-cols-5 min-[900px]:gap-5">
             {related.map((product) => (
               <Link
                 key={product.slug}
@@ -328,9 +337,10 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
                   alt={product.title}
                   className="aspect-[4/3]"
                   radius={0}
+                  sizes={RELATED_IMAGE_SIZES}
                 />
                 <div className="flex items-center justify-between gap-2.5 px-[18px] py-4">
-                  <div className="font-serif-display text-[16px] text-[oklch(0.2_0.008_60)]">
+                  <div className="font-serif-display text-[14px] min-[560px]:text-[16px] text-[oklch(0.2_0.008_60)]">
                     {product.title}
                   </div>
                   <ArrowIcon />

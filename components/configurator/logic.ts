@@ -363,6 +363,22 @@ export function nextStepId(fromId: string, product: ConfigProduct): StepId {
   return "overzicht";
 }
 
+export function prevStepId(
+  fromId: string,
+  product: ConfigProduct,
+): StepId | null {
+  let i = STEP_ORDER.indexOf(fromId as StepId) - 1;
+  while (i >= 0) {
+    const id = STEP_ORDER[i];
+    if (id === "mechanisme" && !product.hasMech) {
+      i--;
+      continue;
+    }
+    return id;
+  }
+  return null;
+}
+
 export function sideOptionsFor(product: ConfigProduct): SideOption[] {
   if (product.sideMode === "required") return SIDE_REQUIRED;
   if (product.sideMode === "count") return SIDE_COUNT;

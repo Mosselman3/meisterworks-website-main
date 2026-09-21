@@ -5,6 +5,7 @@ import { WhyCustom } from "@/components/home/WhyCustom";
 import { ReviewMarquee } from "@/components/home/ReviewMarquee";
 import { ArrowIcon, CoverImage } from "@/components/ui";
 import {
+  CONFIGURATOR_STEPS,
   HOME_PRODUCTS,
   MARQUEE_REVIEWS_A,
   MARQUEE_REVIEWS_B,
@@ -83,15 +84,16 @@ export function HomePage() {
                 src={product.image}
                 alt={product.alt}
                 className="home-product-image aspect-[4/5]"
+                sizes="(min-width: 900px) 33vw, 50vw"
               />
-              <div className="px-6 py-[26px]">
+              <div className="home-product-card-body px-6 py-[26px]">
                 <div className="mb-2 flex items-center justify-between gap-2.5">
-                  <div className="font-serif-display text-[22px]">
+                  <div className="home-product-card-title font-serif-display text-[22px]">
                     {product.title}
                   </div>
                   <ArrowIcon size={18} />
                 </div>
-                <div className="text-[14px] leading-[1.55] text-[oklch(0.45_0.008_60)]">
+                <div className="home-product-card-blurb text-[14px] leading-[1.55] text-[oklch(0.45_0.008_60)]">
                   {product.blurb}
                 </div>
               </div>
@@ -132,7 +134,8 @@ export function HomePage() {
                 Lucinda Coumans
               </div>
               <div className="text-[13px] text-[oklch(0.5_0.008_60)]">
-                Taatsdeur &nbsp;·&nbsp; Google review
+                Taatsdeur &nbsp;·&nbsp; Google review &nbsp;·&nbsp; 9 maanden
+                geleden
               </div>
             </div>
           </div>
@@ -232,7 +235,7 @@ export function HomePage() {
               Vakmanschap
             </div>
             <h2 className="font-serif-display m-0 mb-[22px] text-[clamp(28px,3.6vw,40px)] leading-[1.15] font-medium">
-              Gemaakt in het atelier, niet van de plank.
+              Handgemaakte deuren uit het atelier.
             </h2>
             <p className="m-0 mb-[18px] text-[16px] leading-[1.7] text-[oklch(0.4_0.008_60)]">
               Staal wordt op maat gezaagd, gelast en met de hand nagewerkt tot
@@ -251,26 +254,23 @@ export function HomePage() {
 
       <ReviewMarquee rowA={MARQUEE_REVIEWS_A} rowB={MARQUEE_REVIEWS_B} />
 
-      <section className="mx-auto max-w-[1000px] px-7 py-[100px] text-center">
+      <section className="mx-auto max-w-[var(--max-width)] px-7 py-[100px] text-center">
         <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
           Configurator
         </div>
         <h2 className="font-serif-display m-0 mb-5 text-[clamp(28px,3.6vw,40px)] leading-[1.15] font-medium">
           Stel uw eigen deur samen.
         </h2>
-        <p className="mx-auto mb-12 max-w-[560px] text-[16px] leading-[1.7] text-[oklch(0.4_0.008_60)]">
-          Kies type, afwerking en glas in de configurator, of stel uw deur
-          samen in een persoonlijk adviesgesprek.
+        <p className="mx-auto mb-12 max-w-[640px] text-[16px] leading-[1.7] text-[oklch(0.4_0.008_60)]">
+          Kies product, mechanisme, zijpanelen, vlakverdeling, afmeting, kleur
+          en glas. Daarna controleert u het overzicht en vraagt u vrijblijvend
+          aan — of u stelt de deur samen in een adviesgesprek.
         </p>
-        <div className="mb-12 grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-8 text-left">
-          {[
-            ["01", "Kies het type deur"],
-            ["02", "Bepaal afmetingen en afwerking"],
-            ["03", "Ontvang een richtprijs"],
-          ].map(([num, label]) => (
+        <div className="home-config-steps mb-12">
+          {CONFIGURATOR_STEPS.map(([num, label]) => (
             <div
               key={num}
-              className="border-t border-[oklch(0.85_0.006_75)] pt-5"
+              className="border-t border-[oklch(0.85_0.006_75)] pt-5 text-left"
             >
               <div className="font-serif-display mb-2.5 text-[28px] text-[var(--accent)]">
                 {num}

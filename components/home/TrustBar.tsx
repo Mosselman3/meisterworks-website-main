@@ -56,7 +56,7 @@ export function TrustBar() {
                 “{slide.quote}”
               </p>
               <div className="text-[13px] text-[oklch(0.58_0.008_75)]">
-                — {slide.name}, {slide.context}
+                — {slide.name}, {slide.context} · {slide.time}
               </div>
             </div>
           ))}

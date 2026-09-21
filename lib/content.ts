@@ -108,8 +108,18 @@ export const PRODUCT_STORIES = [
   },
 ];
 
+export const CONFIGURATOR_STEPS = [
+  ["01", "Uw product"],
+  ["02", "Type mechanisme"],
+  ["03", "Zijpanelen"],
+  ["04", "Vlakverdeling"],
+  ["05", "Afmeting"],
+  ["06", "Kleur, glas en afwerking"],
+  ["07", "Overzicht & aanvraag"],
+] as const;
+
 export const WHY_CUSTOM_TEXT =
-  "Geen standaard, geen compromis. Een standaarddeur dwingt uw ruimte om zich aan te passen: aan een vaste kozijnmaat, een vaste kleur, een vaste indeling. Een maatwerkdeur werkt andersom — hij past zich aan uw opening, uw interieur en uw manier van leven aan. Van de dikte van het staalprofiel tot de kleur van de poedercoating: elke keuze wordt vooraf met u afgestemd en met de hand uitgevoerd in ons atelier.";
+  "Omdat elk huis uniek is, geloven we bij MeisterWorks niet in standaardoplossingen. We vertalen uw woonwensen naar handgemaakte stalen deuren en puien op maat. Met puur vakmanschap creëren we een warm meesterwerk voor uw thuis.";
 
 export const TRUST_QUOTES = [
   {
@@ -117,24 +127,28 @@ export const TRUST_QUOTES = [
       "Wij hebben een bronzen stalen deur op maat laten maken door Meisterworks en zijn echt ontzettend blij met het resultaat.",
     name: "Melissa Vijgen",
     context: "Google review",
+    time: "7 maanden geleden",
   },
   {
     quote:
       "Zeer tevreden met de stalen taatsdeuren die Rens heeft gemaakt. De kwaliteit en het vakmanschap zijn echt top.",
     name: "Thorsten Lamerigts",
     context: "Google review",
+    time: "4 maanden geleden",
   },
   {
     quote:
       "Wij zijn heel erg tevreden over zowel de kwaliteit van de deur, als ook het gehele proces vooraf.",
     name: "Bart Janssen",
     context: "Google review",
+    time: "3 maanden geleden",
   },
   {
     quote:
       "Heel blij met onze stalen taatsdeur met ribglas. Het is een echte eyecatcher en maakt de ruimte helemaal af!",
     name: "Niels Janssen",
     context: "Google review",
+    time: "2 maanden geleden",
   },
 ];
 

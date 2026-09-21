@@ -30,6 +30,7 @@ import {
   isStepConfirmed,
   mechThumbStyle,
   nextStepId,
+  prevStepId,
   sideOptionsFor,
   sideStepCopy,
   totalWidth,
@@ -581,6 +582,12 @@ export function Configurator() {
   const totalCount = sectionDefs.length - 1;
   const nextUnanswered = firstUnconfirmedStep(state, product);
   const allDone = nextUnanswered === "overzicht";
+  const currentStepId = (
+    sectionDefs.some((s) => s.id === state.openSection)
+      ? state.openSection
+      : nextUnanswered
+  ) as StepId;
+  const previousStep = prevStepId(currentStepId, product);
   const progressPct = Math.round((confirmedCount / totalCount) * 100);
 
   const preview = buildPreviewSvg(state, product, curZij);
@@ -1580,25 +1587,57 @@ export function Configurator() {
             {progressPct}% ⌃
           </span>
         </button>
-        <button
-          type="button"
-          onClick={() => openAndScroll(nextUnanswered)}
-          style={{
-            padding: "13px 26px",
-            borderRadius: 999,
-            cursor: "pointer",
-            fontFamily: "inherit",
-            fontSize: 14,
-            fontWeight: 500,
-            border: "none",
-            background: accent,
-            color: "oklch(0.14 0.006 60)",
-            boxShadow: "0 2px 10px oklch(0 0 0 / 0.14)",
-            width: "100%",
-          }}
-        >
-          {allDone ? "Naar overzicht" : "Volgende stap"}
-        </button>
+        <div style={{ display: "flex", alignItems: "stretch", gap: 10 }}>
+          <button
+            type="button"
+            aria-label="Vorige stap"
+            disabled={!previousStep}
+            onClick={() => previousStep && openAndScroll(previousStep)}
+            style={{
+              flexShrink: 0,
+              width: 48,
+              borderRadius: 999,
+              cursor: previousStep ? "pointer" : "not-allowed",
+              fontFamily: "inherit",
+              border: "1px solid oklch(0.88 0.006 75)",
+              background: "oklch(0.99 0.002 75)",
+              color: "oklch(0.22 0.008 60)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: previousStep ? 1 : 0.35,
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M15 5L8 12L15 19"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => openAndScroll(nextUnanswered)}
+            style={{
+              flex: 1,
+              padding: "13px 26px",
+              borderRadius: 999,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              fontSize: 14,
+              fontWeight: 500,
+              border: "none",
+              background: accent,
+              color: "oklch(0.14 0.006 60)",
+              boxShadow: "0 2px 10px oklch(0 0 0 / 0.14)",
+            }}
+          >
+            {allDone ? "Naar overzicht" : "Volgende stap"}
+          </button>
+        </div>
       </div>
 
       {state.summaryOpen ? (

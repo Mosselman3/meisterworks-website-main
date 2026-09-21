@@ -17,7 +17,7 @@ export default async function DeurLayout({
 
   return (
     <>
-      <div className="mx-auto max-w-[var(--max-width)] px-7 pt-[22px]">
+      <div className="mx-auto min-w-0 w-full max-w-[var(--max-width)] px-7 pt-[22px]">
         <p className="text-[13px] text-[oklch(0.5_0.008_60)]">
           <Link
             href={ROUTES.deuren}

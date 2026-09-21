@@ -362,25 +362,41 @@
 
   <!-- CONFIGURATOR TEASER -->
   <sc-if value="{{ showConfiguratorTeaser }}" hint-placeholder-val="{{ true }}">
-    <div style="padding: 100px 28px; max-width: 1000px; margin: 0 auto; text-align: center;">
-      <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Binnenkort</div>
+    <div style="padding: 100px 28px; max-width: 1280px; margin: 0 auto; text-align: center;">
+      <div style="color: oklch(0.5 0.01 60); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;">Configurator</div>
       <h2 style="font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 20px; line-height: 1.15;">Stel uw eigen deur samen.</h2>
-      <p style="color: oklch(0.4 0.008 60); font-size: 16px; line-height: 1.7; max-width: 560px; margin: 0 auto 48px;">We bouwen een configurator waarmee u type, afmetingen en afwerking direct zelf kunt bepalen. Tot die tijd stellen we uw deur samen in een persoonlijk adviesgesprek.</p>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; text-align: left; margin-bottom: 48px;">
+      <p style="color: oklch(0.4 0.008 60); font-size: 16px; line-height: 1.7; max-width: 640px; margin: 0 auto 48px;">Kies product, mechanisme, zijpanelen, vlakverdeling, afmeting, kleur en glas. Daarna controleert u het overzicht en vraagt u vrijblijvend aan — of u stelt de deur samen in een adviesgesprek.</p>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 32px 18px; text-align: left; margin-bottom: 48px;">
         <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
           <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">01</div>
-          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Kies het type deur</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Uw product</div>
         </div>
         <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
           <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">02</div>
-          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Bepaal afmetingen en afwerking</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Type mechanisme</div>
         </div>
         <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
           <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">03</div>
-          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Ontvang een richtprijs</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Zijpanelen</div>
+        </div>
+        <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
+          <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">04</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Vlakverdeling</div>
+        </div>
+        <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
+          <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">05</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Afmeting</div>
+        </div>
+        <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
+          <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">06</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Kleur, glas en afwerking</div>
+        </div>
+        <div style="border-top: 1px solid oklch(0.85 0.006 75); padding-top: 20px;">
+          <div style="font-family: 'Newsreader', serif; font-size: 28px; color: {{ accentColor }}; margin-bottom: 10px;">07</div>
+          <div style="font-size: 15px; color: oklch(0.25 0.008 60);">Overzicht &amp; aanvraag</div>
         </div>
       </div>
-      <a href="Adviesgesprek Plannen.dc.html" style="display: inline-block; padding: 15px 30px; background: oklch(0.16 0.006 60); color: oklch(0.97 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Plan een adviesgesprek</a>
+      <a href="Configurator.dc.html" style="display: inline-block; padding: 15px 30px; background: oklch(0.16 0.006 60); color: oklch(0.97 0.004 75); font-size: 14px; letter-spacing: 0.03em; border-radius: 999px; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 10px oklch(0 0 0 / 0.14);" style-hover="filter: brightness(0.92);" style-active="transform: scale(0.97); filter: brightness(0.88);" style-focus="outline: 2px solid currentColor; outline-offset: 3px;">Open de configurator</a>
     </div>
   </sc-if>
 
@@ -452,7 +468,7 @@ const REVIEWS_B = [
   { initial: 'A', name: 'Axel Kanters', context: 'Google review', quote: 'Meisterworks heeft bij mij 3 dubbele stalen deuren gemaakt en een enkele. Het is echt vakwerk.', time: '3 jaar geleden' },
 ];
 
-const WHY_CUSTOM_TEXT = "Geen standaard, geen compromis. Een standaarddeur dwingt uw ruimte om zich aan te passen: aan een vaste kozijnmaat, een vaste kleur, een vaste indeling. Een maatwerkdeur werkt andersom — hij past zich aan uw opening, uw interieur en uw manier van leven aan. Van de dikte van het staalprofiel tot de kleur van de poedercoating: elke keuze wordt vooraf met u afgestemd en met de hand uitgevoerd in ons atelier.";
+const WHY_CUSTOM_TEXT = "Omdat elk huis uniek is, geloven we bij MeisterWorks niet in standaardoplossingen. We vertalen uw woonwensen naar handgemaakte stalen deuren en puien op maat. Met puur vakmanschap creëren we een warm meesterwerk voor uw thuis.";
 const WHY_CUSTOM_WORDS = WHY_CUSTOM_TEXT.split(' ');
 
 const TRUST_QUOTES = [

@@ -3,10 +3,15 @@ import Link from "next/link";
 import { PRODUCTS, productPath } from "@/lib/site";
 
 export function ProductChipStrip({ activeSlug }: { activeSlug: string }) {
+  const products = [
+    ...PRODUCTS.filter((product) => product.slug === activeSlug),
+    ...PRODUCTS.filter((product) => product.slug !== activeSlug),
+  ];
+
   return (
-    <div className="mx-auto max-w-[var(--max-width)] px-7 pt-4">
-      <div className="chip-strip">
-        {PRODUCTS.map((product) => {
+    <div className="min-w-0 w-full pt-4">
+      <div className="chip-strip mx-auto max-w-[var(--max-width)]">
+        {products.map((product) => {
           const active = product.slug === activeSlug;
           const inner = (
             <>
