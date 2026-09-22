@@ -172,7 +172,7 @@ export function QuoteForm({
           value={fields.adres}
           onChange={update("adres")}
           autoComplete="street-address"
-          placeholder="Postcode en huisnummer"
+          placeholder="Postcode"
         />
       </label>
 

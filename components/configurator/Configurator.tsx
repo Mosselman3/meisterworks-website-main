@@ -4,7 +4,9 @@ import Link from "next/link";
 import { QuoteForm } from "@/components/configurator/QuoteForm";
 import {
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type ReactNode,
@@ -42,6 +44,13 @@ import {
 } from "./logic";
 
 const accent = ACCENT;
+const MOBILE_CFG = "(max-width: 960px)";
+
+function isMobileConfigurator() {
+  return (
+    typeof window !== "undefined" && window.matchMedia(MOBILE_CFG).matches
+  );
+}
 
 function optionCardStyle(selected: boolean): CSSProperties {
   return {
@@ -323,6 +332,8 @@ function OptionGroups({
 
 export function Configurator() {
   const [state, setState] = useState<ConfiguratorState>(INITIAL_STATE);
+  const [quoteOpen, setQuoteOpen] = useState(false);
+  const quoteAutoShown = useRef(false);
 
   const product = useMemo(
     () => getProduct(state.productId),
@@ -591,6 +602,39 @@ export function Configurator() {
   const progressPct = Math.round((confirmedCount / totalCount) * 100);
 
   const preview = buildPreviewSvg(state, product, curZij);
+
+  const openQuote = useCallback(() => {
+    setQuoteOpen(true);
+    setState((s) => ({ ...s, summaryOpen: false }));
+  }, []);
+
+  useEffect(() => {
+    if (!allDone) {
+      quoteAutoShown.current = false;
+      setQuoteOpen(false);
+      return;
+    }
+    if (quoteAutoShown.current || !isMobileConfigurator()) return;
+    quoteAutoShown.current = true;
+    setQuoteOpen(true);
+    setState((s) => (s.summaryOpen ? { ...s, summaryOpen: false } : s));
+  }, [allDone]);
+
+  useEffect(() => {
+    if (!quoteOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setQuoteOpen(false);
+    };
+    const prevOverflow = document.body.style.overflow;
+    if (isMobileConfigurator()) {
+      document.body.style.overflow = "hidden";
+    }
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [quoteOpen]);
 
   const renderSectionBody = (id: StepId): ReactNode => {
     if (id === "product") {
@@ -1079,9 +1123,31 @@ export function Configurator() {
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 28 }}>
+          <div data-cfg-inline-quote style={{ marginTop: 28 }}>
             <QuoteForm summaryRows={summaryRows} />
           </div>
+          <button
+            type="button"
+            data-cfg-open-quote
+            onClick={openQuote}
+            style={{
+              display: "none",
+              width: "100%",
+              marginTop: 28,
+              padding: "14px 24px",
+              borderRadius: 999,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              fontSize: 14,
+              fontWeight: 500,
+              border: "none",
+              background: accent,
+              color: "oklch(0.14 0.006 60)",
+              boxShadow: "0 2px 10px oklch(0 0 0 / 0.14)",
+            }}
+          >
+            Offerte aanvragen
+          </button>
         </>
       );
     }
@@ -1560,7 +1626,10 @@ export function Configurator() {
           onClick={() =>
             setState((s) => ({ ...s, summaryOpen: !s.summaryOpen }))
           }
+          aria-label={`Bekijk uw samenstelling, ${progressPct}% voltooid`}
           style={{
+            position: "relative",
+            overflow: "hidden",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -1575,7 +1644,21 @@ export function Configurator() {
           }}
         >
           <span
+            aria-hidden
             style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: `${progressPct}%`,
+              background: `color-mix(in oklch, ${accent} ${allDone ? 36 : 22}%, transparent)`,
+              transition: "width 0.4s ease",
+              pointerEvents: "none",
+            }}
+          />
+          <span
+            style={{
+              position: "relative",
               fontSize: 12,
               color: "oklch(0.35 0.008 60)",
               fontWeight: 600,
@@ -1583,7 +1666,14 @@ export function Configurator() {
           >
             Bekijk uw samenstelling
           </span>
-          <span style={{ fontSize: 12, color: "oklch(0.5 0.008 60)" }}>
+          <span
+            style={{
+              position: "relative",
+              fontSize: 12,
+              color: "oklch(0.5 0.008 60)",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
             {progressPct}% ⌃
           </span>
         </button>
@@ -1620,7 +1710,9 @@ export function Configurator() {
           </button>
           <button
             type="button"
-            onClick={() => openAndScroll(nextUnanswered)}
+            onClick={() =>
+              allDone ? openQuote() : openAndScroll(nextUnanswered)
+            }
             style={{
               flex: 1,
               padding: "13px 26px",
@@ -1635,7 +1727,7 @@ export function Configurator() {
               boxShadow: "0 2px 10px oklch(0 0 0 / 0.14)",
             }}
           >
-            {allDone ? "Naar overzicht" : "Volgende stap"}
+            {allDone ? "Offerte aanvragen" : "Volgende stap"}
           </button>
         </div>
       </div>
@@ -1765,6 +1857,96 @@ export function Configurator() {
                 </span>
               </button>
             ))}
+          </div>
+        </div>
+      ) : null}
+
+      {allDone ? (
+        <div
+          data-cfg-quote-overlay
+          role="dialog"
+          aria-modal={quoteOpen}
+          aria-hidden={!quoteOpen}
+          aria-labelledby="cfg-quote-overlay-title"
+          onClick={() => setQuoteOpen(false)}
+          style={{
+            display: quoteOpen ? "flex" : "none",
+            position: "fixed",
+            inset: 0,
+            zIndex: 80,
+            background: "oklch(0.14 0.006 60 / 0.52)",
+            alignItems: "flex-end",
+          }}
+        >
+          <div
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "100%",
+              maxHeight: "94vh",
+              overflowY: "auto",
+              background: "oklch(0.99 0.002 75)",
+              borderRadius: "18px 18px 0 0",
+              padding: "12px 20px calc(28px + env(safe-area-inset-bottom))",
+            }}
+          >
+            <div
+              style={{
+                width: 40,
+                height: 4,
+                borderRadius: 999,
+                background: "oklch(0.86 0.006 75)",
+                margin: "0 auto 14px",
+              }}
+              aria-hidden
+            />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: 16,
+                marginBottom: 10,
+              }}
+            >
+              <div>
+                <div
+                  id="cfg-quote-overlay-title"
+                  className="font-serif-display"
+                  style={{ fontSize: 22, lineHeight: 1.2 }}
+                >
+                  Uw gegevens
+                </div>
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    fontSize: 14,
+                    lineHeight: 1.55,
+                    color: "oklch(0.42 0.008 60)",
+                  }}
+                >
+                  Uw samenstelling is compleet. Vul uw gegevens in en ontvang
+                  vrijblijvend een offerte.
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="Overlay sluiten"
+                onClick={() => setQuoteOpen(false)}
+                style={{
+                  flexShrink: 0,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 24,
+                  lineHeight: 1,
+                  color: "oklch(0.45 0.008 60)",
+                  padding: 4,
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <QuoteForm summaryRows={summaryRows} />
           </div>
         </div>
       ) : null}

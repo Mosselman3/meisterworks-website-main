@@ -281,9 +281,10 @@
   </div>
 
   <div data-cfg-nav-mobile="true" style="display: none; flex-direction: column; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: oklch(1 0 0 / 0.97); backdrop-filter: blur(10px); border-top: 1px solid oklch(0.88 0.006 75); box-shadow: 0 -2px 12px oklch(0 0 0 / 0.06);">
-    <button onClick="{{ toggleSummary }}" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 9px 14px; border-radius: 999px; background: oklch(0.96 0.004 75); border: 1px solid oklch(0.9 0.006 75); cursor: pointer; font-family: inherit;">
-      <span style="font-size: 12px; color: oklch(0.35 0.008 60); font-weight: 600;">Bekijk uw samenstelling</span>
-      <span style="font-size: 12px; color: oklch(0.5 0.008 60);">{{ progressPercent }} ⌃</span>
+    <button onClick="{{ toggleSummary }}" aria-label="{{ mobileSummaryLabel }}" style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 9px 14px; border-radius: 999px; background: oklch(0.96 0.004 75); border: 1px solid oklch(0.9 0.006 75); cursor: pointer; font-family: inherit;">
+      <span style="{{ mobileProgressFillStyle }}"></span>
+      <span style="position: relative; font-size: 12px; color: oklch(0.35 0.008 60); font-weight: 600;">Bekijk uw samenstelling</span>
+      <span style="position: relative; font-size: 12px; color: oklch(0.5 0.008 60); font-variant-numeric: tabular-nums;">{{ progressPercent }} ⌃</span>
     </button>
     <div style="display: flex; align-items: stretch; gap: 10px;">
       <button onClick="{{ goToPrevious }}" aria-label="Vorige stap" style="{{ mobilePrevStyle }}">
@@ -981,6 +982,8 @@ class Component extends DCLogic {
       progressLabel: allDone ? 'Alle stappen ingevuld' : `${confirmedCount} van ${totalCount} stappen ingevuld`,
       progressPercent: `${Math.round((confirmedCount / totalCount) * 100)}%`,
       progressBarStyle: `height: 100%; border-radius: 999px; background: ${accent}; width: ${Math.max(4, (confirmedCount / totalCount) * 100)}%; transition: width 0.35s ease;`,
+      mobileSummaryLabel: `Bekijk uw samenstelling, ${Math.round((confirmedCount / totalCount) * 100)}% voltooid`,
+      mobileProgressFillStyle: `position: absolute; left: 0; top: 0; bottom: 0; width: ${Math.round((confirmedCount / totalCount) * 100)}%; background: color-mix(in oklch, ${accent} ${allDone ? 36 : 22}%, transparent); transition: width 0.4s ease; pointer-events: none;`,
       liveSummary: summaryRows.map(r => ({
         label: r.label, value: r.value, onEdit: r.onEdit,
         rowStyle: 'display: flex; align-items: baseline; justify-content: space-between; gap: 14px; width: 100%; padding: 7px 0; background: none; border: none; border-bottom: 1px solid oklch(0.95 0.004 75); cursor: pointer; font-family: inherit; text-align: left;',

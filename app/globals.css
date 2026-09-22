@@ -803,4 +803,31 @@ img {
   [data-cfg-nav-mobile] {
     display: flex !important;
   }
+  [data-cfg-inline-quote] {
+    display: none !important;
+  }
+  [data-cfg-open-quote] {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+  [data-cfg-quote-overlay] .cfg-quote-form {
+    padding: 8px 0 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+  [data-cfg-quote-overlay] .cfg-quote-form > .cfg-quote-heading:first-of-type {
+    display: none;
+  }
+  [data-cfg-quote-overlay] .cfg-quote-success {
+    border: none;
+    padding: 28px 8px 12px;
+  }
+}
+@media (min-width: 961px) {
+  [data-cfg-quote-overlay],
+  [data-cfg-open-quote] {
+    display: none !important;
+  }
 }

@@ -164,7 +164,7 @@ export function OfferteForm() {
             value={values.woonplaats}
             onChange={update("woonplaats")}
             className="field-input"
-            placeholder="Postcode en huisnummer"
+            placeholder="Postcode"
           />
         </label>
       </div>
