@@ -65,8 +65,7 @@ export default function ReviewsPage() {
           Klaar voor de volgende stap?
         </h2>
         <p className="m-0 mb-9 text-[16px] text-[oklch(0.22_0.03_60)]">
-          Ga verder in de configurator, of vraag een snelle offerte aan — beide
-          vrijblijvend.
+          Stel vrijblijvend uw deur samen in de configurator, of vraag direct een snelle offerte aan.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link href={ROUTES.configurator} className="btn-dark gap-2 px-[34px] py-4">
