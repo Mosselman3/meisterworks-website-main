@@ -22,38 +22,33 @@ export type Product = {
   slug: string;
   title: string;
   image: string;
+  doorTypeCode: string;
 };
 
 export const PRODUCTS: Product[] = [
   {
-    slug: "enkele-deur",
-    title: "Enkele deur",
+    slug: "taatsdeur",
+    title: "Taatsdeur",
     image: "/assets/pivot-door-slats.jpg",
+    doorTypeCode: "taatsdeur",
   },
   {
-    slug: "enkele-deur-met-vast-paneel",
-    title: "Enkele deur met vast paneel",
-    image: "/assets/hero-open-door.jpg",
-  },
-  {
-    slug: "dubbele-deur",
-    title: "Dubbele deur",
-    image: "/assets/double-doors-black.jpg",
-  },
-  {
-    slug: "dubbele-deur-met-vast-paneel",
-    title: "Dubbele deur met vast paneel",
+    slug: "scharnierdeur-kozijn",
+    title: "Scharnierdeur incl. kozijn",
     image: "/assets/arched-bronze-door.jpg",
+    doorTypeCode: "scharnierdeur_kozijn",
+  },
+  {
+    slug: "schuifdeur",
+    title: "Schuifdeur",
+    image: "/assets/sliding-wall-herringbone.jpg",
+    doorTypeCode: "schuifdeur",
   },
   {
     slug: "vast-paneel",
-    title: "Vast paneel",
-    image: "/assets/sliding-wall-herringbone.jpg",
-  },
-  {
-    slug: "complete-scheidingswand",
-    title: "Complete scheidingswand",
-    image: "/assets/detail-green.jpg",
+    title: "Vast paneel (los)",
+    image: "/assets/hero-open-door.jpg",
+    doorTypeCode: "vast_paneel",
   },
 ];
 
@@ -105,22 +100,22 @@ export const DESIGN_PAGES: DesignPage[] = [
   {
     file: "Deur - Enkele deur.dc.html",
     title: "Enkele deur",
-    nextRoute: productPath("enkele-deur"),
+    nextRoute: ROUTES.configurator,
   },
   {
     file: "Deur - Enkele deur met vast paneel.dc.html",
     title: "Enkele deur met vast paneel",
-    nextRoute: productPath("enkele-deur-met-vast-paneel"),
+    nextRoute: ROUTES.configurator,
   },
   {
     file: "Deur - Dubbele deur.dc.html",
     title: "Dubbele deur",
-    nextRoute: productPath("dubbele-deur"),
+    nextRoute: ROUTES.configurator,
   },
   {
     file: "Deur - Dubbele deur met vast paneel.dc.html",
     title: "Dubbele deur met vast paneel",
-    nextRoute: productPath("dubbele-deur-met-vast-paneel"),
+    nextRoute: ROUTES.configurator,
   },
   {
     file: "Deur - Vast paneel.dc.html",
@@ -130,6 +125,6 @@ export const DESIGN_PAGES: DesignPage[] = [
   {
     file: "Deur - Complete scheidingswand.dc.html",
     title: "Complete scheidingswand",
-    nextRoute: productPath("complete-scheidingswand"),
+    nextRoute: ROUTES.configurator,
   },
 ];

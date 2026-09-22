@@ -1,5 +1,6 @@
 import React from "react";
 import { ACCENT } from "@/lib/site";
+import { COLORS, findGlass, windowCountFromBars } from "./catalog";
 
 export { ACCENT as CONFIGURATOR_ACCENT };
 
@@ -10,10 +11,11 @@ export type ConfigProduct = {
   label: string;
   desc: string;
   img: string;
-  leaves: number;
-  hasMech: boolean;
-  hasGreep: boolean;
-  sideMode: SideMode;
+  doorTypeCode: string;
+  basePrice: number;
+  hasHardware: boolean;
+  hasFixedPanel: boolean;
+  custom?: boolean;
 };
 
 export type SideOption = {
@@ -32,20 +34,25 @@ export type Bay = {
   defaultWidth: number;
 };
 
+export type PanelLayout = "geen" | "een" | "beide";
+export type PanelSide = "links" | "rechts";
+
 export type ConfiguratorState = {
   openSection: string | null;
   productId: string;
-  mechanisme: string;
-  zij: string | null;
-  richting: string;
+  breedte: number;
   liggers: number;
   staanders: number;
+  panelLiggers: number;
   panelStaanders: number;
-  bayWidths: Record<string, number>;
   hoogte: number;
   kleur: string;
   glas: string;
-  greep: string;
+  beslag: string;
+  panelLayout: PanelLayout;
+  panelSide: PanelSide;
+  leftPanelBreedte: number;
+  rightPanelBreedte: number;
   groupOpen: Record<string, number>;
   answered: Record<string, boolean>;
   summaryOpen: boolean;
@@ -54,18 +61,20 @@ export type ConfiguratorState = {
 
 export const INITIAL_STATE: ConfiguratorState = {
   openSection: "product",
-  productId: "enkele",
-  mechanisme: "taats",
-  zij: null,
-  richting: "links",
+  productId: "taatsdeur",
+  breedte: 900,
   liggers: 0,
   staanders: 0,
+  panelLiggers: 0,
   panelStaanders: 0,
-  bayWidths: {},
-  hoogte: 2300,
-  kleur: "zwart",
-  glas: "helder",
-  greep: "hoek",
+  hoogte: 2100,
+  kleur: "standaard_mat_zwart",
+  glas: "33.1",
+  beslag: "standaard",
+  panelLayout: "geen",
+  panelSide: "rechts",
+  leftPanelBreedte: 700,
+  rightPanelBreedte: 700,
   groupOpen: {},
   answered: {},
   summaryOpen: false,
@@ -74,66 +83,58 @@ export const INITIAL_STATE: ConfiguratorState = {
 
 export const CFG_PRODUCTS: ConfigProduct[] = [
   {
-    id: "enkele",
-    label: "Enkele deur",
-    desc: "Eén vast kader, één beweegbaar vlak.",
+    id: "taatsdeur",
+    label: "Taatsdeur",
+    desc: "Taatsmechaniek vloer en boven.",
     img: "/assets/pivot-door-slats.jpg",
-    leaves: 1,
-    hasMech: true,
-    hasGreep: true,
-    sideMode: "optional",
+    doorTypeCode: "taatsdeur",
+    basePrice: 380,
+    hasHardware: true,
+    hasFixedPanel: true,
   },
   {
-    id: "enkele-paneel",
-    label: "Enkele deur met vast paneel",
-    desc: "Eén deur, verlengd met vast glas.",
-    img: "/assets/hero-open-door.jpg",
-    leaves: 1,
-    hasMech: true,
-    hasGreep: true,
-    sideMode: "required",
-  },
-  {
-    id: "dubbele",
-    label: "Dubbele deur",
-    desc: "Twee vlakken, één brede opening.",
-    img: "/assets/double-doors-black.jpg",
-    leaves: 2,
-    hasMech: true,
-    hasGreep: true,
-    sideMode: "optional",
-  },
-  {
-    id: "dubbele-paneel",
-    label: "Dubbele deur met vast paneel",
-    desc: "Twee vlakken, aangevuld met vast glas.",
+    id: "scharnierdeur-kozijn",
+    label: "Scharnierdeur incl. kozijn",
+    desc: "Kozijn en scharnieren inbegrepen.",
     img: "/assets/arched-bronze-door.jpg",
-    leaves: 2,
-    hasMech: true,
-    hasGreep: true,
-    sideMode: "required",
+    doorTypeCode: "scharnierdeur_kozijn",
+    basePrice: 450,
+    hasHardware: true,
+    hasFixedPanel: true,
   },
   {
-    id: "paneel",
-    label: "Vast paneel",
-    desc: "Een vlak dat niet beweegt, en dat ook niet hoeft.",
+    id: "schuifdeur",
+    label: "Schuifdeur",
+    desc: "Inclusief rail en loopwerk.",
     img: "/assets/sliding-wall-herringbone.jpg",
-    leaves: 0,
-    hasMech: false,
-    hasGreep: false,
-    sideMode: "count",
+    doorTypeCode: "schuifdeur",
+    basePrice: 520,
+    hasHardware: true,
+    hasFixedPanel: true,
   },
   {
-    id: "wand",
-    label: "Complete scheidingswand",
-    desc: "Ruimtes scheiden zonder ze te sluiten.",
-    img: "/assets/detail-green.jpg",
-    leaves: 1,
-    hasMech: true,
-    hasGreep: true,
-    sideMode: "count-fixed",
+    id: "vast-paneel",
+    label: "Vast paneel (los)",
+    desc: "Alleen een bevestigingsframe, geen mechaniek.",
+    img: "/assets/hero-open-door.jpg",
+    doorTypeCode: "vast_paneel",
+    basePrice: 150,
+    hasHardware: false,
+    hasFixedPanel: false,
   },
 ];
+
+export const CUSTOM_PRODUCT: ConfigProduct = {
+  id: "custom",
+  label: "Staat er niet tussen",
+  desc: "Uw situatie past niet in de vier standaardproducten. We nemen de wens mee in de offerte.",
+  img: "",
+  doorTypeCode: "custom",
+  basePrice: 0,
+  hasHardware: false,
+  hasFixedPanel: false,
+  custom: true,
+};
 
 export const MECHANISMEN = [
   {
@@ -336,17 +337,26 @@ export const GREPEN = [
 
 export const STEP_ORDER = [
   "product",
-  "mechanisme",
-  "zij",
-  "vlak",
+  "paneel",
   "maat",
-  "opties",
+  "vlak",
+  "glas",
+  "kleur",
+  "beslag",
   "overzicht",
 ] as const;
 
 export type StepId = (typeof STEP_ORDER)[number];
 
+export function stepApplies(id: StepId, product: ConfigProduct) {
+  if (product.custom) return id === "product" || id === "overzicht";
+  if (id === "beslag") return product.hasHardware;
+  if (id === "paneel") return product.hasFixedPanel;
+  return true;
+}
+
 export function getProduct(productId: string): ConfigProduct {
+  if (productId === CUSTOM_PRODUCT.id) return CUSTOM_PRODUCT;
   return CFG_PRODUCTS.find((p) => p.id === productId) ?? CFG_PRODUCTS[0];
 }
 
@@ -354,7 +364,7 @@ export function nextStepId(fromId: string, product: ConfigProduct): StepId {
   let i = STEP_ORDER.indexOf(fromId as StepId) + 1;
   while (i < STEP_ORDER.length) {
     const id = STEP_ORDER[i];
-    if (id === "mechanisme" && !product.hasMech) {
+    if (!stepApplies(id, product)) {
       i++;
       continue;
     }
@@ -370,7 +380,7 @@ export function prevStepId(
   let i = STEP_ORDER.indexOf(fromId as StepId) - 1;
   while (i >= 0) {
     const id = STEP_ORDER[i];
-    if (id === "mechanisme" && !product.hasMech) {
+    if (!stepApplies(id, product)) {
       i--;
       continue;
     }
@@ -379,38 +389,14 @@ export function prevStepId(
   return null;
 }
 
-export function sideOptionsFor(product: ConfigProduct): SideOption[] {
-  if (product.sideMode === "required") return SIDE_REQUIRED;
-  if (product.sideMode === "count") return SIDE_COUNT;
-  if (product.sideMode === "count-fixed") return SIDE_COUNT_FIXED;
+export function sideOptionsFor(_product: ConfigProduct): SideOption[] {
   return SIDE_OPTIONAL;
 }
 
-export function sideStepCopy(product: ConfigProduct): {
+export function sideStepCopy(_product: ConfigProduct): {
   title: string;
   intro: string;
 } {
-  if (product.sideMode === "count") {
-    return {
-      title: "Hoeveel panelen sluit u aaneen?",
-      intro:
-        "Een vast paneel kan alleen staan, of aaneengesloten worden met extra panelen tot de gewenste breedte.",
-    };
-  }
-  if (product.sideMode === "count-fixed") {
-    return {
-      title: "Hoeveel vaste panelen naast de doorgang?",
-      intro:
-        "Naast het bewegende deel bepaalt u hoeveel vaste panelen de rest van de breedte invullen.",
-    };
-  }
-  if (product.sideMode === "required") {
-    return {
-      title: "Aan welke kant komt het vaste paneel?",
-      intro:
-        "Dit model combineert de deur altijd met een vast paneel. Kies aan welke zijde het paneel komt.",
-    };
-  }
   return {
     title: "Wilt u een vast paneel naast de deur?",
     intro:
@@ -536,17 +522,11 @@ export function zijThumbStyle(
   product: ConfigProduct,
 ): React.CSSProperties {
   const bays: { type: "panel" | "door"; w: number }[] = [];
-  if (product.sideMode === "count") {
-    for (let i = 0; i < (opt.panels ?? 1); i++)
-      bays.push({ type: "panel", w: 1 });
-  } else {
-    for (let i = 0; i < (opt.left ?? 0); i++)
-      bays.push({ type: "panel", w: 0.62 });
-    for (let i = 0; i < product.leaves; i++)
-      bays.push({ type: "door", w: 1 });
-    for (let i = 0; i < (opt.right ?? 0); i++)
-      bays.push({ type: "panel", w: 0.62 });
-  }
+  for (let i = 0; i < (opt.left ?? 0); i++)
+    bays.push({ type: "panel", w: 0.62 });
+  bays.push({ type: "door", w: 1 });
+  for (let i = 0; i < (opt.right ?? 0); i++)
+    bays.push({ type: "panel", w: 0.62 });
   if (!bays.length) bays.push({ type: "panel", w: 1 });
 
   const VB_W = 170;
@@ -585,21 +565,10 @@ export function zijThumbStyle(
 }
 
 export function baysFor(
-  product: ConfigProduct,
+  _product: ConfigProduct,
   zij: SideOption,
 ): Bay[] {
   const out: Bay[] = [];
-  if (product.sideMode === "count") {
-    for (let i = 0; i < (zij.panels ?? 1); i++) {
-      out.push({
-        type: "panel",
-        key: "c" + i,
-        label: (zij.panels ?? 1) > 1 ? `Paneel ${i + 1}` : "Paneel",
-        defaultWidth: 800,
-      });
-    }
-    return out;
-  }
   for (let i = 0; i < (zij.left ?? 0); i++) {
     out.push({
       type: "panel",
@@ -608,14 +577,12 @@ export function baysFor(
       defaultWidth: 700,
     });
   }
-  for (let i = 0; i < product.leaves; i++) {
-    out.push({
-      type: "door",
-      key: "door" + i,
-      label: product.leaves === 2 ? `Deur ${i + 1}` : "Deur",
-      defaultWidth: product.leaves === 2 ? 900 : 1000,
-    });
-  }
+  out.push({
+    type: "door",
+    key: "door0",
+    label: "Deur",
+    defaultWidth: 1000,
+  });
   for (let i = 0; i < (zij.right ?? 0); i++) {
     out.push({
       type: "panel",
@@ -627,24 +594,130 @@ export function baysFor(
   return out;
 }
 
-export function bayWidth(
-  state: ConfiguratorState,
-  bay: Bay,
-): number {
-  return state.bayWidths[bay.key] ?? bay.defaultWidth;
+export function bayWidth(_state: ConfiguratorState, bay: Bay): number {
+  return bay.defaultWidth;
 }
 
-export function totalWidth(
-  state: ConfiguratorState,
-  product: ConfigProduct,
-  zij: SideOption,
-): number {
+export function totalWidth(state: ConfiguratorState): number {
   return (
-    baysFor(product, zij).reduce(
-      (sum, b) => sum + bayWidth(state, b),
-      0,
-    ) || 1000
+    (state.breedte || 0) +
+    (leftPanelActive(state) ? state.leftPanelBreedte : 0) +
+    (rightPanelActive(state) ? state.rightPanelBreedte : 0)
   );
+}
+
+export function hasPanels(state: ConfiguratorState) {
+  return state.panelLayout === "een" || state.panelLayout === "beide";
+}
+
+export function leftPanelActive(state: ConfiguratorState) {
+  return (
+    state.panelLayout === "beide" ||
+    (state.panelLayout === "een" && state.panelSide === "links")
+  );
+}
+
+export function rightPanelActive(state: ConfiguratorState) {
+  return (
+    state.panelLayout === "beide" ||
+    (state.panelLayout === "een" && state.panelSide === "rechts")
+  );
+}
+
+export function panelAreaM2(widthMm: number, heightMm: number) {
+  if (widthMm <= 0 || heightMm <= 0) return 0;
+  return (widthMm * heightMm) / 1_000_000;
+}
+
+export function totalPanelM2(state: ConfiguratorState) {
+  const hoogte = state.hoogte;
+  return (
+    (leftPanelActive(state) ? panelAreaM2(state.leftPanelBreedte, hoogte) : 0) +
+    (rightPanelActive(state) ? panelAreaM2(state.rightPanelBreedte, hoogte) : 0)
+  );
+}
+
+export function paneelLabel(state: ConfiguratorState) {
+  if (state.panelLayout === "geen") return "Geen vast paneel";
+  if (state.panelLayout === "een") {
+    return `Eén vast paneel ${state.panelSide}`;
+  }
+  return "Twee vaste panelen, links en rechts";
+}
+
+export function maatLabel(state: ConfiguratorState) {
+  const hoogte = state.hoogte;
+  const parts = [`Deur ${state.breedte} × ${hoogte} mm`];
+  if (leftPanelActive(state)) {
+    parts.push(`paneel links ${state.leftPanelBreedte} × ${hoogte} mm`);
+  }
+  if (rightPanelActive(state)) {
+    parts.push(`paneel rechts ${state.rightPanelBreedte} × ${hoogte} mm`);
+  }
+  return parts.join(" · ");
+}
+
+export function formatM2(area: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(area);
+}
+
+export function formatPanelM2(widthMm: number, heightMm: number) {
+  return formatM2(panelAreaM2(widthMm, heightMm));
+}
+
+export function totalOpeningM2(state: ConfiguratorState) {
+  return panelAreaM2(state.breedte, state.hoogte) + totalPanelM2(state);
+}
+
+export type SizeLine = { label: string; widthMm: number; heightMm: number };
+
+export function sizeLines(state: ConfiguratorState): SizeLine[] {
+  const hoogte = state.hoogte;
+  const lines: SizeLine[] = [];
+  if (leftPanelActive(state)) {
+    lines.push({
+      label: "Paneel links",
+      widthMm: state.leftPanelBreedte,
+      heightMm: hoogte,
+    });
+  }
+  lines.push({ label: "Deur", widthMm: state.breedte, heightMm: hoogte });
+  if (rightPanelActive(state)) {
+    lines.push({
+      label: "Paneel rechts",
+      widthMm: state.rightPanelBreedte,
+      heightMm: hoogte,
+    });
+  }
+  return lines;
+}
+
+export function panelLayoutThumb(kind: PanelLayout): React.CSSProperties {
+  const door =
+    '<rect x="70" y="12" width="60" height="176" fill="#ffffff" stroke="#2f4a63" stroke-width="4"/>';
+  const left =
+    '<rect x="12" y="12" width="50" height="176" fill="#e3e9e8" stroke="#2f4a63" stroke-width="3"/><text x="37" y="178" text-anchor="middle" font-size="9" fill="#2f4a63" fill-opacity="0.55" font-family="monospace">VAST</text>';
+  const right =
+    '<rect x="138" y="12" width="50" height="176" fill="#e3e9e8" stroke="#2f4a63" stroke-width="3"/><text x="163" y="178" text-anchor="middle" font-size="9" fill="#2f4a63" fill-opacity="0.55" font-family="monospace">VAST</text>';
+  const parts =
+    kind === "geen"
+      ? door
+      : kind === "een"
+        ? `${door}${right}`
+        : `${left}${door}${right}`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f4f2ef"/>${parts}</svg>`;
+  return {
+    height: 96,
+    borderRadius: 9,
+    backgroundColor: "#f4f2ef",
+    backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(svg.replace(/\s+/g, " "))}")`,
+    backgroundSize: "contain",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  };
 }
 
 export function isStepConfirmed(
@@ -653,14 +726,14 @@ export function isStepConfirmed(
   product: ConfigProduct,
 ): boolean {
   const a = state.answered;
+  if (!stepApplies(stepId as StepId, product)) return true;
   if (stepId === "product") return !!a.product;
-  if (stepId === "mechanisme")
-    return !product.hasMech || (!!a.mechanisme && !!a.richting);
-  if (stepId === "zij") return !!a.zij;
-  if (stepId === "vlak") return !!a.vlak;
   if (stepId === "maat") return !!a.maat;
-  if (stepId === "opties")
-    return !!a.kleur && !!a.glas && (!product.hasGreep || !!a.greep);
+  if (stepId === "vlak") return !!a.vlak;
+  if (stepId === "glas") return !!a.glas;
+  if (stepId === "kleur") return !!a.kleur;
+  if (stepId === "beslag") return !!a.beslag;
+  if (stepId === "paneel") return !!a.paneel;
   return false;
 }
 
@@ -670,7 +743,7 @@ export function firstUnconfirmedStep(
 ): StepId {
   for (const id of STEP_ORDER) {
     if (id === "overzicht") continue;
-    if (id === "mechanisme" && !product.hasMech) continue;
+    if (!stepApplies(id, product)) continue;
     if (!isStepConfirmed(id, state, product)) return id;
   }
   return "overzicht";
@@ -728,22 +801,39 @@ export function directionLabel(
   return "n.t.b.";
 }
 
+function barPhrase(liggers: number, staanders: number) {
+  if (liggers === 0 && staanders === 0) return "zonder onderverdeling";
+  return `${liggers} ligger${liggers === 1 ? "" : "s"}, ${staanders} staander${staanders === 1 ? "" : "s"}`;
+}
+
 export function vlakLabel(state: ConfiguratorState): string {
-  if (state.liggers === 0 && state.staanders === 0)
-    return "Zonder onderverdeling";
-  return `${state.liggers} ligger${state.liggers === 1 ? "" : "s"}, ${state.staanders} staander${state.staanders === 1 ? "" : "s"}`;
+  const windows = windowCountFromBars(state.liggers, state.staanders);
+  const door = `${barPhrase(state.liggers, state.staanders)} · ${windows} ${windows === 1 ? "raam" : "ramen"}`;
+  if (!hasPanels(state)) return door;
+  const panelWindows = windowCountFromBars(state.panelLiggers, state.panelStaanders);
+  const panelWord = state.panelLayout === "beide" ? "Panelen" : "Paneel";
+  return `Deur: ${door}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}`;
 }
 
 export function buildPreviewSvg(
   state: ConfiguratorState,
   product: ConfigProduct,
-  zij: SideOption,
 ): React.ReactElement {
-  const kleur = KLEUREN.find((k) => k.id === state.kleur) ?? KLEUREN[0];
-  const glas = GLAS.find((g) => g.id === state.glas) ?? GLAS[0];
-  const bays = baysFor(product, zij);
-
-  const totalMm = totalWidth(state, product, zij);
+  const kleur = COLORS.find((k) => k.code === state.kleur) ?? COLORS[0];
+  const glas = findGlass(state.glas);
+  const doorWidth = Math.max(300, state.breedte || 900);
+  const leftWidth = leftPanelActive(state) ? state.leftPanelBreedte : 0;
+  const rightWidth = rightPanelActive(state) ? state.rightPanelBreedte : 0;
+  const bays: Bay[] = [
+    ...(leftWidth
+      ? [{ type: "panel" as const, key: "links", label: "Paneel links", defaultWidth: leftWidth }]
+      : []),
+    { type: "door", key: "deur", label: "Deur", defaultWidth: doorWidth },
+    ...(rightWidth
+      ? [{ type: "panel" as const, key: "rechts", label: "Paneel rechts", defaultWidth: rightWidth }]
+      : []),
+  ];
+  const totalMm = doorWidth + leftWidth + rightWidth;
   const ratio = Math.max(0.28, Math.min(1.6, totalMm / state.hoogte));
   const H = 300;
   const minW = Math.min(400, 54 * bays.length + 14);
@@ -772,8 +862,8 @@ export function buildPreviewSvg(
   );
 
   let cx = x0 + frame / 2;
-  bays.forEach((bay, i) => {
-    const bw = ((W - frame) * bayWidth(state, bay)) / totalMm;
+  bays.forEach((bay) => {
+    const bw = ((W - frame) * bay.defaultWidth) / totalMm;
     const gx = cx + mullion / 2;
     const gy = y0 + frame / 2 + mullion / 2;
     const gw = Math.max(6, bw - mullion);
@@ -786,14 +876,14 @@ export function buildPreviewSvg(
         y: gy,
         width: gw,
         height: gh,
-        fill: glas.fill,
-        fillOpacity: glas.opacity,
+        fill: glas.visual.fill,
+        fillOpacity: glas.visual.opacity,
         stroke: kleur.hex,
         strokeWidth: mullion,
       }),
     );
 
-    if (glas.pattern === "reeded") {
+    if (glas.visual.pattern === "reeded") {
       for (let sx = gx + 6; sx < gx + gw - 2; sx += 7) {
         e.push(
           React.createElement("line", {
@@ -810,8 +900,10 @@ export function buildPreviewSvg(
       }
     }
 
-    for (let l = 1; l <= state.liggers; l++) {
-      const ly = gy + (gh * l) / (state.liggers + 1);
+    const liggerCount = bay.type === "panel" ? state.panelLiggers : state.liggers;
+    const staanderCount = bay.type === "panel" ? state.panelStaanders : state.staanders;
+    for (let l = 1; l <= liggerCount; l++) {
+      const ly = gy + (gh * l) / (liggerCount + 1);
       e.push(
         React.createElement("line", {
           key: key(ki++),
@@ -824,8 +916,6 @@ export function buildPreviewSvg(
         }),
       );
     }
-    const staanderCount =
-      bay.type === "panel" ? state.panelStaanders : state.staanders;
     for (let s = 1; s <= staanderCount; s++) {
       const sx = gx + (gw * s) / (staanderCount + 1);
       e.push(
@@ -860,134 +950,90 @@ export function buildPreviewSvg(
       );
     }
 
-    if (bay.type === "door" && product.hasGreep) {
-      const doorCount = bays.filter((b) => b.type === "door").length;
-      const doorIdx = bays.slice(0, i).filter((b) => b.type === "door").length;
-      const handleRight =
-        doorCount > 1 ? doorIdx === 0 : state.richting === "links";
-      const hx = handleRight ? gx + gw - 12 : gx + 12;
-      if (state.greep === "stang") {
-        e.push(
-          React.createElement("rect", {
-            key: key(ki++),
-            x: hx - 2.5,
-            y: gy + gh * 0.16,
-            width: 5,
-            height: gh * 0.68,
-            rx: 2.5,
-            fill: kleur.hex,
-          }),
-        );
-      } else if (state.greep === "u") {
-        e.push(
-          React.createElement("rect", {
-            key: key(ki++),
-            x: hx - 3,
-            y: gy + gh / 2 - 26,
-            width: 6,
-            height: 52,
-            rx: 3,
-            fill: kleur.hex,
-          }),
-        );
-        e.push(
-          React.createElement("circle", {
-            key: key(ki++),
-            cx: hx,
-            cy: gy + gh / 2 - 26,
-            r: 3.4,
-            fill: kleur.hex,
-          }),
-        );
-        e.push(
-          React.createElement("circle", {
-            key: key(ki++),
-            cx: hx,
-            cy: gy + gh / 2 + 26,
-            r: 3.4,
-            fill: kleur.hex,
-          }),
-        );
-      } else {
-        e.push(
-          React.createElement("rect", {
-            key: key(ki++),
-            x: hx - 2,
-            y: gy + gh / 2 - 15,
-            width: 4,
-            height: 30,
-            rx: 2,
-            fill: kleur.hex,
-          }),
-        );
-      }
+    if (bay.type === "door" && product.hasHardware) {
+      const hx = gx + gw - 12;
+      e.push(
+        React.createElement("rect", {
+          key: key(ki++),
+          x: hx - 2,
+          y: gy + gh / 2 - 15,
+          width: 4,
+          height: 30,
+          rx: 2,
+          fill: kleur.hex,
+        }),
+      );
     }
 
-    if (bay.type === "door" && product.hasMech) {
-      const flip = state.richting === "rechts";
-      const hingeX = flip ? gx + gw - 11 : gx + 11;
-      const arrowDir = flip ? -1 : 1;
-      if (state.mechanisme === "taats") {
-        e.push(
-          React.createElement("circle", {
-            key: key(ki++),
-            cx: hingeX,
-            cy: y0 + H - frame / 2 - 3,
-            r: 3,
-            fill: kleur.hex,
-            fillOpacity: 0.75,
-          }),
-        );
-        e.push(
-          React.createElement("circle", {
-            key: key(ki++),
-            cx: hingeX,
-            cy: y0 + frame / 2 + 3,
-            r: 3,
-            fill: kleur.hex,
-            fillOpacity: 0.75,
-          }),
-        );
-      } else if (state.mechanisme === "schuif") {
-        e.push(
-          React.createElement("line", {
-            key: key(ki++),
-            x1: x0,
-            y1: y0 - 4,
-            x2: x0 + W,
-            y2: y0 - 4,
-            stroke: kleur.hex,
-            strokeWidth: 3,
-            strokeOpacity: 0.6,
-          }),
-        );
-        const ax = gx + gw / 2;
-        const ay = gy + gh / 2;
-        e.push(
-          React.createElement("path", {
-            key: key(ki++),
-            d:
-              arrowDir === 1
-                ? `M ${ax - 14} ${ay} h 28 m -6 -5 l 6 5 l -6 5`
-                : `M ${ax + 14} ${ay} h -28 m 6 -5 l -6 5 l 6 5`,
-            stroke: kleur.hex,
-            strokeOpacity: 0.5,
-            strokeWidth: 2,
-            fill: "none",
-          }),
-        );
-      } else {
-        e.push(
-          React.createElement("path", {
-            key: key(ki++),
-            d: `M ${hingeX - 3} ${gy + 10} v 14 M ${hingeX - 3} ${gy + gh - 24} v 14`,
-            stroke: kleur.hex,
-            strokeWidth: 3.5,
-            strokeOpacity: 0.75,
-          }),
-        );
-      }
+    if (bay.type === "door" && product.doorTypeCode === "taatsdeur") {
+      const hingeX = gx + gw / 2;
+      e.push(
+        React.createElement("circle", {
+          key: key(ki++),
+          cx: hingeX,
+          cy: y0 + H - frame / 2 - 3,
+          r: 3,
+          fill: kleur.hex,
+          fillOpacity: 0.75,
+        }),
+      );
+      e.push(
+        React.createElement("circle", {
+          key: key(ki++),
+          cx: hingeX,
+          cy: y0 + frame / 2 + 3,
+          r: 3,
+          fill: kleur.hex,
+          fillOpacity: 0.75,
+        }),
+      );
+    } else if (bay.type === "door" && product.doorTypeCode === "schuifdeur") {
+      e.push(
+        React.createElement("line", {
+          key: key(ki++),
+          x1: x0,
+          y1: y0 - 4,
+          x2: x0 + W,
+          y2: y0 - 4,
+          stroke: kleur.hex,
+          strokeWidth: 3,
+          strokeOpacity: 0.6,
+        }),
+      );
     }
+
+    const sizeName =
+      bay.type === "door" ? "Deur" : bay.key === "links" ? "Links" : "Rechts";
+    e.push(
+      React.createElement(
+        "text",
+        {
+          key: key(ki++),
+          x: gx + gw / 2,
+          y: y0 + H + 16,
+          textAnchor: "middle",
+          fontSize: 10,
+          fill: "#555",
+          fontFamily: "monospace",
+        },
+        String(bay.defaultWidth),
+      ),
+    );
+    e.push(
+      React.createElement(
+        "text",
+        {
+          key: key(ki++),
+          x: gx + gw / 2,
+          y: y0 + H + 28,
+          textAnchor: "middle",
+          fontSize: 8,
+          fill: "#777",
+          fontFamily: "monospace",
+        },
+        sizeName,
+      ),
+    );
 
     cx += bw;
   });

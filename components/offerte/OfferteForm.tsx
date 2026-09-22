@@ -41,10 +41,23 @@ export function OfferteForm() {
       return;
     }
     try {
+      const product = PRODUCTS.find((item) => item.slug === values.product);
       const response = await fetch("/api/offerte", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, fileName }),
+        body: JSON.stringify({
+          source: "website_snelle_offerte",
+          aanhef: values.aanhef,
+          voornaam: values.voornaam,
+          achternaam: values.achternaam,
+          email: values.email,
+          telefoon: values.telefoon,
+          adres: values.woonplaats,
+          opmerkingen: values.opmerkingen,
+          productId: product?.slug ?? "",
+          product: product?.title ?? "",
+          doorTypeCode: product?.doorTypeCode ?? "",
+        }),
       });
       if (!response.ok) throw new Error("Verzenden mislukt");
       setSubmitted(true);
@@ -184,7 +197,7 @@ export function OfferteForm() {
           >
             <option value="">Kies een product</option>
             {PRODUCTS.map((product) => (
-              <option key={product.slug} value={product.title}>
+              <option key={product.slug} value={product.slug}>
                 {product.title}
               </option>
             ))}

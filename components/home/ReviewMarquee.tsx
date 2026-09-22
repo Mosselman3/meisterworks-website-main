@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { GoogleReviewsRating } from "@/components/reviews/GoogleReviewsRating";
 import type { MARQUEE_REVIEWS_A } from "@/lib/content";
-import { REVIEW_COUNT, REVIEW_SCORE } from "@/lib/content";
 
 type Review = (typeof MARQUEE_REVIEWS_A)[number];
 
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <div className="flex w-[320px] shrink-0 flex-col gap-3 rounded-2xl bg-[oklch(0.97_0.004_75)] p-6">
+    <div className="flex w-[320px] shrink-0 flex-col gap-3 rounded-2xl bg-white p-6">
       <div className="flex items-center gap-3">
         <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[14px] font-semibold text-[oklch(0.14_0.006_60)]">
           {review.initial}
@@ -25,7 +25,7 @@ function ReviewCard({ review }: { review: Review }) {
       <div className="text-[13px] tracking-[0.1em] text-[var(--accent)]">
         ★★★★★
       </div>
-      <p className="font-serif-display m-0 text-[15px] leading-[1.55] text-[oklch(0.28_0.008_60)] italic">
+      <p className="m-0 text-[15px] font-light leading-[1.65] text-[oklch(0.28_0.008_60)] italic">
         “{review.quote}”
       </p>
       <div className="text-[11px] text-[oklch(0.55_0.008_60)]">
@@ -81,17 +81,10 @@ export function ReviewMarquee({
           <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.55_0.008_75)] uppercase">
             Reviews
           </div>
-          <h2 className="font-serif-display m-0 mb-4 text-[clamp(30px,4vw,44px)] leading-[1.15] font-medium text-[oklch(0.97_0.004_75)]">
+          <h2 className="font-serif-display m-0 mb-4 text-[clamp(30px,4vw,44px)] font-normal text-[oklch(0.97_0.004_75)]">
             Wat klanten zeggen
           </h2>
-          <div className="flex items-center justify-center gap-3">
-            <span className="text-[18px] tracking-[0.1em] text-[var(--accent)]">
-              ★★★★★
-            </span>
-            <span className="text-[14px] text-[oklch(0.65_0.008_75)]">
-              {REVIEW_SCORE} · {REVIEW_COUNT} reviews op Google
-            </span>
-          </div>
+          <GoogleReviewsRating />
         </div>
       </div>
 

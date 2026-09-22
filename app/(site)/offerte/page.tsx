@@ -23,7 +23,7 @@ export default function OffertePage() {
         <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
           Snelle offerte
         </div>
-        <h1 className="font-serif-display m-0 mb-3.5 text-[clamp(28px,4vw,40px)] leading-[1.15] font-medium">
+        <h1 className="font-serif-display m-0 mb-3.5 text-[clamp(28px,4vw,40px)] font-normal">
           Vertel ons wat u nodig heeft.
         </h1>
         <p className="mb-9 max-w-[520px] text-[15px] leading-[1.6] text-[oklch(0.42_0.008_60)]">

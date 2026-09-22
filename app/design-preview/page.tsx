@@ -21,7 +21,7 @@ export default function DesignIndexPage() {
         <p className="text-[13px] font-medium tracking-[0.18em] text-[var(--accent)] uppercase">
           Design preview
         </p>
-        <h1 className="font-[family-name:var(--font-newsreader)] text-[40px] leading-[1.1] font-medium">
+        <h1 className="font-serif-display text-[40px] font-normal">
           Original mockups
         </h1>
         <p className="max-w-[520px] text-[15px] leading-6 text-[var(--muted)]">
@@ -32,9 +32,9 @@ export default function DesignIndexPage() {
       </header>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-[13px] font-semibold tracking-[0.06em] text-[var(--muted)] uppercase">
+        <p className="text-[13px] font-semibold tracking-[0.06em] text-[var(--muted)] uppercase">
           Main pages
-        </h2>
+        </p>
         <ul className="overflow-hidden rounded-[18px] border border-[var(--line)] bg-white">
           {mainPages.map((page) => (
             <li
@@ -59,9 +59,9 @@ export default function DesignIndexPage() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-[13px] font-semibold tracking-[0.06em] text-[var(--muted)] uppercase">
+        <p className="text-[13px] font-semibold tracking-[0.06em] text-[var(--muted)] uppercase">
           Product pages
-        </h2>
+        </p>
         <ul className="overflow-hidden rounded-[18px] border border-[var(--line)] bg-white">
           {productPages.map((page) => (
             <li

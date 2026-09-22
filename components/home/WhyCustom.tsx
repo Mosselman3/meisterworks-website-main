@@ -39,7 +39,7 @@ export function WhyCustom() {
         <div className="mb-7 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.008_75)] uppercase">
           — Waarom maatwerk
         </div>
-        <p className="font-serif-display m-0 max-w-[920px] text-[clamp(24px,3.4vw,38px)] leading-[1.5]">
+        <p className="font-serif-display m-0 max-w-[920px] text-[clamp(24px,3.4vw,38px)] leading-[1.55] tracking-[0.04em]">
           {WORDS.map((word, index) => (
             <span
               key={`${word}-${index}`}
@@ -71,7 +71,7 @@ export function WhyCustom() {
           <CoverImage
             src="/assets/arched-bronze-door.jpg"
             alt="Stalen draaideur op maat"
-            className="aspect-[3/4]"
+            className="hidden aspect-[3/4] min-[900px]:block"
             sizes="(min-width: 900px) 33vw, 50vw"
           />
         </div>

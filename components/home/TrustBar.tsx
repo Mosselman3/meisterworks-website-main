@@ -52,7 +52,7 @@ export function TrustBar() {
                 pointerEvents: index === active ? "auto" : "none",
               }}
             >
-              <p className="font-serif-display m-0 mb-2.5 text-[18px] leading-[1.5] text-[oklch(0.92_0.004_75)] italic">
+              <p className="m-0 mb-2.5 text-[18px] font-light leading-[1.6] text-[oklch(0.92_0.004_75)] italic">
                 “{slide.quote}”
               </p>
               <div className="text-[13px] text-[oklch(0.58_0.008_75)]">

@@ -1,12 +1,21 @@
 import type { Metadata } from "next";
-import { Newsreader } from "next/font/google";
+import { Cormorant_Garamond, Lato } from "next/font/google";
 import "./globals.css";
 
-const newsreader = Newsreader({
+const cormorantGaramond = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-newsreader",
+  weight: ["400", "700"],
   style: ["normal", "italic"],
-  weight: ["400", "500", "600"],
+  variable: "--font-cormorant-garamond",
+  display: "swap",
+});
+
+const lato = Lato({
+  subsets: ["latin"],
+  weight: ["300", "400", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-lato",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -16,8 +25,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="nl" className={`${newsreader.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+    <html
+      lang="nl"
+      className={`${cormorantGaramond.variable} ${lato.variable} h-full antialiased`}
+    >
+      <body className={`${lato.className} flex min-h-full flex-col`}>
+        {children}
+      </body>
     </html>
   );
 }

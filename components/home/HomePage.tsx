@@ -31,11 +31,11 @@ export function HomePage() {
           sizes="100vw"
         />
         <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,oklch(0.14_0.006_60_/_0.15)_0%,oklch(0.12_0.006_60_/_0.35)_55%,oklch(0.1_0.006_60_/_0.82)_100%)]" />
-        <div className="relative z-[2] max-w-[780px] px-7 pb-[72px]">
+        <div className="relative z-[2] max-w-[780px] px-7 pt-10 pb-[72px] lg:pt-0">
           <div className="mb-[18px] text-[13px] font-medium tracking-[0.18em] text-[var(--accent)] uppercase">
-            Maatwerk in staal & glas
+            Vakmanschap in stalen deuren
           </div>
-          <h1 className="font-serif-display m-0 mb-[22px] text-[clamp(38px,6vw,72px)] leading-[1.05] font-medium text-[oklch(0.98_0.004_75)]">
+          <h1 className="font-serif-display m-0 mb-[22px] text-[clamp(38px,5.4vw,65px)] font-normal text-[oklch(0.98_0.004_75)]">
             Deuren op maat,
             <br />
             gemaakt om te blijven.
@@ -65,12 +65,11 @@ export function HomePage() {
           <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
             Ons aanbod
           </div>
-          <h2 className="font-serif-display m-0 mb-4 text-[clamp(30px,4vw,44px)] leading-[1.15] font-medium">
+          <h2 className="font-serif-display m-0 mb-4 text-[clamp(30px,4vw,44px)] font-normal">
             Zes producten. Eindeloos maatwerk.
           </h2>
           <p className="m-0 text-[16px] leading-[1.6] text-[oklch(0.42_0.008_60)]">
-            We houden het assortiment klein, zodat elk model tot in de puntjes
-            is uitgewerkt.
+            Elk model met de hand vervaardigd op basis van uw wensen.
           </p>
         </div>
         <div className="home-product-grid">
@@ -100,6 +99,16 @@ export function HomePage() {
             </Link>
           ))}
         </div>
+        <p className="m-0 mt-10 text-center text-[13px] leading-[1.6] text-[oklch(0.52_0.008_60)]">
+          Staat uw project er niet tussen?{" "}
+          <Link
+            href={ROUTES.offerte}
+            className="text-[oklch(0.38_0.008_60)] underline decoration-[oklch(0.78_0.006_75)] underline-offset-[3px] hover:text-[oklch(0.22_0.008_60)]"
+          >
+            Vraag een offerte voor maatwerk
+          </Link>
+          .
+        </p>
       </section>
 
       <WhyCustom />
@@ -119,7 +128,7 @@ export function HomePage() {
             ★★★★★ &nbsp;·&nbsp;{" "}
             <span className="text-[oklch(0.5_0.01_60)]">Uitgelicht verhaal</span>
           </div>
-          <p className="font-serif-display m-0 mb-7 text-[clamp(22px,2.6vw,30px)] leading-[1.45] text-[oklch(0.2_0.008_60)] italic">
+          <p className="m-0 mb-7 text-[clamp(22px,2.6vw,30px)] font-light leading-[1.55] text-[oklch(0.2_0.008_60)] italic">
             “Na 2 jaar verbouwen de eerste vakman die zijn afspraken volledig
             nakomt, goed communiceert, alles netjes op tijd levert, niets
             beschadigt bij het plaatsen en bovendien een prachtige taatsdeur
@@ -150,7 +159,7 @@ export function HomePage() {
             ? "oklch(0.16 0.006 60)"
             : story.tinted
               ? "oklch(0.93 0.006 75)"
-              : "oklch(0.97 0.004 75)";
+              : "var(--background)";
           const ctaClass = dark ? "btn-accent" : "btn-dark";
 
           return (
@@ -180,7 +189,7 @@ export function HomePage() {
                     {story.kicker}
                   </div>
                   <h2
-                    className={`font-serif-display m-0 mb-5 text-[clamp(28px,3.6vw,40px)] leading-[1.15] font-medium ${dark ? "text-[oklch(0.97_0.004_75)]" : ""}`}
+                    className={`font-serif-display m-0 mb-5 text-[clamp(28px,3.6vw,40px)] font-normal ${dark ? "text-[oklch(0.97_0.004_75)]" : ""}`}
                   >
                     {product.title}
                   </h2>
@@ -234,7 +243,7 @@ export function HomePage() {
             <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
               Vakmanschap
             </div>
-            <h2 className="font-serif-display m-0 mb-[22px] text-[clamp(28px,3.6vw,40px)] leading-[1.15] font-medium">
+            <h2 className="font-serif-display m-0 mb-[22px] text-[clamp(28px,3.6vw,40px)] font-normal">
               Handgemaakte deuren uit het atelier.
             </h2>
             <p className="m-0 mb-[18px] text-[16px] leading-[1.7] text-[oklch(0.4_0.008_60)]">
@@ -260,7 +269,7 @@ export function HomePage() {
         id="offerte"
         className="bg-[var(--accent)] px-7 py-[90px] text-center"
       >
-        <h2 className="font-serif-display m-0 mb-5 text-[clamp(30px,4.2vw,48px)] leading-[1.1] font-medium text-[oklch(0.14_0.006_60)]">
+        <h2 className="font-serif-display m-0 mb-5 text-[clamp(30px,4.2vw,48px)] font-normal text-[oklch(0.14_0.006_60)]">
           Klaar om te beginnen?
         </h2>
         <p className="m-0 mb-9 text-[16px] text-[oklch(0.22_0.03_60)]">

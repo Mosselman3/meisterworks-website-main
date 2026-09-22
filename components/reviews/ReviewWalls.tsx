@@ -58,7 +58,7 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
                 <div className="mb-3 text-[13px] tracking-[0.1em] text-[var(--accent)]">
                   {review.stars}
                 </div>
-                <p className="font-serif-display m-0 mb-4 text-[15px] leading-[1.55] text-[oklch(0.25_0.008_60)]">
+                <p className="m-0 mb-4 text-[15px] font-light leading-[1.65] text-[oklch(0.25_0.008_60)]">
                   “{review.quote}”
                 </p>
                 <div className="text-[13px] font-semibold text-[oklch(0.2_0.008_60)]">
@@ -72,8 +72,8 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
           </div>
         ))}
       </div>
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[60px] bg-[linear-gradient(180deg,oklch(0.97_0.004_75),transparent)]" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[60px] bg-[linear-gradient(0deg,oklch(0.97_0.004_75),transparent)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[60px] bg-[linear-gradient(180deg,var(--background),transparent)]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[60px] bg-[linear-gradient(0deg,var(--background),transparent)]" />
     </div>
   );
 }

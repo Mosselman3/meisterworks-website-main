@@ -19,7 +19,7 @@ export default function InspiratiePage() {
         <div className="mb-4 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
           Inspiratie
         </div>
-        <h1 className="font-serif-display m-0 mb-[18px] text-[clamp(30px,4.4vw,46px)] leading-[1.15] font-medium">
+        <h1 className="font-serif-display m-0 mb-[18px] text-[clamp(30px,4.4vw,46px)] font-normal">
           Ons werk, dagelijks bijgehouden.
         </h1>
         <p className="mx-auto mb-7 max-w-[560px] text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
@@ -55,15 +55,15 @@ export default function InspiratiePage() {
         </a>
       </header>
 
-      <section className="mx-auto max-w-[var(--max-width)] px-7 pb-[100px]">
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-1">
+      <section className="mx-auto max-w-[var(--max-width)] px-0 pb-[100px] min-[720px]:px-7">
+        <div className="grid grid-cols-3 gap-px min-[720px]:gap-1">
           {POSTS.map((post) => (
             <a
               key={post.id}
               href={CONTACT.instagram}
               target="_blank"
               rel="noreferrer"
-              className="relative block aspect-[4/5] overflow-hidden bg-[oklch(0.9_0.006_75)]"
+              className="relative block aspect-square overflow-hidden bg-[oklch(0.9_0.006_75)]"
             >
               {post.src ? (
                 <Image
@@ -71,7 +71,7 @@ export default function InspiratiePage() {
                   alt="Instagram post van Meisterworks"
                   fill
                   className="object-cover"
-                  sizes="(min-width: 1280px) 300px, 50vw"
+                  sizes="(min-width: 1280px) 400px, 33vw"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-[12px] tracking-[0.08em] text-[oklch(0.55_0.008_60)] uppercase">

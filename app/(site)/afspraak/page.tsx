@@ -35,7 +35,7 @@ export default function AfspraakPage() {
         <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
           Adviesgesprek plannen
         </div>
-        <h1 className="font-serif-display m-0 mb-3.5 text-[clamp(28px,4vw,40px)] leading-[1.15] font-medium">
+        <h1 className="font-serif-display m-0 mb-3.5 text-[clamp(28px,4vw,40px)] font-normal">
           Kies een moment dat u past.
         </h1>
         <p className="mb-3 max-w-[560px] text-[15px] leading-[1.6] text-[oklch(0.42_0.008_60)]">
@@ -159,7 +159,7 @@ export default function AfspraakPage() {
           </div>
 
           <div className="border-l-2 border-[var(--accent)] pl-4">
-            <p className="font-serif-display m-0 mb-2 text-[14px] leading-[1.6] text-[oklch(0.3_0.008_60)] italic">
+            <p className="m-0 mb-2 text-[14px] font-light leading-[1.65] text-[oklch(0.3_0.008_60)] italic">
               “Het adviesgesprek gaf ons precies de duidelijkheid die we nodig
               hadden voordat we gingen bestellen.”
             </p>

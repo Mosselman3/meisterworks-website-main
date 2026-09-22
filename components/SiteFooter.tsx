@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { GoogleReviewsRating } from "@/components/reviews/GoogleReviewsRating";
+import { REVIEW_COUNT, REVIEW_SCORE } from "@/lib/content";
 import { CONTACT, ROUTES } from "@/lib/site";
 
 export function SiteFooter() {
@@ -18,6 +20,13 @@ export function SiteFooter() {
             Maatwerk in metaal. Stalen en glazen deuren, volledig naar wens
             ontworpen en vervaardigd.
           </p>
+          <Link
+            href={ROUTES.reviews}
+            className="mt-5 inline-flex"
+            aria-label={`${REVIEW_SCORE} van 5, ${REVIEW_COUNT} reviews op Google`}
+          >
+            <GoogleReviewsRating className="flex-wrap justify-start" />
+          </Link>
         </div>
         <div>
           <div className="mb-[18px] text-[13px] tracking-[0.1em] text-[oklch(0.9_0.004_75)] uppercase">

@@ -9,6 +9,26 @@ type SummaryRow = {
   value: string;
 };
 
+export type QuoteConfiguration = {
+  doorTypeCode: string;
+  clientWidthMm: number | null;
+  clientHeightMm: number | null;
+  windowCount: number;
+  glassCode: string | null;
+  colorCode: string | null;
+  hardwareCode: string | null;
+  hasFixedPanel: boolean;
+  fixedPanelSquareMetres: number;
+  panelLayout: "geen" | "een" | "beide";
+  panelSide: "links" | "rechts" | "beide" | null;
+  leftPanelSquareMetres: number;
+  rightPanelSquareMetres: number;
+  leftPanelWidthMm: number;
+  rightPanelWidthMm: number;
+  panelLiggers: number;
+  panelStaanders: number;
+};
+
 type ContactFields = {
   aanhef: string;
   voornaam: string;
@@ -31,8 +51,12 @@ const INITIAL_FIELDS: ContactFields = {
 
 export function QuoteForm({
   summaryRows,
+  productId,
+  configuration,
 }: {
   summaryRows: SummaryRow[];
+  productId: string;
+  configuration: QuoteConfiguration;
 }) {
   const [fields, setFields] = useState(INITIAL_FIELDS);
   const [fileName, setFileName] = useState("");
@@ -63,11 +87,11 @@ export function QuoteForm({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...fields,
-          product: summaryRows.find((row) => row.label === "Product")?.value,
-          configuratie: summaryRows,
-          fileName,
-          source: "configurator",
+          source: "website_configurator",
+          contact: fields,
+          productId,
+          configuration,
+          summary: summaryRows,
         }),
       });
 

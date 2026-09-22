@@ -15,8 +15,8 @@ export default function ReviewsPage() {
         <div className="mb-4 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
           Reviews
         </div>
-        <h1 className="font-serif-display m-0 mb-5 text-[clamp(30px,4.4vw,46px)] leading-[1.15] font-medium">
-          52 klanten, één beoordeling.
+        <h1 className="font-serif-display m-0 mb-5 text-[clamp(30px,4.4vw,46px)] font-normal">
+          52 reviews, één beoordeling.
         </h1>
         <div className="inline-flex items-center gap-3.5 rounded-[999px] bg-white px-[26px] py-3.5 shadow-[0_1px_3px_oklch(0_0_0_/_0.06)]">
           <span className="font-serif-display text-[26px]">4.9</span>
@@ -33,7 +33,7 @@ export default function ReviewsPage() {
 
       <section className="bg-[oklch(0.16_0.006_60)] px-7 py-20 text-center">
         <div className="mx-auto max-w-[640px]">
-          <h2 className="font-serif-display m-0 mb-[18px] text-[clamp(26px,3.4vw,36px)] leading-[1.25] font-medium text-[oklch(0.97_0.004_75)]">
+          <h2 className="font-serif-display m-0 mb-[18px] text-[clamp(26px,3.4vw,36px)] font-normal text-[oklch(0.97_0.004_75)]">
             Laten we kijken wat bij uw huis past.
           </h2>
           <p className="m-0 mb-8 text-[15px] leading-[1.6] text-[oklch(0.65_0.008_75)]">
@@ -61,7 +61,7 @@ export default function ReviewsPage() {
       </div>
 
       <section className="bg-[var(--accent)] px-7 py-[90px] text-center">
-        <h2 className="font-serif-display m-0 mb-5 text-[clamp(28px,4vw,44px)] leading-[1.1] font-medium text-[oklch(0.14_0.006_60)]">
+        <h2 className="font-serif-display m-0 mb-5 text-[clamp(28px,4vw,44px)] font-normal text-[oklch(0.14_0.006_60)]">
           Klaar voor de volgende stap?
         </h2>
         <p className="m-0 mb-9 text-[16px] text-[oklch(0.22_0.03_60)]">

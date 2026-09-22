@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { QuoteForm } from "@/components/configurator/QuoteForm";
+import { useSearchParams } from "next/navigation";
+import { QuoteForm, type QuoteConfiguration } from "@/components/configurator/QuoteForm";
 import {
   useCallback,
   useEffect,
@@ -13,44 +14,45 @@ import {
 } from "react";
 import { ACCENT, ROUTES } from "@/lib/site";
 import {
+  COLORS,
+  GLASS_CATEGORIES,
+  GLASS_TYPES,
+  HARDWARE,
+  findGlass,
+  priceTier,
+  windowCountFromBars,
+} from "./catalog";
+import {
   CFG_PRODUCTS,
-  GLAS,
-  GREPEN,
+  CUSTOM_PRODUCT,
   INITIAL_STATE,
-  KLEUREN,
-  MECHANISMEN,
-  STEP_ORDER,
   VLAK_PRESETS,
-  bayWidth,
-  baysFor,
   buildPreviewSvg,
-  directionLabel,
-  directionOptions,
-  dirThumbStyle,
   firstUnconfirmedStep,
   getProduct,
+  formatM2,
+  hasPanels,
   isStepConfirmed,
-  mechThumbStyle,
+  leftPanelActive,
+  maatLabel,
   nextStepId,
+  paneelLabel,
+  panelAreaM2,
+  panelLayoutThumb,
   prevStepId,
-  sideOptionsFor,
-  sideStepCopy,
+  rightPanelActive,
+  sizeLines,
+  stepApplies,
+  totalOpeningM2,
+  totalPanelM2,
   totalWidth,
   vlakLabel,
-  zijChoiceFor,
-  zijThumbStyle,
   type ConfiguratorState,
+  type PanelLayout,
   type StepId,
 } from "./logic";
 
 const accent = ACCENT;
-const MOBILE_CFG = "(max-width: 960px)";
-
-function isMobileConfigurator() {
-  return (
-    typeof window !== "undefined" && window.matchMedia(MOBILE_CFG).matches
-  );
-}
 
 function optionCardStyle(selected: boolean): CSSProperties {
   return {
@@ -117,246 +119,194 @@ function OptionCard({
   selected,
   thumbStyle,
   onClick,
+  priceMark,
+  footnote,
+  info,
 }: {
   label: string;
   desc: string;
   selected: boolean;
   thumbStyle: CSSProperties;
   onClick: () => void;
+  priceMark?: string | null;
+  footnote?: string;
+  info?: string;
 }) {
   return (
-    <button type="button" onClick={onClick} style={optionCardStyle(selected)}>
-      <div style={thumbStyle} />
-      <div
+    <div style={optionCardStyle(selected)}>
+      <button
+        type="button"
+        onClick={onClick}
         style={{
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          flexDirection: "column",
           gap: 10,
-        }}
-      >
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: "oklch(0.2 0.008 60)",
-            textAlign: "left",
-          }}
-        >
-          {label}
-        </div>
-        <div style={tickStyle(selected)} />
-      </div>
-      <div
-        style={{
-          fontSize: 12,
-          color: "oklch(0.5 0.008 60)",
-          lineHeight: 1.45,
+          padding: 0,
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+          fontFamily: "inherit",
           textAlign: "left",
         }}
       >
-        {desc}
-      </div>
-    </button>
+        <div style={thumbStyle} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 10,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: "oklch(0.2 0.008 60)",
+              textAlign: "left",
+            }}
+          >
+            {label}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {priceMark ? (
+              <span
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.04em",
+                  color: "oklch(0.45 0.008 60)",
+                }}
+              >
+                {priceMark}
+              </span>
+            ) : null}
+            <div style={tickStyle(selected)} />
+          </div>
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: "oklch(0.5 0.008 60)",
+            lineHeight: 1.45,
+            textAlign: "left",
+          }}
+        >
+          {desc}
+        </div>
+        {footnote ? (
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "oklch(0.28 0.008 60)",
+              textAlign: "left",
+            }}
+          >
+            {footnote}
+          </div>
+        ) : null}
+      </button>
+      {info ? (
+        <details style={{ fontSize: 12, color: "oklch(0.45 0.008 60)" }}>
+          <summary style={{ cursor: "pointer" }}>Meer informatie</summary>
+          <p style={{ margin: "8px 0 0", lineHeight: 1.45 }}>{info}</p>
+        </details>
+      ) : null}
+    </div>
   );
 }
 
-type GroupDef = {
-  key: string;
-  title: string;
-  list: readonly { id: string; label: string; desc: string }[];
-  thumb: (o: { id: string; label: string; desc: string }) => CSSProperties;
-};
+function glassThumb(visual?: {
+  fill: string;
+  pattern: "none" | "reeded";
+}): CSSProperties {
+  if (!visual) {
+    return { height: 96, borderRadius: 9, background: "#dfe7e6" };
+  }
+  if (visual.pattern === "reeded") {
+    return {
+      height: 96,
+      borderRadius: 9,
+      background: `repeating-linear-gradient(90deg, ${visual.fill} 0 5px, oklch(1 0 0 / 0.55) 5px 7px)`,
+    };
+  }
+  return { height: 96, borderRadius: 9, background: visual.fill };
+}
 
-function OptionGroups({
-  groupKey,
-  defs,
-  state,
-  setState,
-  onComplete,
+
+function MmField({
+  label,
+  value,
+  min,
+  max,
+  onChange,
 }: {
-  groupKey: string;
-  defs: GroupDef[];
-  state: ConfiguratorState;
-  setState: React.Dispatch<React.SetStateAction<ConfiguratorState>>;
-  onComplete: () => void;
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
 }) {
-  const openIdx = state.groupOpen[groupKey] ?? 0;
-
   return (
-    <>
-      {defs.map((d, gi) => {
-        const answered = !!state.answered[d.key];
-        const expanded = openIdx === gi;
-        const currentId = state[d.key as keyof ConfiguratorState] as string;
-        const current = d.list.find((o) => o.id === currentId) ?? d.list[0];
-
-        return (
-          <div
-            key={d.key}
-            style={{
-              marginBottom: 14,
-              border: `1px solid ${expanded ? "oklch(0.85 0.006 75)" : "oklch(0.9 0.006 75)"}`,
-              borderRadius: 14,
-              padding: "16px 18px",
-              background:
-                answered && !expanded
-                  ? "oklch(0.98 0.003 75)"
-                  : "oklch(1 0 0)",
-              transition: "background 0.2s ease",
-            }}
-          >
-            <button
-              type="button"
-              onClick={() =>
-                setState((s) => ({
-                  ...s,
-                  groupOpen: {
-                    ...s.groupOpen,
-                    [groupKey]: expanded ? -1 : gi,
-                  },
-                }))
-              }
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: 0,
-                marginBottom: expanded ? 16 : 0,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 11,
-                    flexShrink: 0,
-                    background: answered ? accent : "oklch(0.9 0.006 75)",
-                    color: answered
-                      ? "oklch(0.14 0.006 60)"
-                      : "oklch(0.55 0.008 60)",
-                  }}
-                >
-                  {answered ? "✓" : ""}
-                </div>
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: "oklch(0.3 0.008 60)",
-                  }}
-                >
-                  {d.title}
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 13,
-                    color: "oklch(0.5 0.008 60)",
-                  }}
-                >
-                  {answered ? current.label : ""}
-                </div>
-                <div
-                  style={{
-                    fontSize: 14,
-                    color: "oklch(0.5 0.008 60)",
-                    transform: `rotate(${expanded ? 180 : 0}deg)`,
-                    transition: "transform 0.2s ease",
-                  }}
-                >
-                  ⌄
-                </div>
-              </div>
-            </button>
-            {expanded ? (
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-                  gap: 14,
-                }}
-              >
-                {d.list.map((o) => (
-                  <OptionCard
-                    key={o.id}
-                    label={o.label}
-                    desc={o.desc}
-                    selected={o.id === currentId}
-                    thumbStyle={d.thumb(o)}
-                    onClick={() => {
-                      setState((s) => {
-                        const nextIdx = gi + 1;
-                        const groupOpen = { ...s.groupOpen, [groupKey]: nextIdx };
-                        if (nextIdx >= defs.length) {
-                          groupOpen[groupKey] = -1;
-                        }
-                        return {
-                          ...s,
-                          [d.key]: o.id,
-                          answered: { ...s.answered, [d.key]: true },
-                          groupOpen,
-                        };
-                      });
-                      const nextIdx = gi + 1;
-                      if (nextIdx >= defs.length) {
-                        onComplete();
-                      }
-                    }}
-                  />
-                ))}
-              </div>
-            ) : null}
-          </div>
-        );
-      })}
-    </>
+    <label style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <span style={{ fontSize: 13, color: "oklch(0.35 0.008 60)" }}>{label}</span>
+      <input
+        type="number"
+        value={value}
+        min={min}
+        max={max}
+        step={10}
+        onChange={(ev) => onChange(Number(ev.target.value) || 0)}
+        style={{
+          padding: "13px 14px",
+          border: "1px solid oklch(0.85 0.006 75)",
+          borderRadius: 10,
+          fontSize: 15,
+          fontFamily: "inherit",
+          color: "oklch(0.2 0.008 60)",
+          background: "oklch(1 0 0)",
+        }}
+      />
+    </label>
   );
+}
+
+function stateForProduct(slug: string | null): ConfiguratorState {
+  const chosen =
+    slug === CUSTOM_PRODUCT.id
+      ? CUSTOM_PRODUCT
+      : CFG_PRODUCTS.find((item) => item.id === slug);
+  if (!chosen) return INITIAL_STATE;
+  return {
+    ...INITIAL_STATE,
+    productId: chosen.id,
+    answered: { product: true },
+    openSection: nextStepId("product", chosen),
+  };
 }
 
 export function Configurator() {
-  const [state, setState] = useState<ConfiguratorState>(INITIAL_STATE);
+  const searchParams = useSearchParams();
+  const [state, setState] = useState<ConfiguratorState>(() =>
+    stateForProduct(searchParams.get("product")),
+  );
   const [quoteOpen, setQuoteOpen] = useState(false);
+  const [glassCategory, setGlassCategory] = useState<string | null>(null);
+  const [missingStep, setMissingStep] = useState<StepId | null>(null);
   const quoteAutoShown = useRef(false);
 
   const product = useMemo(
     () => getProduct(state.productId),
     [state.productId],
   );
-  const curZij = useMemo(
-    () => zijChoiceFor(product, state.zij),
-    [product, state.zij],
-  );
-  const bays = useMemo(
-    () => baysFor(product, curZij),
-    [product, curZij],
-  );
 
-  const kleur = KLEUREN.find((k) => k.id === state.kleur) ?? KLEUREN[0];
-  const glas = GLAS.find((g) => g.id === state.glas) ?? GLAS[0];
-  const mech =
-    MECHANISMEN.find((m) => m.id === state.mechanisme) ?? MECHANISMEN[0];
-  const greep = GREPEN.find((g) => g.id === state.greep) ?? GREPEN[0];
-  const isSchuifMech = state.mechanisme === "schuif";
-  const dirList = directionOptions(state.mechanisme);
+  const kleur = COLORS.find((k) => k.code === state.kleur) ?? COLORS[0];
+  const glas = findGlass(state.glas);
+  const beslag = HARDWARE.find((item) => item.code === state.beslag) ?? HARDWARE[1];
   const vlak = vlakLabel(state);
-  const totW = totalWidth(state, product, curZij);
+  const totW = totalWidth(state);
+  const windows = windowCountFromBars(state.liggers, state.staanders);
+  const panelWindows = windowCountFromBars(state.panelLiggers, state.panelStaanders);
 
   const scrollToSection = useCallback((id: string) => {
     requestAnimationFrame(() => {
@@ -377,8 +327,8 @@ export function Configurator() {
   );
 
   const advanceFrom = useCallback(
-    (fromId: string) => {
-      const next = nextStepId(fromId, product);
+    (fromId: string, nextProduct = product) => {
+      const next = nextStepId(fromId, nextProduct);
       setState((s) => ({ ...s, openSection: next }));
       scrollToSection(next);
     },
@@ -404,7 +354,6 @@ export function Configurator() {
   }, []);
 
   const sectionDefs = useMemo(() => {
-    const sideCopy = sideStepCopy(product);
     return [
       {
         id: "product" as StepId,
@@ -413,50 +362,62 @@ export function Configurator() {
           "Kies het model dat bij uw opening past. U kunt dit later nog aanpassen.",
         summary: product.label,
       },
-      product.hasMech
+      product.hasFixedPanel
         ? {
-            id: "mechanisme" as StepId,
-            title: "Type mechanisme",
+            id: "paneel" as StepId,
+            title: "Vast paneel",
             intro:
-              "Alle mechanismen worden verzonken gemonteerd — er is geen zichtbaar scharnier of rail.",
-            summary: `${mech.label} · ${directionLabel(state.richting, state.mechanisme)}`,
+              "Kies of u een vast paneel links, rechts of aan beide zijden wilt.",
+            summary: paneelLabel(state),
           }
         : null,
       {
-        id: "zij" as StepId,
-        title: "Zijpanelen",
-        intro: sideCopy.intro,
-        summary: curZij.label,
+        id: "maat" as StepId,
+        title: "Afmeting",
+        intro: hasPanels(state)
+          ? "Vul de breedte van de deur en de panelen, en de hoogte van de opening in millimeters in."
+          : "Vul de breedte en de hoogte van de opening in millimeters in.",
+        summary: maatLabel(state),
       },
       {
         id: "vlak" as StepId,
         title: "Vlakverdeling",
-        intro:
-          "Het aantal liggers en staanders bepaalt hoe het glas wordt opgedeeld — van rustig en open tot fijn geraamd.",
+        intro: hasPanels(state)
+          ? "Liggers en staanders verdeelt u apart voor de deur en de vaste panelen."
+          : "Liggers en staanders bepalen hoeveel ramen het glas krijgt.",
         summary: vlak,
       },
       {
-        id: "maat" as StepId,
-        title: "Afmeting",
-        intro:
-          "Vul de breedte per vlak en de hoogte van de opening in millimeters in.",
-        summary: `${totW} × ${state.hoogte} mm`,
+        id: "glas" as StepId,
+        title: "Glas",
+        intro: "Hoe wilt u dat het glas eruitziet?",
+        summary: glas.customerName,
       },
       {
-        id: "opties" as StepId,
-        title: "Kleur, glas en afwerking",
-        intro:
-          "Kies de kleur coating, het glas en (indien van toepassing) de handgreep.",
-        summary: `${kleur.label} · ${glas.label}${product.hasGreep ? " · " + greep.label : ""}`,
+        id: "kleur" as StepId,
+        title: "Kleur",
+        intro: "Kies de afwerking van het frame.",
+        summary: kleur.label,
       },
+      product.hasHardware
+        ? {
+            id: "beslag" as StepId,
+            title: "Beslag",
+            intro: "Kies de greep en het slot.",
+            summary: beslag.label,
+          }
+        : null,
       {
         id: "overzicht" as StepId,
-        title: "Overzicht & aanvraag",
-        intro:
-          "Controleer uw keuzes. Wijzig wat u wilt, of stuur de samenstelling direct naar ons door.",
+        title: "Overzicht",
+        intro: product.custom
+          ? "Deze aanvraag valt buiten de vier standaardproducten. Vul uw gegevens in, dan maken we een voorstel."
+          : "Controleer uw keuzes. Klopt alles, dan vraagt u in de volgende stap vrijblijvend een offerte aan.",
         summary: null as string | null,
       },
-    ].filter(Boolean) as {
+    ].filter((item): item is NonNullable<typeof item> =>
+      Boolean(item && stepApplies(item.id, product)),
+    ) as {
       id: StepId;
       title: string;
       intro: string;
@@ -464,20 +425,29 @@ export function Configurator() {
     }[];
   }, [
     product,
-    mech.label,
-    state.richting,
-    state.mechanisme,
-    curZij.label,
     vlak,
     totW,
     state.hoogte,
+    state.panelLayout,
+    state.panelSide,
+    state.leftPanelBreedte,
+    state.rightPanelBreedte,
     kleur.label,
-    glas.label,
-    greep.label,
+    glas.customerName,
+    beslag.label,
   ]);
 
   const summaryRows = useMemo(() => {
     const a = state.answered;
+    if (product.custom && a.product) {
+      return [
+        {
+          label: "Product",
+          value: "Buiten de vier standaardproducten",
+          onEdit: () => openAndScroll("product"),
+        },
+      ];
+    }
     return [
       a.product
         ? {
@@ -486,18 +456,18 @@ export function Configurator() {
             onEdit: () => openAndScroll("product"),
           }
         : null,
-      product.hasMech && a.mechanisme && a.richting
+      product.hasFixedPanel && a.paneel
         ? {
-            label: "Mechanisme",
-            value: `${mech.label} (${directionLabel(state.richting, state.mechanisme)})`,
-            onEdit: () => openAndScroll("mechanisme"),
+            label: "Vast paneel",
+            value: paneelLabel(state),
+            onEdit: () => openAndScroll("paneel"),
           }
         : null,
-      a.zij
+      a.maat
         ? {
-            label: "Zijpanelen",
-            value: curZij.label,
-            onEdit: () => openAndScroll("zij"),
+            label: "Afmeting",
+            value: maatLabel(state),
+            onEdit: () => openAndScroll("maat"),
           }
         : null,
       a.vlak
@@ -507,32 +477,25 @@ export function Configurator() {
             onEdit: () => openAndScroll("vlak"),
           }
         : null,
-      a.maat
+      a.glas
         ? {
-            label: "Afmeting",
-            value: `${totW} × ${state.hoogte} mm`,
-            onEdit: () => openAndScroll("maat"),
+            label: "Glas",
+            value: glas.customerName,
+            onEdit: () => openAndScroll("glas"),
           }
         : null,
       a.kleur
         ? {
-            label: "Kleur coating",
+            label: "Kleur",
             value: kleur.label,
-            onEdit: () => openAndScroll("opties"),
+            onEdit: () => openAndScroll("kleur"),
           }
         : null,
-      a.glas
+      product.hasHardware && a.beslag
         ? {
-            label: "Glassoort",
-            value: glas.label,
-            onEdit: () => openAndScroll("opties"),
-          }
-        : null,
-      product.hasGreep && a.greep
-        ? {
-            label: "Handgreep",
-            value: greep.label,
-            onEdit: () => openAndScroll("opties"),
+            label: "Beslag",
+            value: beslag.label,
+            onEdit: () => openAndScroll("beslag"),
           }
         : null,
     ].filter(Boolean) as {
@@ -542,30 +505,48 @@ export function Configurator() {
     }[];
   }, [
     state.answered,
-    state.richting,
-    state.mechanisme,
     state.hoogte,
+    state.panelLayout,
+    state.panelSide,
+    state.leftPanelBreedte,
+    state.rightPanelBreedte,
     product,
-    mech.label,
-    curZij.label,
     vlak,
     totW,
     kleur.label,
-    glas.label,
-    greep.label,
+    glas.customerName,
+    beslag.label,
     openAndScroll,
   ]);
 
   const chips = useMemo(() => {
     type ChipDot = CSSProperties;
+    if (product.custom) {
+      return [
+        {
+          label: "Buiten de vier standaardproducten",
+          dot: {
+            border: "1.5px solid oklch(0.5 0.008 60)",
+            borderRadius: "50%",
+          } satisfies ChipDot,
+        },
+      ];
+    }
     const list: { label: string; dot: ChipDot }[] = [
+      {
+        label: product.label,
+        dot: {
+          border: "1.5px solid oklch(0.5 0.008 60)",
+          borderRadius: "50%",
+        },
+      },
       {
         label: kleur.label,
         dot: { background: kleur.hex, borderRadius: "50%" },
       },
       {
-        label: glas.label,
-        dot: { background: glas.fill, borderRadius: 3 },
+        label: glas.customerName,
+        dot: { background: glas.visual.fill, borderRadius: 3 },
       },
       {
         label: vlak,
@@ -575,17 +556,8 @@ export function Configurator() {
         },
       },
     ];
-    if (product.hasMech) {
-      list.unshift({
-        label: mech.label,
-        dot: {
-          border: "1.5px solid oklch(0.5 0.008 60)",
-          borderRadius: "50%",
-        },
-      });
-    }
     return list;
-  }, [kleur, glas, vlak, product.hasMech, mech.label]);
+  }, [product.label, kleur, glas, vlak]);
 
   const confirmedCount = sectionDefs.filter(
     (s) => s.id !== "overzicht" && isStepConfirmed(s.id, state, product),
@@ -601,12 +573,156 @@ export function Configurator() {
   const previousStep = prevStepId(currentStepId, product);
   const progressPct = Math.round((confirmedCount / totalCount) * 100);
 
-  const preview = buildPreviewSvg(state, product, curZij);
+  const quoteConfiguration = useMemo((): QuoteConfiguration =>
+    product.custom
+        ? {
+            doorTypeCode: "custom",
+            clientWidthMm: null,
+            clientHeightMm: null,
+            windowCount: 0,
+            glassCode: null,
+            colorCode: null,
+            hardwareCode: null,
+            hasFixedPanel: false,
+            fixedPanelSquareMetres: 0,
+            panelLayout: "geen",
+            panelSide: null,
+            leftPanelSquareMetres: 0,
+            rightPanelSquareMetres: 0,
+            leftPanelWidthMm: 0,
+            rightPanelWidthMm: 0,
+            panelLiggers: 0,
+            panelStaanders: 0,
+          }
+        : {
+            doorTypeCode: product.doorTypeCode,
+            clientWidthMm: state.breedte,
+            clientHeightMm: state.hoogte,
+            windowCount: windows,
+            glassCode: state.glas,
+            colorCode: state.kleur,
+            hardwareCode: product.hasHardware ? state.beslag : null,
+            hasFixedPanel: hasPanels(state),
+            fixedPanelSquareMetres: hasPanels(state) ? totalPanelM2(state) : 0,
+            panelLayout: state.panelLayout,
+            panelSide:
+              state.panelLayout === "een"
+                ? state.panelSide
+                : state.panelLayout === "beide"
+                  ? "beide"
+                  : null,
+            leftPanelSquareMetres: leftPanelActive(state)
+              ? panelAreaM2(state.leftPanelBreedte, state.hoogte)
+              : 0,
+            rightPanelSquareMetres: rightPanelActive(state)
+              ? panelAreaM2(state.rightPanelBreedte, state.hoogte)
+              : 0,
+            leftPanelWidthMm: leftPanelActive(state) ? state.leftPanelBreedte : 0,
+            rightPanelWidthMm: rightPanelActive(state)
+              ? state.rightPanelBreedte
+              : 0,
+            panelLiggers: hasPanels(state) ? state.panelLiggers : 0,
+            panelStaanders: hasPanels(state) ? state.panelStaanders : 0,
+          },
+    [
+      product,
+      state.breedte,
+      state.hoogte,
+      state.glas,
+      state.kleur,
+      state.beslag,
+      state.panelLayout,
+      state.panelSide,
+      state.leftPanelBreedte,
+      state.rightPanelBreedte,
+      state.panelLiggers,
+      state.panelStaanders,
+      windows,
+    ],
+  );
+
+  const preview = product.custom ? (
+    <p
+      style={{
+        margin: 0,
+        fontSize: 14,
+        lineHeight: 1.5,
+        color: "oklch(0.35 0.008 60)",
+      }}
+    >
+      Deze aanvraag valt buiten de vier standaardproducten. We stemmen de
+      uitvoering af nadat we uw gegevens hebben.
+    </p>
+  ) : (
+    <div>
+      {buildPreviewSvg(state, product)}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+          marginTop: 8,
+          fontSize: 13,
+          color: "oklch(0.35 0.008 60)",
+        }}
+      >
+        {sizeLines(state).map((line) => (
+          <div
+            key={line.label}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 12,
+            }}
+          >
+            <span>{line.label}</span>
+            <span>
+              {line.widthMm} × {line.heightMm} mm
+            </span>
+          </div>
+        ))}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            marginTop: 4,
+            paddingTop: 8,
+            borderTop: "1px solid oklch(0.9 0.006 75)",
+            fontWeight: 600,
+            color: "oklch(0.22 0.008 60)",
+          }}
+        >
+          <span>Totaal</span>
+          <span>{formatM2(totalOpeningM2(state))} m²</span>
+        </div>
+      </div>
+    </div>
+  );
 
   const openQuote = useCallback(() => {
+    setMissingStep(null);
     setQuoteOpen(true);
     setState((s) => ({ ...s, summaryOpen: false }));
   }, []);
+
+  const requestQuote = useCallback(() => {
+    const missing = firstUnconfirmedStep(state, product);
+    if (missing !== "overzicht") {
+      setQuoteOpen(false);
+      setMissingStep(missing);
+      setState((s) => ({ ...s, summaryOpen: false, openSection: missing }));
+      scrollToSection(missing);
+      return;
+    }
+    openQuote();
+  }, [state, product, openQuote, scrollToSection]);
+
+  useEffect(() => {
+    if (missingStep && isStepConfirmed(missingStep, state, product)) {
+      setMissingStep(null);
+    }
+  }, [missingStep, state, product]);
 
   useEffect(() => {
     if (!allDone) {
@@ -614,21 +730,19 @@ export function Configurator() {
       setQuoteOpen(false);
       return;
     }
-    if (quoteAutoShown.current || !isMobileConfigurator()) return;
+    if (quoteAutoShown.current) return;
     quoteAutoShown.current = true;
     setQuoteOpen(true);
     setState((s) => (s.summaryOpen ? { ...s, summaryOpen: false } : s));
   }, [allDone]);
 
   useEffect(() => {
-    if (!quoteOpen) return;
+    if (!quoteOpen || !allDone) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setQuoteOpen(false);
     };
     const prevOverflow = document.body.style.overflow;
-    if (isMobileConfigurator()) {
-      document.body.style.overflow = "hidden";
-    }
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prevOverflow;
@@ -651,6 +765,10 @@ export function Configurator() {
               key={o.id}
               label={o.label}
               desc={o.desc}
+              priceMark={priceTier(
+                o.basePrice,
+                CFG_PRODUCTS.map((item) => item.basePrice),
+              )}
               selected={o.id === state.productId}
               thumbStyle={{
                 height: 96,
@@ -663,76 +781,39 @@ export function Configurator() {
                 setState((s) => ({
                   ...s,
                   productId: o.id,
-                  zij: null,
-                  bayWidths: {},
+                  panelLayout: "geen",
                   answered: { ...s.answered, product: true },
                 }));
-                advanceFrom("product");
+                advanceFrom("product", o);
               }}
             />
           ))}
-        </div>
-      );
-    }
-
-    if (id === "mechanisme") {
-      return (
-        <OptionGroups
-          groupKey="mechanisme"
-          state={state}
-          setState={setState}
-          onComplete={() => advanceFrom("mechanisme")}
-          defs={[
-            {
-              key: "mechanisme",
-              title: "Type mechanisme",
-              list: MECHANISMEN,
-              thumb: (o) => mechThumbStyle(o.id),
-            },
-            {
-              key: "richting",
-              title: isSchuifMech ? "Schuifrichting" : "Draairichting",
-              list: dirList,
-              thumb: (o) => {
-                const dia =
-                  dirList.find((d) => d.id === o.id)?.dia ?? "draai-links";
-                return dirThumbStyle(dia);
-              },
-            },
-          ]}
-        />
-      );
-    }
-
-    if (id === "zij") {
-      const zijOpts = sideOptionsFor(product);
-      return (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-            gap: 14,
-          }}
-        >
-          {zijOpts.map((o) => (
-            <OptionCard
-              key={o.id}
-              label={o.label}
-              desc={o.desc}
-              selected={o.id === curZij.id}
-              thumbStyle={zijThumbStyle(o, product)}
-              onClick={() => {
-                mark("zij", o.id);
-                advanceFrom("zij");
-              }}
-            />
-          ))}
+          <OptionCard
+            label={CUSTOM_PRODUCT.label}
+            desc={CUSTOM_PRODUCT.desc}
+            selected={state.productId === CUSTOM_PRODUCT.id}
+            thumbStyle={{
+              height: 96,
+              borderRadius: 9,
+              background:
+                "repeating-linear-gradient(135deg, oklch(0.94 0.004 75) 0 10px, oklch(0.9 0.006 75) 10px 11px)",
+            }}
+            onClick={() => {
+              setState((s) => ({
+                ...s,
+                productId: CUSTOM_PRODUCT.id,
+                panelLayout: "geen",
+                answered: { ...s.answered, product: true },
+              }));
+              advanceFrom("product", CUSTOM_PRODUCT);
+              openQuote();
+            }}
+          />
         </div>
       );
     }
 
     if (id === "vlak") {
-      const showPanelStaanders = bays.some((b) => b.type === "panel");
       return (
         <>
           <div
@@ -746,7 +827,10 @@ export function Configurator() {
             {VLAK_PRESETS.map((o) => {
               const sel =
                 state.liggers === o.liggers &&
-                state.staanders === o.staanders;
+                state.staanders === o.staanders &&
+                (!hasPanels(state) ||
+                  (state.panelLiggers === o.liggers &&
+                    state.panelStaanders === o.staanders));
               return (
                 <button
                   key={o.id}
@@ -756,6 +840,8 @@ export function Configurator() {
                       ...s,
                       liggers: o.liggers,
                       staanders: o.staanders,
+                      panelLiggers: hasPanels(s) ? o.liggers : s.panelLiggers,
+                      panelStaanders: hasPanels(s) ? o.staanders : s.panelStaanders,
                     }))
                   }
                   style={{
@@ -784,7 +870,7 @@ export function Configurator() {
             }}
           >
             <StepperField
-              title="Liggers"
+              title={hasPanels(state) ? "Liggers deur" : "Liggers"}
               subtitle="Horizontale onderverdeling"
               value={state.liggers}
               onMinus={() =>
@@ -801,7 +887,7 @@ export function Configurator() {
               }
             />
             <StepperField
-              title="Staanders deur"
+              title={hasPanels(state) ? "Staanders deur" : "Staanders"}
               subtitle="Verticale onderverdeling"
               value={state.staanders}
               onMinus={() =>
@@ -817,24 +903,51 @@ export function Configurator() {
                 }))
               }
             />
-            {showPanelStaanders ? (
-              <StepperField
-                title="Staanders zijpanelen"
-                subtitle="Onafhankelijk van de deur"
-                value={state.panelStaanders}
-                onMinus={() =>
-                  setState((s) => ({
-                    ...s,
-                    panelStaanders: Math.max(0, s.panelStaanders - 1),
-                  }))
-                }
-                onPlus={() =>
-                  setState((s) => ({
-                    ...s,
-                    panelStaanders: Math.min(5, s.panelStaanders + 1),
-                  }))
-                }
-              />
+            {hasPanels(state) ? (
+              <>
+                <StepperField
+                  title={
+                    state.panelLayout === "beide"
+                      ? "Liggers vaste panelen"
+                      : "Liggers vast paneel"
+                  }
+                  subtitle="Horizontale onderverdeling"
+                  value={state.panelLiggers}
+                  onMinus={() =>
+                    setState((s) => ({
+                      ...s,
+                      panelLiggers: Math.max(0, s.panelLiggers - 1),
+                    }))
+                  }
+                  onPlus={() =>
+                    setState((s) => ({
+                      ...s,
+                      panelLiggers: Math.min(5, s.panelLiggers + 1),
+                    }))
+                  }
+                />
+                <StepperField
+                  title={
+                    state.panelLayout === "beide"
+                      ? "Staanders vaste panelen"
+                      : "Staanders vast paneel"
+                  }
+                  subtitle="Verticale onderverdeling"
+                  value={state.panelStaanders}
+                  onMinus={() =>
+                    setState((s) => ({
+                      ...s,
+                      panelStaanders: Math.max(0, s.panelStaanders - 1),
+                    }))
+                  }
+                  onPlus={() =>
+                    setState((s) => ({
+                      ...s,
+                      panelStaanders: Math.min(5, s.panelStaanders + 1),
+                    }))
+                  }
+                />
+              </>
             ) : null}
           </div>
           <p
@@ -845,8 +958,10 @@ export function Configurator() {
               margin: "16px 0 0",
             }}
           >
-            Liggers worden automatisch op zowel de deur als de zijpanelen
-            toegepast.
+            De deur heeft {windows} {windows === 1 ? "raam" : "ramen"}.
+            {hasPanels(state)
+              ? ` ${state.panelLayout === "beide" ? "De vaste panelen hebben" : "Het vaste paneel heeft"} ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}.`
+              : ""}
           </p>
           <button
             type="button"
@@ -872,88 +987,42 @@ export function Configurator() {
               gap: 18,
             }}
           >
-            {bays.map((b) => (
-              <label
-                key={b.key}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 13,
-                    color: "oklch(0.35 0.008 60)",
-                  }}
-                >
-                  {b.label} — breedte (mm)
-                </span>
-                <input
-                  type="number"
-                  value={bayWidth(state, b)}
-                  onChange={(ev) =>
-                    setState((s) => ({
-                      ...s,
-                      bayWidths: {
-                        ...s.bayWidths,
-                        [b.key]: Number(ev.target.value) || 0,
-                      },
-                    }))
-                  }
-                  min={300}
-                  max={3000}
-                  step={10}
-                  style={{
-                    padding: "13px 14px",
-                    border: "1px solid oklch(0.85 0.006 75)",
-                    borderRadius: 10,
-                    fontSize: 15,
-                    fontFamily: "inherit",
-                    color: "oklch(0.2 0.008 60)",
-                    background: "oklch(1 0 0)",
-                  }}
-                />
-              </label>
-            ))}
-            <label
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 13,
-                  color: "oklch(0.35 0.008 60)",
-                }}
-              >
-                Hoogte opening (mm)
-              </span>
-              <input
-                type="number"
-                value={state.hoogte}
-                onChange={(ev) =>
-                  setState((s) => ({
-                    ...s,
-                    hoogte: Number(ev.target.value) || 0,
-                  }))
+            <MmField
+              label={hasPanels(state) ? "Breedte deur (mm)" : "Breedte (mm)"}
+              value={state.breedte}
+              min={300}
+              max={3000}
+              onChange={(breedte) => setState((s) => ({ ...s, breedte }))}
+            />
+            {leftPanelActive(state) ? (
+              <MmField
+                label="Breedte paneel links (mm)"
+                value={state.leftPanelBreedte}
+                min={300}
+                max={3000}
+                onChange={(leftPanelBreedte) =>
+                  setState((s) => ({ ...s, leftPanelBreedte }))
                 }
-                min={1500}
-                max={4000}
-                step={10}
-                style={{
-                  padding: "13px 14px",
-                  border: "1px solid oklch(0.85 0.006 75)",
-                  borderRadius: 10,
-                  fontSize: 15,
-                  fontFamily: "inherit",
-                  color: "oklch(0.2 0.008 60)",
-                  background: "oklch(1 0 0)",
-                }}
               />
-            </label>
+            ) : null}
+            {rightPanelActive(state) ? (
+              <MmField
+                label="Breedte paneel rechts (mm)"
+                value={state.rightPanelBreedte}
+                min={300}
+                max={3000}
+                onChange={(rightPanelBreedte) =>
+                  setState((s) => ({ ...s, rightPanelBreedte }))
+                }
+              />
+            ) : null}
+            <MmField
+              label="Hoogte opening (mm)"
+              value={state.hoogte}
+              min={1500}
+              max={4000}
+              onChange={(hoogte) => setState((s) => ({ ...s, hoogte }))}
+            />
           </div>
           <div
             style={{
@@ -1001,59 +1070,265 @@ export function Configurator() {
       );
     }
 
-    if (id === "opties") {
-      const groupDefs: GroupDef[] = [
-        {
-          key: "kleur",
-          title: "Kleur coating",
-          list: KLEUREN,
-          thumb: (o) => ({
-            height: 96,
-            borderRadius: 9,
-            background: (o as (typeof KLEUREN)[number]).hex ?? kleur.hex,
-          }),
-        },
-        {
-          key: "glas",
-          title: "Glassoort",
-          list: GLAS,
-          thumb: (o) => {
-            const g = o as (typeof GLAS)[number];
-            if (g.pattern === "reeded") {
-              return {
+    if (id === "glas") {
+      const categoryAmounts = GLASS_CATEGORIES.map((category) =>
+        Math.min(
+          ...GLASS_TYPES.filter((item) => item.category === category.id).map(
+            (item) => item.pricePerM2,
+          ),
+        ),
+      );
+      if (!glassCategory) {
+        return (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+              gap: 14,
+            }}
+          >
+            {GLASS_CATEGORIES.map((category, index) => {
+              const sample = GLASS_TYPES.find(
+                (item) => item.category === category.id,
+              );
+              return (
+                <OptionCard
+                  key={category.id}
+                  label={category.title}
+                  desc={category.text}
+                  priceMark={priceTier(categoryAmounts[index], categoryAmounts)}
+                  selected={glas.category === category.id}
+                  thumbStyle={glassThumb(sample?.visual)}
+                  onClick={() => setGlassCategory(category.id)}
+                />
+              );
+            })}
+          </div>
+        );
+      }
+      const variants = GLASS_TYPES.filter(
+        (item) => item.category === glassCategory,
+      );
+      return (
+        <>
+          <button
+            type="button"
+            onClick={() => setGlassCategory(null)}
+            style={{
+              marginBottom: 16,
+              padding: 0,
+              border: "none",
+              background: "transparent",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              fontSize: 13,
+              color: "oklch(0.4 0.008 60)",
+            }}
+          >
+            ← Alle uitstralingen
+          </button>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+              gap: 14,
+            }}
+          >
+            {variants.map((variant) => (
+              <OptionCard
+                key={variant.code}
+                label={variant.customerName}
+                desc={`${variant.glassType} veiligheidsglas · ${variant.thicknessMm} mm`}
+                priceMark={priceTier(
+                  variant.pricePerM2,
+                  variants.map((item) => item.pricePerM2),
+                )}
+                selected={state.glas === variant.code}
+                thumbStyle={glassThumb(variant.visual)}
+                onClick={() => {
+                  setState((s) => ({
+                    ...s,
+                    glas: variant.code,
+                    answered: { ...s.answered, glas: true },
+                  }));
+                  advanceFrom("glas");
+                }}
+              />
+            ))}
+          </div>
+        </>
+      );
+    }
+
+    if (id === "kleur") {
+      return (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+            gap: 14,
+          }}
+        >
+          {COLORS.map((item) => (
+            <OptionCard
+              key={item.code}
+              label={item.label}
+              desc={item.desc}
+              priceMark={priceTier(
+                item.surcharge,
+                COLORS.map((color) => color.surcharge),
+              )}
+              selected={state.kleur === item.code}
+              thumbStyle={{
                 height: 96,
                 borderRadius: 9,
-                background: `repeating-linear-gradient(90deg, ${g.fill} 0 5px, oklch(1 0 0 / 0.6) 5px 7px)`,
-              };
-            }
-            return {
-              height: 96,
-              borderRadius: 9,
-              background: g.fill,
-            };
-          },
+                background: item.hex,
+              }}
+              onClick={() => {
+                setState((s) => ({
+                  ...s,
+                  kleur: item.code,
+                  answered: { ...s.answered, kleur: true },
+                }));
+                advanceFrom("kleur");
+              }}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    if (id === "beslag") {
+      return (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+            gap: 14,
+          }}
+        >
+          {HARDWARE.map((item) => (
+            <OptionCard
+              key={item.code}
+              label={item.label}
+              desc={item.desc}
+              priceMark={priceTier(
+                item.price,
+                HARDWARE.map((option) => option.price),
+              )}
+              selected={state.beslag === item.code}
+              thumbStyle={{
+                height: 96,
+                borderRadius: 9,
+                background: "oklch(0.93 0.006 75)",
+              }}
+              onClick={() => {
+                setState((s) => ({
+                  ...s,
+                  beslag: item.code,
+                  answered: { ...s.answered, beslag: true },
+                }));
+                advanceFrom("beslag");
+              }}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    if (id === "paneel") {
+      const layouts: {
+        id: PanelLayout;
+        label: string;
+        desc: string;
+      }[] = [
+        {
+          id: "geen",
+          label: "Geen vast paneel",
+          desc: "Alleen de deur.",
+        },
+        {
+          id: "een",
+          label: "Eén vast paneel",
+          desc: "Links of rechts van de deur.",
+        },
+        {
+          id: "beide",
+          label: "Twee vaste panelen",
+          desc: "Een paneel links én rechts.",
         },
       ];
-      if (product.hasGreep) {
-        groupDefs.push({
-          key: "greep",
-          title: "Handgreep",
-          list: GREPEN,
-          thumb: () => ({
-            height: 96,
-            borderRadius: 9,
-            background: "oklch(0.93 0.006 75)",
-          }),
-        });
-      }
       return (
-        <OptionGroups
-          groupKey="opties"
-          state={state}
-          setState={setState}
-          onComplete={() => advanceFrom("opties")}
-          defs={groupDefs}
-        />
+        <>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+              gap: 14,
+            }}
+          >
+            {layouts.map((option) => (
+              <OptionCard
+                key={option.id}
+                label={option.label}
+                desc={option.desc}
+                selected={state.panelLayout === option.id}
+                thumbStyle={panelLayoutThumb(option.id)}
+                onClick={() =>
+                  setState((s) => ({
+                    ...s,
+                    panelLayout: option.id,
+                  }))
+                }
+              />
+            ))}
+          </div>
+          {state.panelLayout === "een" ? (
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 10,
+                marginTop: 18,
+              }}
+            >
+              {(["links", "rechts"] as const).map((side) => {
+                const selected = state.panelSide === side;
+                return (
+                  <button
+                    key={side}
+                    type="button"
+                    onClick={() => setState((s) => ({ ...s, panelSide: side }))}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: 999,
+                      fontFamily: "inherit",
+                      fontSize: 13,
+                      cursor: "pointer",
+                      border: `1px solid ${selected ? accent : "oklch(0.85 0.006 75)"}`,
+                      background: selected ? `${accent}1a` : "transparent",
+                      color: selected
+                        ? "oklch(0.25 0.008 60)"
+                        : "oklch(0.45 0.008 60)",
+                    }}
+                  >
+                    {side === "links" ? "Links van de deur" : "Rechts van de deur"}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+          <button
+            type="button"
+            style={confirmBtnStyle()}
+            onClick={() => {
+              mark("paneel", true);
+              advanceFrom("paneel");
+            }}
+          >
+            Bevestigen en doorgaan →
+          </button>
+        </>
       );
     }
 
@@ -1123,31 +1398,28 @@ export function Configurator() {
               </div>
             ))}
           </div>
-          <div data-cfg-inline-quote style={{ marginTop: 28 }}>
-            <QuoteForm summaryRows={summaryRows} />
-          </div>
           <button
             type="button"
             data-cfg-open-quote
-            onClick={openQuote}
-            style={{
-              display: "none",
-              width: "100%",
-              marginTop: 28,
-              padding: "14px 24px",
-              borderRadius: 999,
-              cursor: "pointer",
-              fontFamily: "inherit",
-              fontSize: 14,
-              fontWeight: 500,
-              border: "none",
-              background: accent,
-              color: "oklch(0.14 0.006 60)",
-              boxShadow: "0 2px 10px oklch(0 0 0 / 0.14)",
-            }}
+            onClick={requestQuote}
+            className="btn-dark"
+            style={{ marginTop: 28 }}
           >
             Offerte aanvragen
           </button>
+          {!allDone ? (
+            <p
+              style={{
+                margin: "12px 0 0",
+                fontSize: 13,
+                color: "oklch(0.45 0.12 25)",
+                lineHeight: 1.5,
+              }}
+            >
+              Nog niet alle stappen zijn ingevuld. We openen de eerstvolgende
+              vraag die nog openstaat.
+            </p>
+          ) : null}
         </>
       );
     }
@@ -1158,8 +1430,8 @@ export function Configurator() {
   return (
     <div
       style={{
-        color: "oklch(0.18 0.006 60)",
-        background: "oklch(0.97 0.004 75)",
+        color: "var(--foreground)",
+        background: "var(--background)",
         minHeight: "100vh",
       }}
     >
@@ -1208,10 +1480,9 @@ export function Configurator() {
             <h1
               className="font-serif-display"
               style={{
-                fontWeight: 500,
+                fontWeight: 400,
                 fontSize: "clamp(26px, 3.4vw, 38px)",
                 margin: 0,
-                lineHeight: 1.15,
               }}
             >
               Stel uw deur samen.
@@ -1465,18 +1736,19 @@ export function Configurator() {
               margin: "14px 2px 0",
             }}
           >
-            Schematische weergave van uw samenstelling. Maatvoering en
-            detaillering worden vóór productie samen met u gecontroleerd.
+            {product.custom
+              ? "Deze aanvraag valt buiten de vier standaardproducten."
+              : "Schematische weergave van uw samenstelling. Maatvoering en detaillering worden vóór productie samen met u gecontroleerd."}
           </p>
         </div>
 
         <div>
-          {sectionDefs.map((def) => {
+          {sectionDefs.map((def, index) => {
             const confirmed =
               def.id !== "overzicht" &&
               isStepConfirmed(def.id, state, product);
             const expanded = state.openSection === def.id;
-            const stepNum = STEP_ORDER.indexOf(def.id) + 1;
+            const stepNum = index + 1;
 
             return (
               <div
@@ -1584,6 +1856,21 @@ export function Configurator() {
                 </button>
                 {expanded ? (
                   <div style={{ marginTop: 20 }}>
+                    {missingStep === def.id ? (
+                      <p
+                        style={{
+                          margin: "0 0 16px",
+                          padding: "12px 14px",
+                          borderRadius: 12,
+                          background: "oklch(0.97 0.02 25)",
+                          color: "oklch(0.42 0.12 25)",
+                          fontSize: 13,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        Vul deze stap in voordat u een offerte aanvraagt.
+                      </p>
+                    ) : null}
                     <p
                       style={{
                         color: "oklch(0.42 0.008 60)",
@@ -1603,12 +1890,32 @@ export function Configurator() {
         </div>
       </div>
 
+      {!state.summaryOpen && !quoteOpen ? (
+        <button
+          type="button"
+          data-cfg-summary-float
+          onClick={() => setState((s) => ({ ...s, summaryOpen: true }))}
+          aria-label={`Bekijk uw samenstelling, ${progressPct}% voltooid`}
+        >
+          <span
+            aria-hidden
+            data-cfg-summary-fill
+            style={{
+              width: `${progressPct}%`,
+              background: `color-mix(in oklch, ${accent} ${allDone ? 36 : 22}%, transparent)`,
+            }}
+          />
+          <span>Bekijk uw samenstelling</span>
+          <span>
+            {progressPct}% ⌃
+          </span>
+        </button>
+      ) : null}
+
       <div
         data-cfg-nav-mobile
         style={{
           display: "none",
-          flexDirection: "column",
-          gap: 10,
           position: "fixed",
           left: 0,
           right: 0,
@@ -1621,62 +1928,6 @@ export function Configurator() {
           boxShadow: "0 -2px 12px oklch(0 0 0 / 0.06)",
         }}
       >
-        <button
-          type="button"
-          onClick={() =>
-            setState((s) => ({ ...s, summaryOpen: !s.summaryOpen }))
-          }
-          aria-label={`Bekijk uw samenstelling, ${progressPct}% voltooid`}
-          style={{
-            position: "relative",
-            overflow: "hidden",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 10,
-            width: "100%",
-            padding: "9px 14px",
-            borderRadius: 999,
-            background: "oklch(0.96 0.004 75)",
-            border: "1px solid oklch(0.9 0.006 75)",
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          <span
-            aria-hidden
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: `${progressPct}%`,
-              background: `color-mix(in oklch, ${accent} ${allDone ? 36 : 22}%, transparent)`,
-              transition: "width 0.4s ease",
-              pointerEvents: "none",
-            }}
-          />
-          <span
-            style={{
-              position: "relative",
-              fontSize: 12,
-              color: "oklch(0.35 0.008 60)",
-              fontWeight: 600,
-            }}
-          >
-            Bekijk uw samenstelling
-          </span>
-          <span
-            style={{
-              position: "relative",
-              fontSize: 12,
-              color: "oklch(0.5 0.008 60)",
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {progressPct}% ⌃
-          </span>
-        </button>
         <div style={{ display: "flex", alignItems: "stretch", gap: 10 }}>
           <button
             type="button"
@@ -1711,7 +1962,7 @@ export function Configurator() {
           <button
             type="button"
             onClick={() =>
-              allDone ? openQuote() : openAndScroll(nextUnanswered)
+              allDone ? requestQuote() : openAndScroll(nextUnanswered)
             }
             style={{
               flex: 1,
@@ -1864,89 +2115,46 @@ export function Configurator() {
       {allDone ? (
         <div
           data-cfg-quote-overlay
+          data-open={quoteOpen ? "true" : "false"}
           role="dialog"
           aria-modal={quoteOpen}
           aria-hidden={!quoteOpen}
           aria-labelledby="cfg-quote-overlay-title"
           onClick={() => setQuoteOpen(false)}
-          style={{
-            display: quoteOpen ? "flex" : "none",
-            position: "fixed",
-            inset: 0,
-            zIndex: 80,
-            background: "oklch(0.14 0.006 60 / 0.52)",
-            alignItems: "flex-end",
-          }}
         >
           <div
+            data-cfg-quote-panel
             onClick={(event) => event.stopPropagation()}
-            style={{
-              width: "100%",
-              maxHeight: "94vh",
-              overflowY: "auto",
-              background: "oklch(0.99 0.002 75)",
-              borderRadius: "18px 18px 0 0",
-              padding: "12px 20px calc(28px + env(safe-area-inset-bottom))",
-            }}
           >
-            <div
-              style={{
-                width: 40,
-                height: 4,
-                borderRadius: 999,
-                background: "oklch(0.86 0.006 75)",
-                margin: "0 auto 14px",
-              }}
-              aria-hidden
-            />
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                gap: 16,
-                marginBottom: 10,
-              }}
-            >
+            <div data-cfg-quote-handle aria-hidden />
+            <div className="cfg-quote-overlay-head">
               <div>
                 <div
                   id="cfg-quote-overlay-title"
-                  className="font-serif-display"
-                  style={{ fontSize: 22, lineHeight: 1.2 }}
+                  className="font-serif-display cfg-quote-overlay-title"
                 >
                   Uw gegevens
                 </div>
-                <p
-                  style={{
-                    margin: "8px 0 0",
-                    fontSize: 14,
-                    lineHeight: 1.55,
-                    color: "oklch(0.42 0.008 60)",
-                  }}
-                >
-                  Uw samenstelling is compleet. Vul uw gegevens in en ontvang
-                  vrijblijvend een offerte.
+                <p className="cfg-quote-overlay-intro">
+                  {product.custom
+                    ? "Deze aanvraag valt buiten de vier standaardproducten. Vul uw gegevens in, dan maken we een voorstel."
+                    : "Uw samenstelling is compleet. Vul uw gegevens in en ontvang vrijblijvend een offerte."}
                 </p>
               </div>
               <button
                 type="button"
                 aria-label="Overlay sluiten"
                 onClick={() => setQuoteOpen(false)}
-                style={{
-                  flexShrink: 0,
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 24,
-                  lineHeight: 1,
-                  color: "oklch(0.45 0.008 60)",
-                  padding: 4,
-                }}
+                className="cfg-quote-overlay-close"
               >
                 ×
               </button>
             </div>
-            <QuoteForm summaryRows={summaryRows} />
+            <QuoteForm
+              summaryRows={summaryRows}
+              productId={product.id}
+              configuration={quoteConfiguration}
+            />
           </div>
         </div>
       ) : null}
