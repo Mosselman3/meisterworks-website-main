@@ -9,8 +9,8 @@ export function ProductChipStrip({ activeSlug }: { activeSlug: string }) {
   ];
 
   return (
-    <div className="min-w-0 w-full pt-4">
-      <div className="chip-strip mx-auto max-w-[var(--max-width)]">
+    <div className="mx-auto min-w-0 w-full max-w-[var(--max-width)] px-7 pt-4">
+      <div className="chip-strip">
         {products.map((product) => {
           const active = product.slug === activeSlug;
           const inner = (
