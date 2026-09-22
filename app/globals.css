@@ -249,6 +249,16 @@ img {
   filter: brightness(0.88);
 }
 
+.btn-accent:disabled,
+.cfg-quote-submit button:disabled,
+.btn-accent:disabled:hover,
+.cfg-quote-submit button:disabled:hover {
+  cursor: not-allowed;
+  opacity: 0.6;
+  filter: none;
+  transform: none;
+}
+
 .btn-ghost {
   display: inline-flex;
   align-items: center;

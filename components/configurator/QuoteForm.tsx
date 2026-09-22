@@ -1,8 +1,9 @@
 "use client";
 
-import { type ChangeEvent, type FormEvent, useState } from "react";
+import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
 import { ArrowIcon } from "@/components/ui";
+import { submitQuoteRequest } from "@/lib/quotes/submit-quote";
 
 type SummaryRow = {
   label: string;
@@ -61,9 +62,11 @@ export function QuoteForm({
   onSubmitted?: () => void;
 }) {
   const [fields, setFields] = useState(INITIAL_FIELDS);
-  const [fileName, setFileName] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [quoteNumber, setQuoteNumber] = useState("");
   const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
+  const submitLock = useRef(false);
 
   function update(key: keyof ContactFields) {
     return (
@@ -83,29 +86,36 @@ export function QuoteForm({
       setError("Vul een geldig telefoonnummer in.");
       return;
     }
+    if (submitLock.current) return;
 
+    submitLock.current = true;
+    setPending(true);
     try {
-      const response = await fetch("/api/offerte", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const result = await submitQuoteRequest(
+        {
           source: "website_configurator",
           contact: fields,
           productId,
           configuration,
           summary: summaryRows,
-        }),
-      });
+        },
+        file,
+      );
 
-      if (!response.ok) throw new Error("Verzenden mislukt");
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+
+      setQuoteNumber(result.quoteNumber);
       onSubmitted?.();
-      setSubmitted(true);
-    } catch {
-      setError("Verzenden is mislukt. Probeer het later opnieuw.");
+    } finally {
+      submitLock.current = false;
+      setPending(false);
     }
   }
 
-  if (submitted) {
+  if (quoteNumber) {
     return (
       <div className="cfg-quote-success">
         <div className="cfg-quote-success-icon" aria-hidden>
@@ -123,8 +133,9 @@ export function QuoteForm({
           Bedankt voor uw aanvraag
         </div>
         <p>
-          We hebben uw gegevens en samenstelling ontvangen. We nemen binnen één
-          werkdag contact met u op met een passende offerte.
+          We hebben uw gegevens en samenstelling ontvangen. Uw aanvraagnummer
+          is {quoteNumber}. We nemen binnen één werkdag contact met u op met
+          een passende offerte.
         </p>
       </div>
     );
@@ -222,14 +233,13 @@ export function QuoteForm({
               strokeLinejoin="round"
             />
           </svg>
-          <span>{fileName || "Bestand toevoegen"}</span>
+          <span>{file?.name || "Bestand toevoegen"}</span>
           <small>Klik om te bladeren</small>
           <input
             id="configurator-bijlage-input"
             type="file"
-            onChange={(event) =>
-              setFileName(event.target.files?.[0]?.name ?? "")
-            }
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            onChange={(event) => setFile(event.target.files?.[0] ?? null)}
           />
         </label>
       </div>
@@ -251,7 +261,7 @@ export function QuoteForm({
           Uw samenstelling wordt samen met uw gegevens verstuurd. We gebruiken
           deze alleen om uw aanvraag te behandelen.
         </p>
-        <button type="submit">
+        <button type="submit" disabled={pending}>
           Verstuur aanvraag
           <ArrowIcon />
         </button>

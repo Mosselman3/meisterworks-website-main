@@ -292,6 +292,25 @@ function stateForProduct(slug: string | null): ConfiguratorState {
   };
 }
 
+function isUntouchedProductStart(state: ConfiguratorState, productParam: string) {
+  const initial = stateForProduct(productParam);
+  return (
+    state.productId === initial.productId &&
+    state.openSection === initial.openSection &&
+    state.breedte === initial.breedte &&
+    state.hoogte === initial.hoogte &&
+    state.liggers === initial.liggers &&
+    state.staanders === initial.staanders &&
+    state.panelLiggers === initial.panelLiggers &&
+    state.panelStaanders === initial.panelStaanders &&
+    state.panelLayout === initial.panelLayout &&
+    state.kleur === initial.kleur &&
+    state.glas === initial.glas &&
+    state.beslag === initial.beslag &&
+    JSON.stringify(state.answered) === JSON.stringify(initial.answered)
+  );
+}
+
 export function Configurator() {
   const searchParams = useSearchParams();
   const productParam = searchParams.get("product");
@@ -314,8 +333,9 @@ export function Configurator() {
 
   useEffect(() => {
     if (!draftReady) return;
+    if (productParam && isUntouchedProductStart(state, productParam)) return;
     writeConfiguratorDraft(state);
-  }, [draftReady, state]);
+  }, [draftReady, productParam, state]);
 
   const product = useMemo(
     () => getProduct(state.productId),

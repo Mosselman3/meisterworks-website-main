@@ -16,7 +16,7 @@ export default function ReviewsPage() {
           Reviews
         </div>
         <h1 className="font-serif-display m-0 mb-5 text-[clamp(30px,4.4vw,46px)] font-normal">
-          52 reviews, één beoordeling.
+          Bekijk wat klanten zeggen over Meisterworks.
         </h1>
         <div className="inline-flex items-center gap-3.5 rounded-[999px] bg-white px-[26px] py-3.5 shadow-[0_1px_3px_oklch(0_0_0_/_0.06)]">
           <span className="font-serif-display text-[26px]">4.9</span>

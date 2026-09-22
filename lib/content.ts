@@ -264,3 +264,11 @@ export function reviewColumns(list: typeof ALL_REVIEWS, numCols: number) {
   });
   return cols;
 }
+
+export function reviewWallChunks(size = 10) {
+  const chunks: (typeof ALL_REVIEWS)[] = [];
+  for (let index = 0; index < ALL_REVIEWS.length; index += size) {
+    chunks.push(ALL_REVIEWS.slice(index, index + size));
+  }
+  return chunks;
+}

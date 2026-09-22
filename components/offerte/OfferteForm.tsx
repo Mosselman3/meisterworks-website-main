@@ -1,9 +1,10 @@
 "use client";
 
-import { type ChangeEvent, type FormEvent, useState } from "react";
+import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
 import { ArrowIcon } from "@/components/ui";
+import { submitQuoteRequest } from "@/lib/quotes/submit-quote";
 import { PRODUCTS, ROUTES } from "@/lib/site";
 
 const INITIAL = {
@@ -19,9 +20,11 @@ const INITIAL = {
 
 export function OfferteForm() {
   const [values, setValues] = useState(INITIAL);
-  const [fileName, setFileName] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [quoteNumber, setQuoteNumber] = useState("");
   const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
+  const submitLock = useRef(false);
 
   function update(key: keyof typeof INITIAL) {
     return (
@@ -40,12 +43,14 @@ export function OfferteForm() {
       setError("Vul een geldig telefoonnummer in.");
       return;
     }
+    if (submitLock.current) return;
+
+    submitLock.current = true;
+    setPending(true);
     try {
       const product = PRODUCTS.find((item) => item.slug === values.product);
-      const response = await fetch("/api/offerte", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const result = await submitQuoteRequest(
+        {
           source: "website_snelle_offerte",
           aanhef: values.aanhef,
           voornaam: values.voornaam,
@@ -57,16 +62,21 @@ export function OfferteForm() {
           productId: product?.slug ?? "",
           product: product?.title ?? "",
           doorTypeCode: product?.doorTypeCode ?? "",
-        }),
-      });
-      if (!response.ok) throw new Error("Verzenden mislukt");
-      setSubmitted(true);
-    } catch {
-      setError("Verzenden is mislukt. Probeer het later opnieuw.");
+        },
+        file,
+      );
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setQuoteNumber(result.quoteNumber);
+    } finally {
+      submitLock.current = false;
+      setPending(false);
     }
   }
 
-  if (submitted) {
+  if (quoteNumber) {
     return (
       <div className="rounded-[18px] border border-[oklch(0.88_0.006_75)] bg-white px-8 py-12 text-center">
         <div className="mx-auto mb-5 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[color-mix(in_oklch,var(--accent)_10%,transparent)]">
@@ -84,8 +94,8 @@ export function OfferteForm() {
           Bedankt voor uw aanvraag
         </div>
         <p className="mx-auto m-0 max-w-[380px] text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
-          We hebben uw gegevens ontvangen en nemen binnen één werkdag contact
-          met u op.
+          We hebben uw gegevens ontvangen. Uw aanvraagnummer is {quoteNumber}.
+          We nemen binnen één werkdag contact met u op.
         </p>
       </div>
     );
@@ -220,7 +230,7 @@ export function OfferteForm() {
               />
             </svg>
             <span className="text-[13px] font-medium text-[oklch(0.35_0.008_60)]">
-              {fileName || "Foto of document toevoegen"}
+              {file?.name || "Foto of document toevoegen"}
             </span>
             <span className="text-[12px] text-[oklch(0.55_0.008_60)]">
               Klik om te bladeren, of sleep een bestand hierheen
@@ -228,10 +238,9 @@ export function OfferteForm() {
             <input
               id="offerte-bijlage-input"
               type="file"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
               className="absolute h-px w-px opacity-0"
-              onChange={(event) =>
-                setFileName(event.target.files?.[0]?.name ?? "")
-              }
+              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
             />
           </label>
         </label>
@@ -262,7 +271,11 @@ export function OfferteForm() {
           </Link>
           .
         </p>
-        <button type="submit" className="btn-accent gap-2 px-8 py-[15px] text-[14px]">
+        <button
+          type="submit"
+          disabled={pending}
+          className="btn-accent gap-2 px-8 py-[15px] text-[14px]"
+        >
           Verzenden
           <ArrowIcon />
         </button>

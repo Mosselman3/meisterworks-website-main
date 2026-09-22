@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react";
 import { ALL_REVIEWS, reviewColumns } from "@/lib/content";
 
-const SPEEDS = [1, -1, 1.3, -1.3];
+const PARALLAX_DISTANCE = 120;
+const SPEEDS = [1.8, -1.8, 2.4, -2.4];
 
 function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
   const wallRef = useRef<HTMLDivElement>(null);
@@ -23,7 +24,7 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
         );
         colRefs.current.forEach((col, index) => {
           if (col) {
-            col.style.transform = `translateY(${progress * -60 * SPEEDS[index % SPEEDS.length]}px)`;
+            col.style.transform = `translateY(${progress * -PARALLAX_DISTANCE * SPEEDS[index % SPEEDS.length]}px)`;
           }
         });
       }
@@ -36,11 +37,11 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
   return (
     <div
       ref={wallRef}
-      className="relative mx-auto h-[900px] max-w-[var(--max-width)] overflow-hidden px-7 py-10"
+      className="relative mx-auto h-[820px] max-w-[var(--max-width)] overflow-hidden px-7 py-8"
     >
       <div
         data-wall-cols="true"
-        className="grid h-full grid-cols-4 gap-5"
+        className="grid h-full grid-cols-4 gap-3.5"
       >
         {columns.map((column, colIndex) => (
           <div
@@ -48,17 +49,17 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
             ref={(node) => {
               colRefs.current[colIndex] = node;
             }}
-            className="relative flex flex-col gap-5"
+            className="relative flex flex-col gap-3.5 will-change-transform"
           >
             {column.map((review) => (
               <div
                 key={`${review.name}-${review.time}`}
-                className="rounded-2xl bg-white p-6 shadow-[0_1px_3px_oklch(0_0_0_/_0.05)]"
+                className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_oklch(0_0_0_/_0.05)]"
               >
-                <div className="mb-3 text-[13px] tracking-[0.1em] text-[var(--accent)]">
+                <div className="mb-2 text-[12px] tracking-[0.1em] text-[var(--accent)]">
                   {review.stars}
                 </div>
-                <p className="m-0 mb-4 text-[15px] font-light leading-[1.65] text-[oklch(0.25_0.008_60)]">
+                <p className="line-clamp-4 m-0 mb-3 text-[14px] font-light leading-[1.55] text-[oklch(0.25_0.008_60)]">
                   “{review.quote}”
                 </p>
                 <div className="text-[13px] font-semibold text-[oklch(0.2_0.008_60)]">

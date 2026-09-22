@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { REVIEW_COUNT, REVIEW_SCORE } from "@/lib/content";
 import { CONTACT, ROUTES } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -58,7 +59,7 @@ export default function AfspraakPage() {
             ))}
           </div>
           <span className="text-[13px] text-[oklch(0.4_0.008_60)]">
-            4,9 uit 138 beoordelingen
+            {REVIEW_SCORE.toLocaleString("nl-NL")} uit {REVIEW_COUNT} beoordelingen
           </span>
         </div>
       </header>
