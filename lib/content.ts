@@ -109,13 +109,26 @@ export const PRODUCT_STORIES = [
 ];
 
 export const CONFIGURATOR_STEPS = [
-  ["01", "Uw product"],
-  ["02", "Type mechanisme"],
-  ["03", "Zijpanelen"],
-  ["04", "Vlakverdeling"],
-  ["05", "Afmeting"],
-  ["06", "Kleur, glas en afwerking"],
-  ["07", "Overzicht & aanvraag"],
+  {
+    num: "01",
+    title: "Product & mechanisme",
+    text: "Kies het type deur en hoe hij beweegt: taats, draai of schuif.",
+  },
+  {
+    num: "02",
+    title: "Zijpanelen & vlakverdeling",
+    text: "Bepaal vaste panelen en de verdeling van staal en glas.",
+  },
+  {
+    num: "03",
+    title: "Afmeting, kleur en glas",
+    text: "Vul de maat in en kies coating, glassoort en afwerking.",
+  },
+  {
+    num: "04",
+    title: "Overzicht & aanvraag",
+    text: "Controleer uw keuzes en vraag vrijblijvend aan — of plan een adviesgesprek.",
+  },
 ] as const;
 
 export const WHY_CUSTOM_TEXT =

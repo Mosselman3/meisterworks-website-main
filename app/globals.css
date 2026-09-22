@@ -57,10 +57,48 @@ body {
   gap: 24px;
 }
 
-.home-config-steps {
+.home-config-process {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 32px 18px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.home-config-step {
+  position: relative;
+  min-width: 0;
+}
+
+.home-config-step-marker {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.home-config-num {
+  display: flex;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(0.85 0.006 75);
+  border-radius: 50%;
+  background: oklch(0.97 0.004 75);
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.home-config-step:not(:last-child) .home-config-step-marker::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  margin-left: 12px;
+  margin-right: -20px;
+  background: oklch(0.85 0.006 75);
 }
 
 .home-product-card {
@@ -623,8 +661,11 @@ img {
   [data-trust-divider] { display: none !important; }
 }
 @media (max-width: 1100px) {
-  .home-config-steps {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .home-config-process {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .home-config-step:nth-child(2n) .home-config-step-marker::after {
+    display: none;
   }
 }
 @media (max-width: 900px) {
@@ -633,8 +674,46 @@ img {
   }
 }
 @media (max-width: 720px) {
-  .home-config-steps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .home-config-process {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .home-config-step:nth-child(2n) .home-config-step-marker::after {
+    display: block;
+  }
+  .home-config-step {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    column-gap: 16px;
+    padding-bottom: 28px;
+  }
+  .home-config-step:last-child {
+    padding-bottom: 0;
+  }
+  .home-config-step-marker {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    margin-bottom: 0;
+    align-items: flex-start;
+  }
+  .home-config-step:not(:last-child) .home-config-step-marker::after {
+    position: absolute;
+    top: 48px;
+    bottom: -28px;
+    left: 23px;
+    right: auto;
+    width: 1px;
+    height: auto;
+    flex: none;
+    margin: 0;
+  }
+  .home-config-step-body {
+    grid-column: 2;
+    padding-top: 6px;
   }
 }
 @media (max-width: 560px) {

@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ConfiguratorProcess } from "@/components/home/ConfiguratorProcess";
 import { TrustBar } from "@/components/home/TrustBar";
 import { WhyCustom } from "@/components/home/WhyCustom";
 import { ReviewMarquee } from "@/components/home/ReviewMarquee";
 import { ArrowIcon, CoverImage } from "@/components/ui";
 import {
-  CONFIGURATOR_STEPS,
   HOME_PRODUCTS,
   MARQUEE_REVIEWS_A,
   MARQUEE_REVIEWS_B,
@@ -254,37 +254,7 @@ export function HomePage() {
 
       <ReviewMarquee rowA={MARQUEE_REVIEWS_A} rowB={MARQUEE_REVIEWS_B} />
 
-      <section className="mx-auto max-w-[var(--max-width)] px-7 py-[100px] text-center">
-        <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
-          Configurator
-        </div>
-        <h2 className="font-serif-display m-0 mb-5 text-[clamp(28px,3.6vw,40px)] leading-[1.15] font-medium">
-          Stel uw eigen deur samen.
-        </h2>
-        <p className="mx-auto mb-12 max-w-[640px] text-[16px] leading-[1.7] text-[oklch(0.4_0.008_60)]">
-          Kies product, mechanisme, zijpanelen, vlakverdeling, afmeting, kleur
-          en glas. Daarna controleert u het overzicht en vraagt u vrijblijvend
-          aan — of u stelt de deur samen in een adviesgesprek.
-        </p>
-        <div className="home-config-steps mb-12">
-          {CONFIGURATOR_STEPS.map(([num, label]) => (
-            <div
-              key={num}
-              className="border-t border-[oklch(0.85_0.006_75)] pt-5 text-left"
-            >
-              <div className="font-serif-display mb-2.5 text-[28px] text-[var(--accent)]">
-                {num}
-              </div>
-              <div className="text-[15px] text-[oklch(0.25_0.008_60)]">
-                {label}
-              </div>
-            </div>
-          ))}
-        </div>
-        <Link href={ROUTES.configurator} className="btn-dark">
-          Open de configurator
-        </Link>
-      </section>
+      <ConfiguratorProcess />
 
       <section
         id="offerte"
