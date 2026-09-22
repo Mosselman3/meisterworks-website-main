@@ -53,10 +53,12 @@ export function QuoteForm({
   summaryRows,
   productId,
   configuration,
+  onSubmitted,
 }: {
   summaryRows: SummaryRow[];
   productId: string;
   configuration: QuoteConfiguration;
+  onSubmitted?: () => void;
 }) {
   const [fields, setFields] = useState(INITIAL_FIELDS);
   const [fileName, setFileName] = useState("");
@@ -96,6 +98,7 @@ export function QuoteForm({
       });
 
       if (!response.ok) throw new Error("Verzenden mislukt");
+      onSubmitted?.();
       setSubmitted(true);
     } catch {
       setError("Verzenden is mislukt. Probeer het later opnieuw.");

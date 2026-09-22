@@ -50,23 +50,24 @@ function isCurrent(pathname: string, link: NavLink) {
 
 function NavChevron({ open }: { open: boolean }) {
   return (
-    <svg
-      width="10"
-      height="10"
-      viewBox="0 0 12 12"
-      fill="none"
-      aria-hidden="true"
-      className="shrink-0 transition-transform duration-200"
-      style={{ transform: open ? "rotate(180deg)" : "none" }}
-    >
-      <path
-        d="M2.25 4.25 6 8l3.75-3.75"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <span className="inline-flex h-[11px] w-[14px] items-center justify-center" aria-hidden="true">
+      <svg
+        width="10"
+        height="10"
+        viewBox="0 0 12 12"
+        fill="none"
+        className="origin-center transition-transform duration-200"
+        style={{ transform: open ? "rotate(180deg)" : "none" }}
+      >
+        <path
+          d="M2.25 4.25 6 8l3.75-3.75"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
   );
 }
 
@@ -133,7 +134,7 @@ export function SiteHeader() {
             hasChildren(link) ? (
               <div
                 key={link.href}
-                className="relative"
+                className="relative flex items-center py-2"
                 onMouseEnter={() => setDesktopMenu(link.href)}
                 onMouseLeave={() => setDesktopMenu(null)}
                 onFocus={() => setDesktopMenu(link.href)}
@@ -146,11 +147,11 @@ export function SiteHeader() {
               >
                 <Link
                   href={link.href}
-                  className={`btn-nav-link inline-flex items-center gap-1.5${isCurrent(pathname, link) ? " btn-nav-link-active" : ""}`}
+                  className={`btn-nav-link inline-flex items-center gap-2.5${isCurrent(pathname, link) ? " btn-nav-link-active" : ""}`}
                   aria-haspopup="true"
                   aria-expanded={desktopMenu === link.href}
                 >
-                  {link.label}
+                  <span>{link.label}</span>
                   <NavChevron open={desktopMenu === link.href} />
                 </Link>
                 <div

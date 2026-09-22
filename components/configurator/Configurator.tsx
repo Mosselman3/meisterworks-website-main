@@ -6,12 +6,18 @@ import { QuoteForm, type QuoteConfiguration } from "@/components/configurator/Qu
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
   type ReactNode,
 } from "react";
+import {
+  clearConfiguratorDraft,
+  readConfiguratorDraft,
+  writeConfiguratorDraft,
+} from "@/lib/configurator-draft";
 import { ACCENT, ROUTES } from "@/lib/site";
 import {
   COLORS,
@@ -28,6 +34,7 @@ import {
   INITIAL_STATE,
   VLAK_PRESETS,
   buildPreviewSvg,
+  configurationProgress,
   firstUnconfirmedStep,
   getProduct,
   formatM2,
@@ -287,13 +294,28 @@ function stateForProduct(slug: string | null): ConfiguratorState {
 
 export function Configurator() {
   const searchParams = useSearchParams();
+  const productParam = searchParams.get("product");
   const [state, setState] = useState<ConfiguratorState>(() =>
-    stateForProduct(searchParams.get("product")),
+    stateForProduct(productParam),
   );
+  const [draftReady, setDraftReady] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
   const [glassCategory, setGlassCategory] = useState<string | null>(null);
   const [missingStep, setMissingStep] = useState<StepId | null>(null);
   const quoteAutoShown = useRef(false);
+
+  useLayoutEffect(() => {
+    if (!productParam) {
+      const draft = readConfiguratorDraft();
+      if (draft) setState(draft.state);
+    }
+    setDraftReady(true);
+  }, [productParam]);
+
+  useEffect(() => {
+    if (!draftReady) return;
+    writeConfiguratorDraft(state);
+  }, [draftReady, state]);
 
   const product = useMemo(
     () => getProduct(state.productId),
@@ -571,7 +593,7 @@ export function Configurator() {
       : nextUnanswered
   ) as StepId;
   const previousStep = prevStepId(currentStepId, product);
-  const progressPct = Math.round((confirmedCount / totalCount) * 100);
+  const progressPct = configurationProgress(state);
 
   const quoteConfiguration = useMemo((): QuoteConfiguration =>
     product.custom
@@ -2154,6 +2176,7 @@ export function Configurator() {
               summaryRows={summaryRows}
               productId={product.id}
               configuration={quoteConfiguration}
+              onSubmitted={clearConfiguratorDraft}
             />
           </div>
         </div>

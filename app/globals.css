@@ -291,11 +291,10 @@ img {
 .nav-dropdown {
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: 0;
   z-index: 60;
   min-width: 240px;
-  padding-top: 14px;
-  transform: translateX(-50%);
+  padding-top: 10px;
 }
 
 .nav-dropdown-panel {
@@ -894,6 +893,79 @@ img {
 
 [data-cfg-summary-float] {
   display: none;
+}
+
+[data-cfg-resume] {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  max-width: calc(100% - 32px);
+  height: 40px;
+  padding-right: 4px;
+  border: 1px solid oklch(0.88 0.006 75);
+  border-radius: 999px;
+  background: oklch(1 0 0);
+  box-shadow: 0 8px 22px oklch(0 0 0 / 0.14);
+  transform: translateX(-50%);
+  overflow: hidden;
+}
+
+[data-cfg-resume-link] {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  height: 100%;
+  padding: 0 12px 0 16px;
+  color: oklch(0.28 0.008 60);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+[data-cfg-resume-link] > span:not([data-cfg-resume-fill]) {
+  position: relative;
+}
+
+[data-cfg-resume-link] > span:last-child {
+  font-weight: 500;
+  color: oklch(0.45 0.008 60);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-cfg-resume-fill] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: color-mix(in oklch, var(--accent) 28%, transparent);
+  transition: width 0.4s ease;
+  pointer-events: none;
+}
+
+[data-cfg-resume-dismiss] {
+  position: relative;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: oklch(0.45 0.008 60);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+[data-cfg-resume-dismiss]:hover {
+  background: oklch(0.95 0.004 75);
 }
 
 @media (max-width: 960px) {

@@ -664,10 +664,6 @@ export function formatM2(area: number) {
   }).format(area);
 }
 
-export function formatPanelM2(widthMm: number, heightMm: number) {
-  return formatM2(panelAreaM2(widthMm, heightMm));
-}
-
 export function totalOpeningM2(state: ConfiguratorState) {
   return panelAreaM2(state.breedte, state.hoogte) + totalPanelM2(state);
 }
@@ -747,6 +743,18 @@ export function firstUnconfirmedStep(
     if (!isStepConfirmed(id, state, product)) return id;
   }
   return "overzicht";
+}
+
+export function configurationProgress(state: ConfiguratorState): number {
+  const product = getProduct(state.productId);
+  const steps = STEP_ORDER.filter(
+    (id) => id !== "overzicht" && stepApplies(id, product),
+  );
+  if (steps.length === 0) return 0;
+  const confirmed = steps.filter((id) =>
+    isStepConfirmed(id, state, product),
+  ).length;
+  return Math.round((confirmed / steps.length) * 100);
 }
 
 export type DirectionOption = {
