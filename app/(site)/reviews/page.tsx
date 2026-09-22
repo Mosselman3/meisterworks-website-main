@@ -34,10 +34,11 @@ export default function ReviewsPage() {
       <section className="bg-[oklch(0.16_0.006_60)] px-7 py-20 text-center">
         <div className="mx-auto max-w-[640px]">
           <h2 className="font-serif-display m-0 mb-[18px] text-[clamp(26px,3.4vw,36px)] leading-[1.25] font-medium text-[oklch(0.97_0.004_75)]">
-            Zo praten klanten over ons. Wilt u weten hoe dat bij u zou werken?
+            Laten we kijken wat bij uw huis past.
           </h2>
           <p className="m-0 mb-8 text-[15px] leading-[1.6] text-[oklch(0.65_0.008_75)]">
-            Plan een vrijblijvend adviesgesprek, of stel direct uw deur samen.
+            Stel uw deur zelf samen, of plan een vrijblijvend adviesgesprek. Wij
+            denken mee over mechanisme, glas en afwerking.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href={ROUTES.configurator} className="btn-accent btn-accent-lg gap-2">
@@ -61,18 +62,19 @@ export default function ReviewsPage() {
 
       <section className="bg-[var(--accent)] px-7 py-[90px] text-center">
         <h2 className="font-serif-display m-0 mb-5 text-[clamp(28px,4vw,44px)] leading-[1.1] font-medium text-[oklch(0.14_0.006_60)]">
-          Voeg uw eigen verhaal toe.
+          Klaar voor de volgende stap?
         </h2>
         <p className="m-0 mb-9 text-[16px] text-[oklch(0.22_0.03_60)]">
-          Bekijk eerst wat mogelijk is, of ga direct verder.
+          Ga verder in de configurator, of vraag een snelle offerte aan — beide
+          vrijblijvend.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link href={ROUTES.configurator} className="btn-dark gap-2 px-[34px] py-4">
             Deur samenstellen
             <ArrowIcon />
           </Link>
-          <Link href={ROUTES.afspraak} className="btn-outline-on-accent">
-            Adviesgesprek plannen
+          <Link href={ROUTES.offerte} className="btn-outline-on-accent">
+            Offerte aanvragen
             <ArrowIcon />
           </Link>
         </div>
