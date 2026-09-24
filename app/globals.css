@@ -731,6 +731,121 @@ img {
   opacity: 0.72;
 }
 
+.cfg-quote-doors {
+  display: grid;
+  gap: 12px;
+}
+
+.cfg-quote-door {
+  padding: 14px 16px;
+  border: 1px solid oklch(0.9 0.006 75);
+  border-radius: 14px;
+  background: oklch(0.99 0.002 75);
+}
+
+.cfg-quote-door-title {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: oklch(0.22 0.008 60);
+}
+
+.cfg-quote-door-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid oklch(0.94 0.004 75);
+  font-size: 13px;
+}
+
+.cfg-quote-door-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cfg-quote-door-row span:first-child {
+  color: oklch(0.5 0.008 60);
+}
+
+.cfg-quote-door-row span:last-child {
+  color: oklch(0.22 0.008 60);
+  font-weight: 600;
+  text-align: right;
+}
+
+[data-cfg-doors] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+[data-cfg-doors] > button,
+[data-cfg-doors] > span {
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  line-height: 1;
+  color: oklch(0.32 0.008 60);
+}
+
+[data-cfg-doors] > button {
+  min-width: 36px;
+  padding: 0 10px;
+  cursor: pointer;
+  border: 1px solid oklch(0.82 0.006 75);
+  background: oklch(1 0 0);
+}
+
+[data-cfg-doors] > button[data-active="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: oklch(0.14 0.006 60);
+}
+
+[data-cfg-doors] > button[data-add] {
+  padding: 0 2px;
+  border: none;
+  background: none;
+  color: oklch(0.32 0.008 60);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+[data-cfg-doors] > button[data-add]:hover {
+  color: oklch(0.18 0.008 60);
+}
+
+[data-cfg-doors] > button[data-icon] {
+  margin-left: auto;
+  padding: 0;
+  width: 36px;
+  min-width: 36px;
+  border: none;
+  background: none;
+  color: oklch(0.45 0.008 60);
+}
+
+[data-cfg-doors] > button[data-icon]:hover {
+  color: oklch(0.22 0.008 60);
+}
+
+[data-cfg-doors] > button[data-icon] + button[data-icon] {
+  margin-left: 0;
+}
+
+[data-cfg-doors] > button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
 .cfg-quote-submit button {
   display: inline-flex;
   align-items: center;

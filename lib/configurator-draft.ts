@@ -2,6 +2,8 @@ import {
   configurationProgress,
   getProduct,
   INITIAL_STATE,
+  MAX_DOORS,
+  snapshotDoor,
   type ConfiguratorState,
 } from "@/components/configurator/logic";
 
@@ -10,8 +12,10 @@ const DISMISS_KEY = "meisterworks.configurator.resume.dismissedAt";
 export const CONFIGURATOR_DRAFT_EVENT = "meisterworks-configurator-draft";
 
 export type ConfiguratorDraft = {
-  version: 1;
+  version: 2;
   state: ConfiguratorState;
+  doors: ConfiguratorState[];
+  activeIndex: number;
   progressPct: number;
   productLabel: string;
   savedAt: number;
@@ -45,24 +49,62 @@ function asState(value: unknown): ConfiguratorState | null {
   };
 }
 
+function asDoors(value: unknown, fallback: ConfiguratorState): ConfiguratorState[] {
+  if (!Array.isArray(value)) return [snapshotDoor(fallback)];
+  const doors = value
+    .map((item) => asState(item))
+    .filter((item): item is ConfiguratorState => Boolean(item))
+    .slice(0, MAX_DOORS)
+    .map(snapshotDoor);
+  return doors.length > 0 ? doors : [snapshotDoor(fallback)];
+}
+
+function draftProgress(doors: ConfiguratorState[]) {
+  return Math.round(
+    doors.reduce((sum, door) => sum + configurationProgress(door), 0) /
+      doors.length,
+  );
+}
+
+function draftLabel(doors: ConfiguratorState[], active: ConfiguratorState) {
+  if (doors.length > 1) return `${doors.length} deuren`;
+  return getProduct(active.productId).label;
+}
+
 export function readConfiguratorDraft(): ConfiguratorDraft | null {
   if (!canUseStorage()) return null;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const data = JSON.parse(raw) as Partial<ConfiguratorDraft>;
+    const data = JSON.parse(raw) as {
+      version?: number;
+      state?: unknown;
+      doors?: unknown;
+      activeIndex?: number;
+      productLabel?: string;
+      savedAt?: number;
+    };
     const state = asState(data.state);
-    if (data.version !== 1 || !state) return null;
-    const progressPct = configurationProgress(state);
+    if (!state) return null;
+    if (data.version !== 1 && data.version !== 2) return null;
+    const doors = asDoors(data.doors, state);
+    const activeIndex = Math.min(
+      Math.max(0, typeof data.activeIndex === "number" ? data.activeIndex : 0),
+      doors.length - 1,
+    );
+    const active = doors[activeIndex] ?? state;
+    const progressPct = draftProgress(doors);
     if (progressPct <= 0) return null;
     return {
-      version: 1,
-      state,
+      version: 2,
+      state: active,
+      doors,
+      activeIndex,
       progressPct,
       productLabel:
         typeof data.productLabel === "string"
           ? data.productLabel
-          : getProduct(state.productId).label,
+          : draftLabel(doors, active),
       savedAt: typeof data.savedAt === "number" ? data.savedAt : 0,
     };
   } catch {
@@ -70,19 +112,28 @@ export function readConfiguratorDraft(): ConfiguratorDraft | null {
   }
 }
 
-export function writeConfiguratorDraft(state: ConfiguratorState) {
+export function writeConfiguratorDraft(
+  state: ConfiguratorState,
+  doors: ConfiguratorState[] = [state],
+  activeIndex = 0,
+) {
   if (!canUseStorage()) return;
-  const progressPct = configurationProgress(state);
-  if (progressPct <= 0) return;
+  const nextDoors = asDoors(doors, state).map((door, index) =>
+    index === activeIndex ? snapshotDoor(state) : snapshotDoor(door),
+  );
+  const progressPct = draftProgress(nextDoors);
+  if (progressPct <= 0) {
+    clearConfiguratorDraft();
+    return;
+  }
+  const active = nextDoors[Math.min(activeIndex, nextDoors.length - 1)] ?? state;
   const draft: ConfiguratorDraft = {
-    version: 1,
-    state: {
-      ...state,
-      summaryOpen: false,
-      liveSummaryOpen: false,
-    },
+    version: 2,
+    state: snapshotDoor(active),
+    doors: nextDoors,
+    activeIndex: Math.min(activeIndex, nextDoors.length - 1),
     progressPct,
-    productLabel: getProduct(state.productId).label,
+    productLabel: draftLabel(nextDoors, active),
     savedAt: Date.now(),
   };
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));

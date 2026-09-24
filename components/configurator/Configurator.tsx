@@ -33,13 +33,17 @@ import {
   CFG_PRODUCTS,
   CUSTOM_PRODUCT,
   INITIAL_STATE,
+  MAX_DOORS,
   VLAK_PRESETS,
   buildPreviewSvg,
   configurationProgress,
+  doorSummaryRows,
   firstUnconfirmedStep,
+  freshDoorState,
   getProduct,
   formatM2,
   hasPanels,
+  isDoorComplete,
   isStepConfirmed,
   leftPanelActive,
   maatLabel,
@@ -50,6 +54,7 @@ import {
   prevStepId,
   rightPanelActive,
   sizeLines,
+  snapshotDoor,
   stepApplies,
   totalOpeningM2,
   totalPanelM2,
@@ -355,6 +360,181 @@ function stateForProduct(slug: string | null): ConfiguratorState {
   };
 }
 
+function withActiveDoors(
+  doors: ConfiguratorState[],
+  activeIndex: number,
+  current: ConfiguratorState,
+) {
+  return doors.map((door, index) =>
+    snapshotDoor(index === activeIndex ? current : door),
+  );
+}
+
+function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfiguration {
+  const product = getProduct(state.productId);
+  if (product.custom) {
+    return {
+      doorTypeCode: "custom",
+      clientWidthMm: null,
+      clientHeightMm: null,
+      windowCount: 0,
+      glassCode: null,
+      colorCode: null,
+      hardwareCode: null,
+      hasFixedPanel: false,
+      fixedPanelSquareMetres: 0,
+      panelLayout: "geen",
+      panelSide: null,
+      leftPanelSquareMetres: 0,
+      rightPanelSquareMetres: 0,
+      leftPanelWidthMm: 0,
+      rightPanelWidthMm: 0,
+      panelLiggers: 0,
+      panelStaanders: 0,
+    };
+  }
+  return {
+    doorTypeCode: product.doorTypeCode,
+    clientWidthMm: state.breedte,
+    clientHeightMm: state.hoogte,
+    windowCount: windowCountFromBars(state.liggers, state.staanders),
+    glassCode: state.glas,
+    colorCode: state.kleur,
+    hardwareCode: product.hasHardware ? state.beslag : null,
+    hasFixedPanel: hasPanels(state),
+    fixedPanelSquareMetres: hasPanels(state) ? totalPanelM2(state) : 0,
+    panelLayout: state.panelLayout,
+    panelSide:
+      state.panelLayout === "een"
+        ? state.panelSide
+        : state.panelLayout === "beide"
+          ? "beide"
+          : null,
+    leftPanelSquareMetres: leftPanelActive(state)
+      ? panelAreaM2(state.leftPanelBreedte, state.hoogte)
+      : 0,
+    rightPanelSquareMetres: rightPanelActive(state)
+      ? panelAreaM2(state.rightPanelBreedte, state.hoogte)
+      : 0,
+    leftPanelWidthMm: leftPanelActive(state) ? state.leftPanelBreedte : 0,
+    rightPanelWidthMm: rightPanelActive(state) ? state.rightPanelBreedte : 0,
+    panelLiggers: hasPanels(state) ? state.panelLiggers : 0,
+    panelStaanders: hasPanels(state) ? state.panelStaanders : 0,
+  };
+}
+
+function DoorGlyph({ plus = false }: { plus?: boolean }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <rect
+        x="3.25"
+        y="1.75"
+        width="9.5"
+        height="12.5"
+        rx="0.8"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+      {plus ? (
+        <path
+          d="M8 5.4v5.2M5.4 8h5.2"
+          stroke="currentColor"
+          strokeWidth="1.25"
+          strokeLinecap="round"
+        />
+      ) : (
+        <circle cx="10.2" cy="8.2" r="0.7" fill="currentColor" />
+      )}
+    </svg>
+  );
+}
+
+function ResetGlyph() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path
+        d="M3.2 8a4.8 4.8 0 1 0 1.2-3.2"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+      />
+      <path
+        d="M3 2.8v2.7h2.7"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function RemoveGlyph() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path
+        d="M4 5.2h8M6.2 5.2V4h3.6v1.2M5.2 5.2l.5 7.2h4.6l.5-7.2"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function DoorSetControls({
+  count,
+  activeIndex,
+  canAdd,
+  canRemove,
+  onSelect,
+  onAdd,
+  onReset,
+  onRemove,
+}: {
+  count: number;
+  activeIndex: number;
+  canAdd: boolean;
+  canRemove: boolean;
+  onSelect: (index: number) => void;
+  onAdd: () => void;
+  onReset: () => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div data-cfg-doors>
+      {Array.from({ length: count }, (_, index) => (
+        <button
+          key={index}
+          type="button"
+          data-active={index === activeIndex ? "true" : undefined}
+          aria-label={`Deur ${index + 1}`}
+          aria-current={index === activeIndex}
+          onClick={() => onSelect(index)}
+        >
+          <DoorGlyph />
+          <span>{index + 1}</span>
+        </button>
+      ))}
+      {canAdd ? (
+        <button type="button" data-add="" onClick={onAdd}>
+          <DoorGlyph plus />
+          Nog een deur
+        </button>
+      ) : null}
+      {canRemove ? (
+        <button type="button" data-icon="" aria-label="Deze deur verwijderen" onClick={onRemove}>
+          <RemoveGlyph />
+        </button>
+      ) : null}
+      <button type="button" data-icon="" aria-label="Opnieuw beginnen" onClick={onReset}>
+        <ResetGlyph />
+      </button>
+    </div>
+  );
+}
+
 function isUntouchedProductStart(state: ConfiguratorState, productParam: string) {
   const initial = stateForProduct(productParam);
   return (
@@ -380,16 +560,25 @@ export function Configurator() {
   const [state, setState] = useState<ConfiguratorState>(() =>
     stateForProduct(productParam),
   );
+  const [doors, setDoors] = useState<ConfiguratorState[]>(() => [
+    stateForProduct(productParam),
+  ]);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [draftReady, setDraftReady] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
   const [glassCategory, setGlassCategory] = useState<string | null>(null);
   const [missingStep, setMissingStep] = useState<StepId | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
   const quoteAutoShown = useRef(false);
 
   useLayoutEffect(() => {
     if (!productParam) {
       const draft = readConfiguratorDraft();
-      if (draft) setState(draft.state);
+      if (draft) {
+        setState(draft.state);
+        setDoors(draft.doors);
+        setActiveIndex(draft.activeIndex);
+      }
     }
     setDraftReady(true);
   }, [productParam]);
@@ -397,8 +586,8 @@ export function Configurator() {
   useEffect(() => {
     if (!draftReady) return;
     if (productParam && isUntouchedProductStart(state, productParam)) return;
-    writeConfiguratorDraft(state);
-  }, [draftReady, productParam, state]);
+    writeConfiguratorDraft(state, doors, activeIndex);
+  }, [draftReady, productParam, state, doors, activeIndex]);
 
   const product = useMemo(
     () => getProduct(state.productId),
@@ -668,72 +857,20 @@ export function Configurator() {
     return () => window.clearTimeout(timer);
   }, [progressPct]);
 
-  const quoteConfiguration = useMemo((): QuoteConfiguration =>
-    product.custom
-        ? {
-            doorTypeCode: "custom",
-            clientWidthMm: null,
-            clientHeightMm: null,
-            windowCount: 0,
-            glassCode: null,
-            colorCode: null,
-            hardwareCode: null,
-            hasFixedPanel: false,
-            fixedPanelSquareMetres: 0,
-            panelLayout: "geen",
-            panelSide: null,
-            leftPanelSquareMetres: 0,
-            rightPanelSquareMetres: 0,
-            leftPanelWidthMm: 0,
-            rightPanelWidthMm: 0,
-            panelLiggers: 0,
-            panelStaanders: 0,
-          }
-        : {
-            doorTypeCode: product.doorTypeCode,
-            clientWidthMm: state.breedte,
-            clientHeightMm: state.hoogte,
-            windowCount: windows,
-            glassCode: state.glas,
-            colorCode: state.kleur,
-            hardwareCode: product.hasHardware ? state.beslag : null,
-            hasFixedPanel: hasPanels(state),
-            fixedPanelSquareMetres: hasPanels(state) ? totalPanelM2(state) : 0,
-            panelLayout: state.panelLayout,
-            panelSide:
-              state.panelLayout === "een"
-                ? state.panelSide
-                : state.panelLayout === "beide"
-                  ? "beide"
-                  : null,
-            leftPanelSquareMetres: leftPanelActive(state)
-              ? panelAreaM2(state.leftPanelBreedte, state.hoogte)
-              : 0,
-            rightPanelSquareMetres: rightPanelActive(state)
-              ? panelAreaM2(state.rightPanelBreedte, state.hoogte)
-              : 0,
-            leftPanelWidthMm: leftPanelActive(state) ? state.leftPanelBreedte : 0,
-            rightPanelWidthMm: rightPanelActive(state)
-              ? state.rightPanelBreedte
-              : 0,
-            panelLiggers: hasPanels(state) ? state.panelLiggers : 0,
-            panelStaanders: hasPanels(state) ? state.panelStaanders : 0,
-          },
-    [
-      product,
-      state.breedte,
-      state.hoogte,
-      state.glas,
-      state.kleur,
-      state.beslag,
-      state.panelLayout,
-      state.panelSide,
-      state.leftPanelBreedte,
-      state.rightPanelBreedte,
-      state.panelLiggers,
-      state.panelStaanders,
-      windows,
-    ],
+  const committedDoors = useMemo(
+    () => withActiveDoors(doors, activeIndex, state),
+    [doors, activeIndex, state],
+  );
+  const canAddDoor = committedDoors.length < MAX_DOORS;
+  const quoteConfiguration = quoteConfigurationFromState(state);
+  const quoteDoors = useMemo(
+    () =>
+      committedDoors.map((door) => ({
+        productId: getProduct(door.productId).id,
+        configuration: quoteConfigurationFromState(door),
+        summary: doorSummaryRows(door),
+      })),
+    [committedDoors],
   );
 
   const preview = product.custom ? (
@@ -812,6 +949,69 @@ export function Configurator() {
     }
     openQuote();
   }, [state, product, openQuote, scrollToSection]);
+
+  const loadDoor = useCallback(
+    (nextDoors: ConfiguratorState[], nextIndex: number) => {
+      const next = nextDoors[nextIndex] ?? freshDoorState();
+      setDoors(nextDoors);
+      setActiveIndex(nextIndex);
+      setState((current) => ({
+        ...next,
+        liveSummaryOpen: current.liveSummaryOpen,
+        summaryOpen: current.summaryOpen,
+      }));
+      setQuoteOpen(false);
+      setGlassCategory(null);
+      setMissingStep(null);
+      quoteAutoShown.current = isDoorComplete(next);
+      scrollToSection(next.openSection ?? "product");
+    },
+    [scrollToSection],
+  );
+
+  const selectDoor = useCallback(
+    (index: number) => {
+      if (index === activeIndex) return;
+      loadDoor(committedDoors, index);
+    },
+    [activeIndex, committedDoors, loadDoor],
+  );
+
+  const addDoor = useCallback(() => {
+    if (!canAddDoor) return;
+    const next = [...committedDoors, freshDoorState()];
+    loadDoor(next, next.length - 1);
+  }, [canAddDoor, committedDoors, loadDoor]);
+
+  const removeActiveDoor = useCallback(() => {
+    if (committedDoors.length <= 1) return;
+    const next = committedDoors.filter((_, index) => index !== activeIndex);
+    loadDoor(next, Math.min(activeIndex, next.length - 1));
+  }, [activeIndex, committedDoors, loadDoor]);
+
+  const resetDoors = useCallback(() => {
+    const fresh = freshDoorState();
+    setDoors([fresh]);
+    setActiveIndex(0);
+    setState(fresh);
+    setQuoteOpen(false);
+    setGlassCategory(null);
+    setMissingStep(null);
+    quoteAutoShown.current = false;
+    clearConfiguratorDraft();
+    scrollToSection("product");
+  }, [scrollToSection]);
+
+  const doorSetProps = {
+    count: committedDoors.length,
+    activeIndex,
+    canAdd: canAddDoor,
+    canRemove: committedDoors.length > 1,
+    onSelect: selectDoor,
+    onAdd: addDoor,
+    onReset: () => setConfirmReset(true),
+    onRemove: removeActiveDoor,
+  };
 
   const confirmAndContinue = useCallback(() => {
     if (allDone || currentStepId === "overzicht") {
@@ -1745,10 +1945,11 @@ export function Configurator() {
                 </div>
               ))}
             </div>
+            <DoorSetControls {...doorSetProps} />
             <div
               style={{
-                marginTop: 22,
-                paddingTop: 20,
+                marginTop: 18,
+                paddingTop: 18,
                 borderTop: "1px solid oklch(0.93 0.004 75)",
               }}
             >
@@ -1992,7 +2193,7 @@ export function Configurator() {
           data-cfg-summary-float
           data-cfg-just-updated={progressPulse ? "true" : undefined}
           onClick={() => setState((s) => ({ ...s, summaryOpen: true }))}
-          aria-label={`Bekijk uw samenstelling, ${progressPct}% voltooid`}
+          aria-label={`Bekijk uw samenstelling, ${committedDoors.length} ${committedDoors.length === 1 ? "deur" : "deuren"}, ${progressPct}% voltooid`}
         >
           <span
             aria-hidden
@@ -2002,7 +2203,10 @@ export function Configurator() {
               background: `color-mix(in oklch, ${accent} ${allDone ? 36 : 22}%, transparent)`,
             }}
           />
-          <span>Bekijk uw samenstelling</span>
+          <span>
+            Bekijk uw samenstelling
+            {committedDoors.length > 1 ? ` · ${committedDoors.length}` : ""}
+          </span>
           <span>
             {progressPct}% ⌃
           </span>
@@ -2133,12 +2337,14 @@ export function Configurator() {
                 ×
               </button>
             </div>
+            <DoorSetControls {...doorSetProps} />
             <div
               style={{
                 background: "oklch(0.965 0.004 75)",
                 borderRadius: 12,
                 padding: 16,
                 marginBottom: 20,
+                marginTop: 16,
               }}
             >
               {preview}
@@ -2233,7 +2439,9 @@ export function Configurator() {
                 <p className="cfg-quote-overlay-intro">
                   {product.custom
                     ? "Deze aanvraag valt buiten de vier standaardproducten. Vul uw gegevens in, dan maken we een voorstel."
-                    : "Uw samenstelling is compleet. Vul uw gegevens in en ontvang vrijblijvend een offerte."}
+                    : committedDoors.length > 1
+                      ? `Uw ${committedDoors.length} deuren zijn compleet. Vul uw gegevens in en ontvang vrijblijvend een offerte.`
+                      : "Uw samenstelling is compleet. Vul uw gegevens in en ontvang vrijblijvend een offerte."}
                 </p>
               </div>
               <button
@@ -2246,11 +2454,98 @@ export function Configurator() {
               </button>
             </div>
             <QuoteForm
-              summaryRows={summaryRows}
-              productId={product.id}
-              configuration={quoteConfiguration}
+              summaryRows={quoteDoors[0]?.summary ?? summaryRows}
+              productId={quoteDoors[0]?.productId ?? product.id}
+              configuration={quoteDoors[0]?.configuration ?? quoteConfiguration}
+              doors={quoteDoors}
               onSubmitted={clearConfiguratorDraft}
             />
+          </div>
+        </div>
+      ) : null}
+
+      {confirmReset ? (
+        <div
+          role="presentation"
+          onClick={() => setConfirmReset(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 90,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+            background: "oklch(0.14 0.006 60 / 0.45)",
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cfg-reset-title"
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "min(420px, 100%)",
+              padding: "22px 22px 18px",
+              borderRadius: 16,
+              background: "oklch(0.99 0.002 75)",
+            }}
+          >
+            <div
+              id="cfg-reset-title"
+              className="font-serif-display"
+              style={{ fontSize: 22, marginBottom: 8 }}
+            >
+              Opnieuw beginnen?
+            </div>
+            <p
+              style={{
+                margin: "0 0 18px",
+                fontSize: 14,
+                lineHeight: 1.55,
+                color: "oklch(0.4 0.008 60)",
+              }}
+            >
+              Alle deuren en keuzes worden gewist. Dit kunt u niet ongedaan maken.
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <button
+                type="button"
+                onClick={() => setConfirmReset(false)}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: 999,
+                  border: "1px solid oklch(0.85 0.006 75)",
+                  background: "oklch(1 0 0)",
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  cursor: "pointer",
+                  color: "oklch(0.28 0.008 60)",
+                }}
+              >
+                Annuleren
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmReset(false);
+                  resetDoors();
+                }}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: 999,
+                  border: "none",
+                  background: accent,
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  color: "oklch(0.14 0.006 60)",
+                }}
+              >
+                Alles wissen
+              </button>
+            </div>
           </div>
         </div>
       ) : null}

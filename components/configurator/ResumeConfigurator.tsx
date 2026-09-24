@@ -29,7 +29,11 @@ export function ResumeConfigurator() {
   if (!draft || pathname === ROUTES.configurator) return null;
   if (dismissedAt >= draft.savedAt) return null;
 
-  const label = `Hervat deur samenstellen, ${draft.progressPct}% voltooid`;
+  const count = draft.doors?.length ?? 1;
+  const label =
+    count > 1
+      ? `Hervat ${count} deuren samenstellen, ${draft.progressPct}% voltooid`
+      : `Hervat deur samenstellen, ${draft.progressPct}% voltooid`;
 
   return (
     <div data-cfg-resume>
@@ -43,7 +47,7 @@ export function ResumeConfigurator() {
           data-cfg-resume-fill
           style={{ width: `${draft.progressPct}%` }}
         />
-        <span>Hervat deur samenstellen</span>
+        <span>{count > 1 ? `Hervat ${count} deuren` : "Hervat deur samenstellen"}</span>
         <span>{draft.progressPct}%</span>
       </Link>
       <button

@@ -1,6 +1,6 @@
 import React from "react";
 import { ACCENT } from "@/lib/site";
-import { COLORS, findGlass, windowCountFromBars } from "./catalog";
+import { COLORS, HARDWARE, findGlass, windowCountFromBars } from "./catalog";
 
 export { ACCENT as CONFIGURATOR_ACCENT };
 
@@ -755,6 +755,53 @@ export function configurationProgress(state: ConfiguratorState): number {
     isStepConfirmed(id, state, product),
   ).length;
   return Math.round((confirmed / steps.length) * 100);
+}
+
+export const MAX_DOORS = 3;
+
+export function isDoorComplete(state: ConfiguratorState): boolean {
+  return firstUnconfirmedStep(state, getProduct(state.productId)) === "overzicht";
+}
+
+export function snapshotDoor(state: ConfiguratorState): ConfiguratorState {
+  return {
+    ...state,
+    answered: { ...state.answered },
+    groupOpen: { ...state.groupOpen },
+    summaryOpen: false,
+    liveSummaryOpen: false,
+  };
+}
+
+export function freshDoorState(): ConfiguratorState {
+  return snapshotDoor(INITIAL_STATE);
+}
+
+export function doorSummaryRows(
+  state: ConfiguratorState,
+): { label: string; value: string }[] {
+  const product = getProduct(state.productId);
+  const a = state.answered;
+  if (product.custom && a.product) {
+    return [{ label: "Product", value: "Buiten de vier standaardproducten" }];
+  }
+  const kleur = COLORS.find((item) => item.code === state.kleur) ?? COLORS[0];
+  const glas = findGlass(state.glas);
+  const beslag =
+    HARDWARE.find((item) => item.code === state.beslag) ?? HARDWARE[1];
+  return [
+    a.product ? { label: "Product", value: product.label } : null,
+    product.hasFixedPanel && a.paneel
+      ? { label: "Vast paneel", value: paneelLabel(state) }
+      : null,
+    a.maat ? { label: "Afmeting", value: maatLabel(state) } : null,
+    a.vlak ? { label: "Vlakverdeling", value: vlakLabel(state) } : null,
+    a.glas ? { label: "Glas", value: glas.customerName } : null,
+    a.kleur ? { label: "Kleur", value: kleur.label } : null,
+    product.hasHardware && a.beslag
+      ? { label: "Beslag", value: beslag.label }
+      : null,
+  ].filter(Boolean) as { label: string; value: string }[];
 }
 
 export type DirectionOption = {

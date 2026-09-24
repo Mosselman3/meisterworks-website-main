@@ -30,6 +30,12 @@ export type QuoteConfiguration = {
   panelStaanders: number;
 };
 
+export type QuoteDoor = {
+  productId: string;
+  configuration: QuoteConfiguration;
+  summary: SummaryRow[];
+};
+
 type ContactFields = {
   aanhef: string;
   voornaam: string;
@@ -54,11 +60,13 @@ export function QuoteForm({
   summaryRows,
   productId,
   configuration,
+  doors,
   onSubmitted,
 }: {
   summaryRows: SummaryRow[];
   productId: string;
   configuration: QuoteConfiguration;
+  doors?: QuoteDoor[];
   onSubmitted?: () => void;
 }) {
   const [fields, setFields] = useState(INITIAL_FIELDS);
@@ -98,6 +106,9 @@ export function QuoteForm({
           productId,
           configuration,
           summary: summaryRows,
+          configurations: (doors ?? []).map((door) => door.configuration),
+          summaries: (doors ?? []).map((door) => door.summary),
+          doors: doors ?? [],
         },
         file,
       );
@@ -133,7 +144,7 @@ export function QuoteForm({
           Bedankt voor uw aanvraag
         </div>
         <p>
-          We hebben uw gegevens en samenstelling ontvangen. Uw aanvraagnummer
+          We hebben uw gegevens en {doors && doors.length > 1 ? "samenstellingen" : "samenstelling"} ontvangen. Uw aanvraagnummer
           is {quoteNumber}. We nemen binnen één werkdag contact met u op met
           een passende offerte.
         </p>
@@ -214,6 +225,36 @@ export function QuoteForm({
         />
       </label>
 
+      {(doors ?? [{ productId, configuration, summary: summaryRows }]).length >
+      0 ? (
+        <>
+          <div className="cfg-quote-divider" />
+          <div className="cfg-quote-heading">
+            <div>Uw samenstelling</div>
+            <span>
+              {(doors ?? [null]).length === 1
+                ? "1 deur"
+                : `${(doors ?? []).length} deuren`}
+            </span>
+          </div>
+          <div className="cfg-quote-doors">
+            {(doors ?? [{ productId, configuration, summary: summaryRows }]).map(
+              (door, index) => (
+                <div key={`door-${index}`} className="cfg-quote-door">
+                  <div className="cfg-quote-door-title">Deur {index + 1}</div>
+                  {door.summary.map((row) => (
+                    <div key={row.label} className="cfg-quote-door-row">
+                      <span>{row.label}</span>
+                      <span>{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              ),
+            )}
+          </div>
+        </>
+      ) : null}
+
       <div className="cfg-quote-divider" />
 
       <div className="cfg-quote-heading">
@@ -260,7 +301,7 @@ export function QuoteForm({
         <p>
           <LockIcon size={13} />
           <span>
-            Uw samenstelling wordt samen met uw gegevens verstuurd. We gebruiken
+            Uw {doors && doors.length > 1 ? "samenstellingen worden" : "samenstelling wordt"} samen met uw gegevens verstuurd. We gebruiken
             deze alleen om uw aanvraag te behandelen.
           </span>
         </p>

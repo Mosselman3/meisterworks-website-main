@@ -1,0 +1,50 @@
+---
+description: Sync Meisterworks app changes with the marketing site in the same session
+alwaysApply: true
+---
+
+# App ↔ marketing-site
+
+Dit venster is een multi-root workspace. Behandel beide roots als één product.
+
+- App (CRM): `Meisterworks admin` — Vite/React. Routes in `src/app/router.tsx`.
+- Marketing-site: `meisterworks-website-main` — Next.js. Routes in `app/(site)/`.
+
+Raakt een wijziging producten, prijzen, configuratoropties, offerte-intake of klantgerichte labels, werk dan beide repo's in dezelfde sessie bij voordat je afrondt. Puur interne CRM-wijzigingen blijven in de app.
+
+## Gedeeld contract
+
+Koppel op stabiele codes, niet op Nederlandse labels.
+
+- Website-`productId`: `taatsdeur`, `scharnierdeur-kozijn`, `schuifdeur`, `vast-paneel`, `custom`
+- `doorTypeCode`: `taatsdeur`, `scharnierdeur_kozijn`, `schuifdeur`, `vast_paneel`
+- App-configurator-id's gebruiken underscores (`scharnierdeur_kozijn`, `vast_paneel`). Website-slugs gebruiken koppeltekens. Match op `doorTypeCode`.
+- Kleur: `standaard_mat_zwart`, `afwijkende_ral`, `design_kleur`
+- Beslag: `basis`, `standaard`, `luxe`
+- Glas: dezelfde 15 SKU-codes in beide catalogi (`33.1` t/m `4mm_raywall_90t`)
+- Bronnen: `website_snelle_offerte`, `website_configurator`
+- Intake: site `POST /api/offerte` → RPC `submit_website_quote`. Parser: `src/domain/websiteQuote.ts` en `supabase/contracts/website-quote-submission.schema.json`. Totalen van de site zijn alleen weergave; de CRM prijst.
+
+`supabase/contracts/configurator-price-map.json` noemt nog oude slugs (`enkele-deur`, `dubbele-deur`, …). Die URL's redirecten in `next.config.ts` naar `/configurator`. Houd ze met pensioen. Actuele productpagina's zijn `/deuren/{slug}` uit `lib/site.ts`.
+
+## Mapping
+
+| App | Marketing-site |
+| --- | --- |
+| `src/features/pricing/catalog.ts`, `/instellingen/prijzen` | `components/configurator/logic.ts` (`basePrice`) en `components/configurator/catalog.ts` (glas per m², kleurtoeslag, beslag). Pas copy op `/` en `/deuren/*` aan als een prijs of inbegrepen onderdeel wijzigt (rail, kozijn, softclose). |
+| `src/features/configurator/logic.ts`, `DoorLineWizard.tsx`, `DoorPreview.tsx` | `/configurator` (`Configurator.tsx`, `logic.ts`, `catalog.ts`) en `lib/products.ts` |
+| `src/domain/websiteQuote.ts`, schema, `000019_submit_website_quote.sql` | `QuoteForm.tsx` (`website_configurator`) en `OfferteForm.tsx` (`website_snelle_offerte`) via `lib/quotes/` |
+| `WEBSITE_PRODUCTS` in `src/domain/websiteQuote.ts` | `PRODUCTS` in `lib/site.ts`, `HOME_PRODUCTS` en `PRODUCT_STORIES` in `lib/content.ts`, `PRODUCT_PAGES` in `lib/products.ts`, `CFG_PRODUCTS` in de configurator |
+| `/offertes` en `/offertes/:quoteId` | Alleen als klantvelden, de intake-payload of statussen die de site toont wijzigen |
+
+## Niet synchroon houden
+
+- Alleen site: `/inspiratie`, `/reviews`, `/afspraak`, `design/`
+- Alleen app: `/login`, `/wachtwoord`, `/klanten/:customerId`, `/componenten`
+
+## Bij een wijziging aan één kant
+
+1. Noem de gedeelde code (slug, `doorTypeCode`, glascode of `source`).
+2. Pas de bijbehorende bestanden in de andere repo in dezelfde beurt aan.
+3. Wijzigt de payload, werk schema, parser en beide formulieren samen bij.
+4. Deze regel staat in beide repo-wortels (`.cursorrules` en `.cursor/rules/app-marketing-sync.mdc`). Houd die kopieën gelijk als de mapping verandert.

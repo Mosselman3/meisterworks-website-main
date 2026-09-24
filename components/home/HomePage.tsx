@@ -113,21 +113,33 @@ export function HomePage() {
 
       <WhyCustom />
 
-      <section
-        data-split-row="true"
-        className="mx-auto grid max-w-[var(--max-width)] items-center gap-12 px-7 py-[100px]"
-        style={{ gridTemplateColumns: "minmax(0, 440px) minmax(0, 1fr)" }}
-      >
-        <CoverImage
-          src="/assets/hero-open-door.jpg"
-          alt="Stalen taatsdeur bij Anouk Hamelink"
-          className="aspect-[4/5] w-full"
-          sizes="(min-width: 860px) 440px, 100vw"
-        />
-        <div>
+      <section className="mx-auto max-w-[var(--max-width)] px-7 py-[100px]">
+        <div className="mb-12 max-w-[640px]">
+          <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+            Reviews
+          </div>
+          <h2 className="font-serif-display m-0 mb-4 text-[clamp(28px,3.6vw,40px)] font-normal">
+            Uitgelicht verhaal
+          </h2>
+          <p className="m-0 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
+            Een Google-review van een geplaatste taatsdeur: hoe de afspraken,
+            de communicatie en het resultaat in de praktijk uitpakten.
+          </p>
+        </div>
+        <div
+          data-split-row="true"
+          className="grid items-center gap-12"
+          style={{ gridTemplateColumns: "minmax(0, 280px) minmax(0, 1fr)" }}
+        >
+          <CoverImage
+            src="/assets/hero-open-door.jpg"
+            alt="Stalen taatsdeur bij Anouk Hamelink"
+            className="mx-auto aspect-[4/5] w-full max-w-[280px] min-[860px]:mx-0"
+            sizes="280px"
+          />
+          <div>
           <div className="mb-[18px] text-[13px] tracking-[0.1em] text-[var(--accent)]">
-            ★★★★★ &nbsp;·&nbsp;{" "}
-            <span className="text-[oklch(0.5_0.01_60)]">Uitgelicht verhaal</span>
+            ★★★★★
           </div>
           <p className="m-0 mb-7 text-[clamp(22px,2.6vw,30px)] font-light leading-[1.55] text-[oklch(0.2_0.008_60)] italic">
             “Na 2 jaar verbouwen de eerste vakman die zijn afspraken volledig
@@ -149,10 +161,24 @@ export function HomePage() {
               </div>
             </div>
           </div>
+          </div>
         </div>
       </section>
 
       <section id="projecten">
+        <div className="mx-auto max-w-[var(--max-width)] px-7 pt-[100px]">
+          <div className="max-w-[640px]">
+            <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+              De modellen
+            </div>
+            <h2 className="font-serif-display m-0 mb-4 text-[clamp(28px,3.6vw,40px)] font-normal">
+              Stalen deur, met verschillende eigenschappen.
+            </h2>
+            <p className="m-0 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
+            Laat u verder inspireren met hoe de deuren bewegen en voor welke toepassingen ze geschikt zijn. Bekijk een deur, of stel hem direct samen in de configurator. 
+            </p>
+          </div>
+        </div>
         {PRODUCT_STORIES.map((story) => {
           const product = storyProduct(story.slug);
           const dark = story.dark;
