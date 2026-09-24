@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# netlify local deploy output
+/.netlify/
+
 # production
 /build
 
