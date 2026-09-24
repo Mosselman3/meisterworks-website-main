@@ -36,6 +36,43 @@ export type QuoteDoor = {
   summary: SummaryRow[];
 };
 
+export function AttachmentField({
+  id,
+  file,
+  onChange,
+  label = "Foto, tekening of document toevoegen",
+}: {
+  id: string;
+  file: File | null;
+  onChange: (file: File | null) => void;
+  label?: string;
+}) {
+  return (
+    <div className="cfg-file-group">
+      <span>{label}</span>
+      <label htmlFor={id} className="cfg-file-input">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 16V4m0 0l-4 4m4-4l4 4M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span>{file?.name || "Bestand toevoegen"}</span>
+        <small>Klik om te bladeren</small>
+        <input
+          id={id}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,application/pdf"
+          onChange={(event) => onChange(event.target.files?.[0] ?? null)}
+        />
+      </label>
+    </div>
+  );
+}
+
 type ContactFields = {
   aanhef: string;
   voornaam: string;
@@ -62,15 +99,18 @@ export function QuoteForm({
   configuration,
   doors,
   onSubmitted,
+  file,
+  onFileChange,
 }: {
   summaryRows: SummaryRow[];
   productId: string;
   configuration: QuoteConfiguration;
   doors?: QuoteDoor[];
   onSubmitted?: () => void;
+  file: File | null;
+  onFileChange: (file: File | null) => void;
 }) {
   const [fields, setFields] = useState(INITIAL_FIELDS);
-  const [file, setFile] = useState<File | null>(null);
   const [quoteNumber, setQuoteNumber] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -262,28 +302,11 @@ export function QuoteForm({
         <span>Optioneel</span>
       </div>
 
-      <div className="cfg-file-group">
-        <span>Foto, tekening of document toevoegen</span>
-        <label htmlFor="configurator-bijlage-input" className="cfg-file-input">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 16V4m0 0l-4 4m4-4l4 4M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>{file?.name || "Bestand toevoegen"}</span>
-          <small>Klik om te bladeren</small>
-          <input
-            id="configurator-bijlage-input"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,application/pdf"
-            onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-          />
-        </label>
-      </div>
+      <AttachmentField
+        id="configurator-bijlage-input"
+        file={file}
+        onChange={onFileChange}
+      />
 
       <label>
         <span>Opmerkingen of bijzonderheden</span>

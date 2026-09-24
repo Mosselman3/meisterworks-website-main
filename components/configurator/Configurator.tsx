@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { QuoteForm, type QuoteConfiguration } from "@/components/configurator/QuoteForm";
+import {
+  AttachmentField,
+  QuoteForm,
+  type QuoteConfiguration,
+} from "@/components/configurator/QuoteForm";
 import {
   useCallback,
   useEffect,
@@ -34,6 +38,8 @@ import {
   CUSTOM_PRODUCT,
   INITIAL_STATE,
   MAX_DOORS,
+  VLAK_CUSTOM_ID,
+  VLAK_DESIGNS,
   VLAK_PRESETS,
   buildPreviewSvg,
   configurationProgress,
@@ -63,6 +69,7 @@ import {
   type ConfiguratorState,
   type PanelLayout,
   type StepId,
+  type VlakSketch,
 } from "./logic";
 
 const accent = ACCENT;
@@ -288,6 +295,59 @@ function OptionCard({
         </details>
       ) : null}
     </div>
+  );
+}
+
+function VlakSketch({ sketch }: { sketch: VlakSketch }) {
+  const frame = "oklch(0.22 0.01 60)";
+  const bar = "oklch(0.18 0.01 60)";
+  return (
+    <svg viewBox="0 0 48 78" width="48" height="78" aria-hidden>
+      <rect x="8" y="6" width="32" height="62" rx="2" fill="none" stroke={frame} strokeWidth="2.4" />
+      <rect x="8" y="62" width="32" height="6" fill={bar} />
+      {sketch.kind === "bars"
+        ? sketch.y.map((y) => (
+            <rect key={y} x="8" y={6 + 62 * y} width="32" height="2.4" fill={bar} />
+          ))
+        : null}
+      {sketch.kind === "grid" ? (
+        <>
+          {sketch.y.map((y) => (
+            <rect key={`y-${y}`} x="8" y={6 + 62 * y} width="32" height="2.2" fill={bar} />
+          ))}
+          {sketch.x.map((x) => (
+            <rect key={`x-${x}`} x={8 + 32 * x - 1.1} y="6" width="2.2" height="62" fill={bar} />
+          ))}
+        </>
+      ) : null}
+      {sketch.kind === "split-bottom" ? (
+        <>
+          <rect x="8" y={6 + 62 * sketch.y} width="32" height="2.4" fill={bar} />
+          <rect
+            x="23"
+            y={6 + 62 * sketch.y}
+            width="2.2"
+            height={62 - 62 * sketch.y}
+            fill={bar}
+          />
+        </>
+      ) : null}
+      {sketch.kind === "inset" ? (
+        <rect x="16" y="18" width="16" height="34" rx="1" fill="none" stroke={bar} strokeWidth="2.2" />
+      ) : null}
+      {sketch.kind === "custom" ? (
+        <text
+          x="24"
+          y="42"
+          textAnchor="middle"
+          fontSize="16"
+          fontWeight="600"
+          fill={frame}
+        >
+          ?
+        </text>
+      ) : null}
+    </svg>
   );
 }
 
@@ -546,6 +606,8 @@ function isUntouchedProductStart(state: ConfiguratorState, productParam: string)
     state.staanders === initial.staanders &&
     state.panelLiggers === initial.panelLiggers &&
     state.panelStaanders === initial.panelStaanders &&
+    state.vlakPreset === initial.vlakPreset &&
+    state.vlakMode === initial.vlakMode &&
     state.panelLayout === initial.panelLayout &&
     state.kleur === initial.kleur &&
     state.glas === initial.glas &&
@@ -569,6 +631,7 @@ export function Configurator() {
   const [glassCategory, setGlassCategory] = useState<string | null>(null);
   const [missingStep, setMissingStep] = useState<StepId | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [attachment, setAttachment] = useState<File | null>(null);
   const quoteAutoShown = useRef(false);
 
   useLayoutEffect(() => {
@@ -676,9 +739,8 @@ export function Configurator() {
       {
         id: "vlak" as StepId,
         title: "Vlakverdeling",
-        intro: hasPanels(state)
-          ? "Liggers en staanders verdeelt u apart voor de deur en de vaste panelen."
-          : "Liggers en staanders bepalen hoeveel ramen het glas krijgt.",
+        intro:
+          "Stel de verdeling zelf in, of kies een ontwerp. Bij een ontwerp dat er niet tussen staat kunt u een tekening toevoegen.",
         summary: vlak,
       },
       {
@@ -1123,8 +1185,128 @@ export function Configurator() {
     }
 
     if (id === "vlak") {
+      const chooseDesign = state.vlakMode === "ontwerp";
+      const andersChosen = chooseDesign && state.vlakPreset === VLAK_CUSTOM_ID;
       return (
         <>
+          <div
+            role="group"
+            aria-label="Manier van vlakverdeling"
+            style={{
+              display: "flex",
+              gap: 8,
+              marginBottom: 18,
+              padding: 4,
+              borderRadius: 999,
+              background: "oklch(0.96 0.004 75)",
+              width: "fit-content",
+            }}
+          >
+            {(
+              [
+                ["zelf", "Zelf ontwerpen"],
+                ["ontwerp", "Ontwerp kiezen"],
+              ] as const
+            ).map(([mode, label]) => {
+              const selected = state.vlakMode === mode;
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() =>
+                    setState((s) => ({ ...s, vlakMode: mode }))
+                  }
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 999,
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    background: selected ? accent : "transparent",
+                    color: selected ? "oklch(1 0 0)" : "oklch(0.4 0.008 60)",
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+          {chooseDesign ? (
+          <>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(92px, 1fr))",
+              gap: 10,
+              marginBottom: 22,
+            }}
+          >
+            {VLAK_DESIGNS.map((design) => {
+              const selected = state.vlakPreset === design.id;
+              return (
+                <button
+                  key={design.id}
+                  type="button"
+                  onClick={() =>
+                    setState((s) => ({ ...s, vlakPreset: design.id }))
+                  }
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "12px 8px 0",
+                    borderRadius: 16,
+                    border: `1.5px solid ${selected ? accent : "oklch(0.86 0.006 75)"}`,
+                    background: "oklch(0.97 0.003 75)",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    overflow: "hidden",
+                  }}
+                >
+                  <VlakSketch sketch={design.sketch} />
+                  <span
+                    style={{
+                      width: "calc(100% + 16px)",
+                      marginTop: 2,
+                      padding: "7px 6px",
+                      background: accent,
+                      color: "oklch(1 0 0)",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      textAlign: "center",
+                    }}
+                  >
+                    {design.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {andersChosen ? (
+            <AttachmentField
+              id="vlak-bijlage-input"
+              file={attachment}
+              onChange={setAttachment}
+              label="Tekening of foto van uw verdeling"
+            />
+          ) : state.vlakPreset ? (
+            <p
+              style={{
+                fontSize: 12,
+                color: "oklch(0.55 0.008 60)",
+                lineHeight: 1.5,
+                margin: 0,
+              }}
+            >
+              Voorbeeldverdeling. De exacte positie van liggers en staanders volgt nog.
+            </p>
+          ) : null}
+          </>
+          ) : (
+          <>
           <div
             style={{
               display: "flex",
@@ -1272,6 +1454,8 @@ export function Configurator() {
               ? ` ${state.panelLayout === "beide" ? "De vaste panelen hebben" : "Het vaste paneel heeft"} ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}.`
               : ""}
           </p>
+          </>
+          )}
           <button
             type="button"
             data-cfg-confirm
@@ -2458,6 +2642,8 @@ export function Configurator() {
               productId={quoteDoors[0]?.productId ?? product.id}
               configuration={quoteDoors[0]?.configuration ?? quoteConfiguration}
               doors={quoteDoors}
+              file={attachment}
+              onFileChange={setAttachment}
               onSubmitted={clearConfiguratorDraft}
             />
           </div>

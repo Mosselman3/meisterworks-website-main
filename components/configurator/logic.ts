@@ -45,6 +45,8 @@ export type ConfiguratorState = {
   staanders: number;
   panelLiggers: number;
   panelStaanders: number;
+  vlakPreset: string;
+  vlakMode: "zelf" | "ontwerp";
   hoogte: number;
   kleur: string;
   glas: string;
@@ -67,6 +69,8 @@ export const INITIAL_STATE: ConfiguratorState = {
   staanders: 0,
   panelLiggers: 0,
   panelStaanders: 0,
+  vlakPreset: "",
+  vlakMode: "zelf",
   hoogte: 2100,
   kleur: "standaard_mat_zwart",
   glas: "33.1",
@@ -266,6 +270,38 @@ export const VLAK_PRESETS = [
   { id: "twee-liggers", label: "Twee liggers", liggers: 2, staanders: 0 },
   { id: "raster", label: "Liggers en staanders", liggers: 1, staanders: 2 },
 ] as const;
+
+export const VLAK_CUSTOM_ID = "anders";
+
+export type VlakSketch =
+  | { kind: "bars"; y: number[] }
+  | { kind: "grid"; y: number[]; x: number[] }
+  | { kind: "split-bottom"; y: number }
+  | { kind: "inset" }
+  | { kind: "custom" };
+
+export const VLAK_DESIGNS: {
+  id: string;
+  label: string;
+  sketch: VlakSketch;
+}[] = [
+  { id: "jade", label: "Jade", sketch: { kind: "bars", y: [0.36] } },
+  { id: "saffier", label: "Saffier", sketch: { kind: "bars", y: [0.22, 0.5] } },
+  { id: "diamant", label: "Diamant", sketch: { kind: "bars", y: [0.25, 0.5, 0.75] } },
+  {
+    id: "hematiet",
+    label: "Hematiet",
+    sketch: { kind: "grid", y: [0.34, 0.67], x: [0.5] },
+  },
+  { id: "opaal", label: "Opaal", sketch: { kind: "bars", y: [0.68] } },
+  { id: "parel", label: "Parel", sketch: { kind: "split-bottom", y: 0.64 } },
+  { id: "serpetijn", label: "Serpetijn", sketch: { kind: "inset" } },
+  { id: VLAK_CUSTOM_ID, label: "Anders", sketch: { kind: "custom" } },
+];
+
+export function vlakDesign(id: string) {
+  return VLAK_DESIGNS.find((design) => design.id === id) ?? null;
+}
 
 export const KLEUREN = [
   {
@@ -862,6 +898,14 @@ function barPhrase(liggers: number, staanders: number) {
 }
 
 export function vlakLabel(state: ConfiguratorState): string {
+  const design = state.vlakMode === "ontwerp" ? vlakDesign(state.vlakPreset) : null;
+  if (design && design.id === VLAK_CUSTOM_ID) return "Anders";
+  if (design && design.id !== VLAK_CUSTOM_ID) {
+    if (!hasPanels(state)) return design.label;
+    const panelWindows = windowCountFromBars(state.panelLiggers, state.panelStaanders);
+    const panelWord = state.panelLayout === "beide" ? "Panelen" : "Paneel";
+    return `${design.label}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}`;
+  }
   const windows = windowCountFromBars(state.liggers, state.staanders);
   const door = `${barPhrase(state.liggers, state.staanders)} · ${windows} ${windows === 1 ? "raam" : "ramen"}`;
   if (!hasPanels(state)) return door;
