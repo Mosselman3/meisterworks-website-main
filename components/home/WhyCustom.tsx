@@ -55,24 +55,24 @@ export function WhyCustom() {
             </span>
           ))}
         </p>
-        <div className="mt-16 grid grid-cols-2 gap-5 min-[900px]:grid-cols-3">
+        <div className="mx-auto mt-14 grid max-w-[1040px] grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-5">
           <CoverImage
             src="/assets/double-doors-black.jpg"
             alt="Stalen glaswand op maat"
-            className="aspect-[3/4]"
-            sizes="(min-width: 900px) 33vw, 50vw"
+            className="aspect-[3/4] min-[900px]:aspect-[4/3]"
+            sizes="(min-width: 900px) 320px, 50vw"
           />
           <CoverImage
             src="/assets/detail-green.jpg"
             alt="Detail poedercoating"
-            className="aspect-[3/4]"
-            sizes="(min-width: 900px) 33vw, 50vw"
+            className="aspect-[3/4] min-[900px]:aspect-[4/3]"
+            sizes="(min-width: 900px) 320px, 50vw"
           />
           <CoverImage
             src="/assets/arched-bronze-door.jpg"
             alt="Stalen draaideur op maat"
-            className="hidden aspect-[3/4] min-[900px]:block"
-            sizes="(min-width: 900px) 33vw, 50vw"
+            className="hidden aspect-[3/4] min-[900px]:block min-[900px]:aspect-[4/3]"
+            sizes="(min-width: 900px) 320px, 50vw"
           />
         </div>
       </div>

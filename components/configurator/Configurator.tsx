@@ -18,6 +18,7 @@ import {
   readConfiguratorDraft,
   writeConfiguratorDraft,
 } from "@/lib/configurator-draft";
+import { FoldIcon } from "@/components/ui";
 import { ACCENT, ROUTES } from "@/lib/site";
 import {
   COLORS,
@@ -60,6 +61,68 @@ import {
 } from "./logic";
 
 const accent = ACCENT;
+
+type ChipKind = "door" | "brush" | "glass" | "layout" | "custom";
+
+function ChipIcon({ kind, color }: { kind: ChipKind; color?: string }) {
+  const stroke = {
+    stroke: "currentColor",
+    strokeWidth: 1.25,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden
+      style={{ flexShrink: 0 }}
+    >
+      {kind === "door" ? (
+        <>
+          <rect x="3.25" y="1.75" width="9.5" height="12.5" rx="0.8" {...stroke} />
+          <circle cx="10.4" cy="8.2" r="0.7" fill="currentColor" />
+        </>
+      ) : null}
+      {kind === "brush" ? (
+        <g transform="rotate(40 8 8)">
+          <rect
+            x="6.15"
+            y="1.45"
+            width="3.7"
+            height="4.35"
+            rx="0.7"
+            fill={color ?? "currentColor"}
+            stroke="currentColor"
+            strokeWidth="1.1"
+          />
+          <rect x="6.45" y="5.7" width="3.1" height="2.05" rx="0.35" {...stroke} />
+          <path d="M8 7.75v6.1" {...stroke} />
+        </g>
+      ) : null}
+      {kind === "glass" ? (
+        <>
+          <rect x="2.25" y="2.25" width="11.5" height="11.5" rx="1" {...stroke} />
+          <path d="M5.2 10.6 10.6 5.2" {...stroke} />
+        </>
+      ) : null}
+      {kind === "layout" ? (
+        <>
+          <rect x="2.25" y="2.25" width="11.5" height="11.5" rx="1" {...stroke} />
+          <path d="M2.25 6.35h11.5M9.15 2.25v11.5" {...stroke} />
+        </>
+      ) : null}
+      {kind === "custom" ? (
+        <>
+          <rect x="2.25" y="2.25" width="11.5" height="11.5" rx="1.2" {...stroke} />
+          <path d="M8 5.1v5.8M5.1 8h5.8" {...stroke} />
+        </>
+      ) : null}
+    </svg>
+  );
+}
 
 function optionCardStyle(selected: boolean): CSSProperties {
   return {
@@ -562,44 +625,22 @@ export function Configurator() {
   ]);
 
   const chips = useMemo(() => {
-    type ChipDot = CSSProperties;
     if (product.custom) {
       return [
         {
           label: "Buiten de vier standaardproducten",
-          dot: {
-            border: "1.5px solid oklch(0.5 0.008 60)",
-            borderRadius: "50%",
-          } satisfies ChipDot,
+          kind: "custom" as const,
+          color: undefined as string | undefined,
         },
       ];
     }
-    const list: { label: string; dot: ChipDot }[] = [
-      {
-        label: product.label,
-        dot: {
-          border: "1.5px solid oklch(0.5 0.008 60)",
-          borderRadius: "50%",
-        },
-      },
-      {
-        label: kleur.label,
-        dot: { background: kleur.hex, borderRadius: "50%" },
-      },
-      {
-        label: glas.customerName,
-        dot: { background: glas.visual.fill, borderRadius: 3 },
-      },
-      {
-        label: vlak,
-        dot: {
-          border: "1.5px solid oklch(0.5 0.008 60)",
-          borderRadius: 2,
-        },
-      },
+    return [
+      { label: product.label, kind: "door" as const, color: undefined },
+      { label: kleur.label, kind: "brush" as const, color: kleur.hex },
+      { label: glas.customerName, kind: "glass" as const, color: undefined },
+      { label: vlak, kind: "layout" as const, color: undefined },
     ];
-    return list;
-  }, [product.label, kleur, glas, vlak]);
+  }, [product.custom, product.label, kleur, glas.customerName, vlak]);
 
   const confirmedCount = sectionDefs.filter(
     (s) => s.id !== "overzicht" && isStepConfirmed(s.id, state, product),
@@ -614,6 +655,18 @@ export function Configurator() {
   ) as StepId;
   const previousStep = prevStepId(currentStepId, product);
   const progressPct = configurationProgress(state);
+  const progressSeen = useRef(progressPct);
+  const [progressPulse, setProgressPulse] = useState(false);
+  useEffect(() => {
+    if (progressPct <= progressSeen.current) {
+      progressSeen.current = progressPct;
+      return;
+    }
+    progressSeen.current = progressPct;
+    setProgressPulse(true);
+    const timer = window.setTimeout(() => setProgressPulse(false), 900);
+    return () => window.clearTimeout(timer);
+  }, [progressPct]);
 
   const quoteConfiguration = useMemo((): QuoteConfiguration =>
     product.custom
@@ -759,6 +812,20 @@ export function Configurator() {
     }
     openQuote();
   }, [state, product, openQuote, scrollToSection]);
+
+  const confirmAndContinue = useCallback(() => {
+    if (allDone || currentStepId === "overzicht") {
+      requestQuote();
+      return;
+    }
+    const next = nextStepId(currentStepId, product);
+    setState((s) => ({
+      ...s,
+      answered: { ...s.answered, [currentStepId]: true },
+      openSection: next,
+    }));
+    scrollToSection(next);
+  }, [allDone, currentStepId, product, requestQuote, scrollToSection]);
 
   useEffect(() => {
     if (missingStep && isStepConfirmed(missingStep, state, product)) {
@@ -1007,6 +1074,7 @@ export function Configurator() {
           </p>
           <button
             type="button"
+            data-cfg-confirm
             style={confirmBtnStyle()}
             onClick={() => {
               mark("vlak", true);
@@ -1100,6 +1168,7 @@ export function Configurator() {
           </p>
           <button
             type="button"
+            data-cfg-confirm
             style={confirmBtnStyle()}
             onClick={() => {
               mark("maat", true);
@@ -1362,6 +1431,7 @@ export function Configurator() {
           ) : null}
           <button
             type="button"
+            data-cfg-confirm
             style={confirmBtnStyle()}
             onClick={() => {
               mark("paneel", true);
@@ -1549,7 +1619,11 @@ export function Configurator() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1320, margin: "0 auto", padding: "22px 28px 0" }}>
+      <div
+        data-cfg-progress
+        data-cfg-just-updated={progressPulse ? "true" : undefined}
+        style={{ maxWidth: 1320, margin: "0 auto", padding: "22px 28px 0" }}
+      >
         <div
           style={{
             display: "flex",
@@ -1581,12 +1655,13 @@ export function Configurator() {
           }}
         >
           <div
+            data-cfg-progress-fill
             style={{
               height: "100%",
               borderRadius: 999,
               background: accent,
               width: `${Math.max(4, progressPct)}%`,
-              transition: "width 0.35s ease",
+              transition: "width 0.55s cubic-bezier(0.22, 1, 0.36, 1)",
             }}
           />
         </div>
@@ -1665,13 +1740,7 @@ export function Configurator() {
                     color: "oklch(0.35 0.008 60)",
                   }}
                 >
-                  <div
-                    style={{
-                      width: 11,
-                      height: 11,
-                      ...chip.dot,
-                    }}
-                  />
+                  <ChipIcon kind={chip.kind} color={chip.color} />
                   {chip.label}
                 </div>
               ))}
@@ -1713,15 +1782,8 @@ export function Configurator() {
                 >
                   Uw samenstelling
                 </span>
-                <span
-                  style={{
-                    fontSize: 13,
-                    color: "oklch(0.5 0.008 60)",
-                    transform: `rotate(${state.liveSummaryOpen ? 180 : 0}deg)`,
-                    transition: "transform 0.2s ease",
-                  }}
-                >
-                  ⌄
+                <span style={{ color: "oklch(0.5 0.008 60)", display: "flex" }}>
+                  <FoldIcon open={state.liveSummaryOpen} size={16} />
                 </span>
               </button>
               {state.liveSummaryOpen ? (
@@ -1884,16 +1946,8 @@ export function Configurator() {
                       ) : null}
                     </div>
                   </div>
-                  <div
-                    style={{
-                      fontSize: 15,
-                      color: "oklch(0.5 0.008 60)",
-                      transform: `rotate(${expanded ? 180 : 0}deg)`,
-                      transition: "transform 0.2s ease",
-                      flexShrink: 0,
-                    }}
-                  >
-                    ⌄
+                  <div style={{ color: "oklch(0.5 0.008 60)", flexShrink: 0 }}>
+                    <FoldIcon open={expanded} size={16} />
                   </div>
                 </button>
                 {expanded ? (
@@ -1936,6 +1990,7 @@ export function Configurator() {
         <button
           type="button"
           data-cfg-summary-float
+          data-cfg-just-updated={progressPulse ? "true" : undefined}
           onClick={() => setState((s) => ({ ...s, summaryOpen: true }))}
           aria-label={`Bekijk uw samenstelling, ${progressPct}% voltooid`}
         >
@@ -2003,9 +2058,7 @@ export function Configurator() {
           </button>
           <button
             type="button"
-            onClick={() =>
-              allDone ? requestQuote() : openAndScroll(nextUnanswered)
-            }
+            onClick={confirmAndContinue}
             style={{
               flex: 1,
               padding: "13px 26px",

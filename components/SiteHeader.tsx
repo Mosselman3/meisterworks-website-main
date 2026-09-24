@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
+import { FoldIcon } from "@/components/ui";
 import { PRODUCTS, ROUTES, productPath } from "@/lib/site";
 
 type NavChild = {
@@ -45,29 +46,6 @@ function isCurrent(pathname: string, link: NavLink) {
     link.children?.some(
       (child) => pathname === child.href || pathname.startsWith(`${child.href}/`),
     ) ?? false
-  );
-}
-
-function NavChevron({ open }: { open: boolean }) {
-  return (
-    <span className="inline-flex h-[11px] w-[14px] items-center justify-center" aria-hidden="true">
-      <svg
-        width="10"
-        height="10"
-        viewBox="0 0 12 12"
-        fill="none"
-        className="origin-center transition-transform duration-200"
-        style={{ transform: open ? "rotate(180deg)" : "none" }}
-      >
-        <path
-          d="M2.25 4.25 6 8l3.75-3.75"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </span>
   );
 }
 
@@ -152,7 +130,7 @@ export function SiteHeader() {
                   aria-expanded={desktopMenu === link.href}
                 >
                   <span>{link.label}</span>
-                  <NavChevron open={desktopMenu === link.href} />
+                  <FoldIcon open={desktopMenu === link.href} size={14} />
                 </Link>
                 <div
                   className="nav-dropdown"
@@ -298,7 +276,7 @@ export function SiteHeader() {
                 onClick={() => setMobileMenu(expanded ? null : link.href)}
               >
                 {link.label}
-                <NavChevron open={expanded} />
+                <FoldIcon open={expanded} size={14} />
               </button>
               <div
                 className="grid transition-[grid-template-rows] duration-300 ease-out"

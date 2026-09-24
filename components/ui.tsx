@@ -34,6 +34,61 @@ export function CoverImage({
   );
 }
 
+export function LockIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden
+      style={{ display: "block", flexShrink: 0 }}
+    >
+      <rect
+        x="4.25"
+        y="7.25"
+        width="7.5"
+        height="5.75"
+        rx="1"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+      <path
+        d="M5.5 7.25V5.75a2.5 2.5 0 0 1 5 0V7.25"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function FoldIcon({ open = false, size = 16 }: { open?: boolean; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden
+      style={{
+        display: "block",
+        flexShrink: 0,
+        transform: open ? "rotate(180deg)" : undefined,
+        transition: "transform 0.2s ease",
+      }}
+    >
+      <path
+        d="M4 6 8 10 12 6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function ArrowIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>

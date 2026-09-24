@@ -66,7 +66,7 @@ export function HomePage() {
             Ons aanbod
           </div>
           <h2 className="font-serif-display m-0 mb-4 text-[clamp(30px,4vw,44px)] font-normal">
-            Zes producten. Eindeloos maatwerk.
+            Stalen deuren voor elke ruimte. Eindeloos maatwerk.
           </h2>
           <p className="m-0 text-[16px] leading-[1.6] text-[oklch(0.42_0.008_60)]">
             Elk model met de hand vervaardigd op basis van uw wensen.
@@ -83,7 +83,7 @@ export function HomePage() {
                 src={product.image}
                 alt={product.alt}
                 className="home-product-image aspect-[4/5]"
-                sizes="(min-width: 900px) 33vw, 50vw"
+                sizes="(min-width: 1100px) 25vw, 50vw"
               />
               <div className="home-product-card-body px-6 py-[26px]">
                 <div className="mb-2 flex items-center justify-between gap-2.5">
@@ -115,13 +115,14 @@ export function HomePage() {
 
       <section
         data-split-row="true"
-        className="mx-auto grid max-w-[var(--max-width)] items-center gap-16 px-7 py-[100px]"
-        style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)" }}
+        className="mx-auto grid max-w-[var(--max-width)] items-center gap-12 px-7 py-[100px]"
+        style={{ gridTemplateColumns: "minmax(0, 440px) minmax(0, 1fr)" }}
       >
         <CoverImage
           src="/assets/hero-open-door.jpg"
           alt="Stalen taatsdeur bij Anouk Hamelink"
-          className="aspect-[4/5]"
+          className="aspect-[4/5] w-full"
+          sizes="(min-width: 860px) 440px, 100vw"
         />
         <div>
           <div className="mb-[18px] text-[13px] tracking-[0.1em] text-[var(--accent)]">

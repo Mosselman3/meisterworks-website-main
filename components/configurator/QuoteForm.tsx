@@ -2,7 +2,7 @@
 
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
-import { ArrowIcon } from "@/components/ui";
+import { ArrowIcon, LockIcon } from "@/components/ui";
 import { submitQuoteRequest } from "@/lib/quotes/submit-quote";
 
 type SummaryRow = {
@@ -258,8 +258,11 @@ export function QuoteForm({
 
       <div className="cfg-quote-submit">
         <p>
-          Uw samenstelling wordt samen met uw gegevens verstuurd. We gebruiken
-          deze alleen om uw aanvraag te behandelen.
+          <LockIcon size={13} />
+          <span>
+            Uw samenstelling wordt samen met uw gegevens verstuurd. We gebruiken
+            deze alleen om uw aanvraag te behandelen.
+          </span>
         </p>
         <button type="submit" disabled={pending}>
           Verstuur aanvraag
