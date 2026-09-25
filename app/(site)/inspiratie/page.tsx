@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { InspirationGrid } from "@/components/inspiration/InspirationGrid";
+import { listInspirationMedia } from "@/lib/inspiration";
 import { CONTACT } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Inspiratie — Meisterworks",
 };
 
-const POSTS = Array.from({ length: 12 }, (_, index) => ({
-  id: `ig-post-${index + 1}`,
-  isVideo: index === 6,
-  src: index < 8 ? `/assets/ig-post-${index + 1}.jpg` : undefined,
-}));
-
 export default function InspiratiePage() {
+  const posts = listInspirationMedia();
+
   return (
     <main>
       <header className="mx-auto max-w-[var(--max-width)] px-7 pt-[72px] pb-12 text-center">
@@ -56,44 +53,7 @@ export default function InspiratiePage() {
       </header>
 
       <section className="mx-auto max-w-[var(--max-width)] px-0 pb-[100px] min-[720px]:px-7">
-        <div className="grid grid-cols-3 gap-px min-[720px]:gap-1">
-          {POSTS.map((post) => (
-            <a
-              key={post.id}
-              href={CONTACT.instagram}
-              target="_blank"
-              rel="noreferrer"
-              className="relative block aspect-square overflow-hidden bg-[oklch(0.9_0.006_75)]"
-            >
-              {post.src ? (
-                <Image
-                  src={post.src}
-                  alt="Instagram post van Meisterworks"
-                  fill
-                  className="object-cover"
-                  sizes="(min-width: 1280px) 400px, 33vw"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-[12px] tracking-[0.08em] text-[oklch(0.55_0.008_60)] uppercase">
-                  Instagram post
-                </div>
-              )}
-              {post.isVideo ? (
-                <div className="pointer-events-none absolute top-2.5 right-2.5 z-[2]">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="white"
-                    style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.5))" }}
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              ) : null}
-            </a>
-          ))}
-        </div>
+        <InspirationGrid posts={posts} />
       </section>
     </main>
   );
