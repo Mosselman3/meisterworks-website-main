@@ -58,6 +58,26 @@ export const COLORS = [
   { code: "design_kleur", label: "Designkleur", desc: "Brons en andere designkleuren.", surcharge: 0, hex: "#6b5340" },
 ] as const;
 
+/** Display catalog. The CRM prices the quote; surcharges start at 0. */
+export const DESIGN_SURCHARGES = [
+  { code: "jade", name: "Jade", surcharge: 0 },
+  { code: "saffier", name: "Saffier", surcharge: 0 },
+  { code: "diamant", name: "Diamant", surcharge: 0 },
+  { code: "hematiet", name: "Hematiet", surcharge: 0 },
+  { code: "opaal", name: "Opaal", surcharge: 0 },
+  { code: "parel", name: "Parel", surcharge: 0 },
+  { code: "serpetijn", name: "Serpetijn", surcharge: 0 },
+  { code: "anders", name: "Anders", surcharge: 0 },
+] as const;
+
+export const SLUITWERK = [
+  { code: "sluitwerk_a", label: "Sluitwerk A", desc: "Optie A.", price: 0 },
+  { code: "sluitwerk_b", label: "Sluitwerk B", desc: "Optie B.", price: 0 },
+  { code: "sluitwerk_c", label: "Sluitwerk C", desc: "Optie C.", price: 0 },
+  { code: "sluitwerk_d", label: "Sluitwerk D", desc: "Optie D.", price: 0 },
+  { code: "sluitwerk_e", label: "Sluitwerk E", desc: "Optie E.", price: 0 },
+] as const;
+
 export const HARDWARE = [
   { code: "basis", label: "Basis", desc: "Standaard kruk en cilinderslot.", price: 95 },
   { code: "standaard", label: "Standaard", desc: "Kruk mat zwart en dag-nachtslot.", price: 145 },

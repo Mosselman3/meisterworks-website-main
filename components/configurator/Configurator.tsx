@@ -29,6 +29,7 @@ import {
   GLASS_CATEGORIES,
   GLASS_TYPES,
   HARDWARE,
+  SLUITWERK,
   findGlass,
   priceTier,
   windowCountFromBars,
@@ -39,8 +40,8 @@ import {
   INITIAL_STATE,
   MAX_DOORS,
   VLAK_CUSTOM_ID,
-  VLAK_DESIGNS,
   VLAK_PRESETS,
+  catalogVlakDesigns,
   buildPreviewSvg,
   configurationProgress,
   doorSummaryRows,
@@ -441,6 +442,7 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
       glassCode: null,
       colorCode: null,
       hardwareCode: null,
+      sluitwerkCode: null,
       hasFixedPanel: false,
       fixedPanelSquareMetres: 0,
       panelLayout: "geen",
@@ -451,6 +453,8 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
       rightPanelWidthMm: 0,
       panelLiggers: 0,
       panelStaanders: 0,
+      vlakMode: "zelf",
+      vlakPreset: "",
     };
   }
   return {
@@ -461,6 +465,7 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
     glassCode: state.glas,
     colorCode: state.kleur,
     hardwareCode: product.hasHardware ? state.beslag : null,
+    sluitwerkCode: product.hasHardware ? state.sluitwerk : null,
     hasFixedPanel: hasPanels(state),
     fixedPanelSquareMetres: hasPanels(state) ? totalPanelM2(state) : 0,
     panelLayout: state.panelLayout,
@@ -480,6 +485,8 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
     rightPanelWidthMm: rightPanelActive(state) ? state.rightPanelBreedte : 0,
     panelLiggers: hasPanels(state) ? state.panelLiggers : 0,
     panelStaanders: hasPanels(state) ? state.panelStaanders : 0,
+    vlakMode: state.vlakMode === "ontwerp" ? "ontwerp" : "zelf",
+    vlakPreset: state.vlakMode === "ontwerp" ? state.vlakPreset : "",
   };
 }
 
@@ -612,6 +619,7 @@ function isUntouchedProductStart(state: ConfiguratorState, productParam: string)
     state.kleur === initial.kleur &&
     state.glas === initial.glas &&
     state.beslag === initial.beslag &&
+    state.sluitwerk === initial.sluitwerk &&
     JSON.stringify(state.answered) === JSON.stringify(initial.answered)
   );
 }
@@ -660,6 +668,7 @@ export function Configurator() {
   const kleur = COLORS.find((k) => k.code === state.kleur) ?? COLORS[0];
   const glas = findGlass(state.glas);
   const beslag = HARDWARE.find((item) => item.code === state.beslag) ?? HARDWARE[1];
+  const sluitwerk = SLUITWERK.find((item) => item.code === state.sluitwerk) ?? SLUITWERK[0];
   const vlak = vlakLabel(state);
   const totW = totalWidth(state);
   const windows = windowCountFromBars(state.liggers, state.staanders);
@@ -758,9 +767,9 @@ export function Configurator() {
       product.hasHardware
         ? {
             id: "beslag" as StepId,
-            title: "Beslag",
-            intro: "Kies de greep en het slot.",
-            summary: beslag.label,
+            title: "Sluiting",
+            intro: "Kies eerst de handgreep en daarna het sluitwerk.",
+            summary: `${beslag.label} · ${sluitwerk.label}`,
           }
         : null,
       {
@@ -849,8 +858,8 @@ export function Configurator() {
         : null,
       product.hasHardware && a.beslag
         ? {
-            label: "Beslag",
-            value: beslag.label,
+            label: "Sluiting",
+            value: `${beslag.label} · ${sluitwerk.label}`,
             onEdit: () => openAndScroll("beslag"),
           }
         : null,
@@ -1243,7 +1252,7 @@ export function Configurator() {
               marginBottom: 22,
             }}
           >
-            {VLAK_DESIGNS.map((design) => {
+            {catalogVlakDesigns().map((design) => {
               const selected = state.vlakPreset === design.id;
               return (
                 <button
@@ -1280,6 +1289,22 @@ export function Configurator() {
                     }}
                   >
                     {design.label}
+                    <span
+                      style={{
+                        display: "block",
+                        marginTop: 2,
+                        fontSize: 11,
+                        fontWeight: 500,
+                        opacity: 0.85,
+                      }}
+                    >
+                      Toeslag{" "}
+                      {new Intl.NumberFormat("nl-NL", {
+                        style: "currency",
+                        currency: "EUR",
+                        maximumFractionDigits: 0,
+                      }).format(design.surcharge)}
+                    </span>
                   </span>
                 </button>
               );
@@ -1695,39 +1720,76 @@ export function Configurator() {
 
     if (id === "beslag") {
       return (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-            gap: 14,
-          }}
-        >
-          {HARDWARE.map((item) => (
-            <OptionCard
-              key={item.code}
-              label={item.label}
-              desc={item.desc}
-              priceMark={priceTier(
-                item.price,
-                HARDWARE.map((option) => option.price),
-              )}
-              selected={state.beslag === item.code}
-              thumbStyle={{
-                height: 96,
-                borderRadius: 9,
-                background: "oklch(0.93 0.006 75)",
-              }}
-              onClick={() => {
-                setState((s) => ({
-                  ...s,
-                  beslag: item.code,
-                  answered: { ...s.answered, beslag: true },
-                }));
-                advanceFrom("beslag");
-              }}
-            />
-          ))}
-        </div>
+        <>
+          <h3 style={{ margin: "0 0 12px", fontSize: 16 }}>Handgreep</h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+              gap: 14,
+              marginBottom: 22,
+            }}
+          >
+            {HARDWARE.map((item) => (
+              <OptionCard
+                key={item.code}
+                label={item.label}
+                desc={item.desc}
+                priceMark={priceTier(
+                  item.price,
+                  HARDWARE.map((option) => option.price),
+                )}
+                selected={state.beslag === item.code}
+                thumbStyle={{
+                  height: 96,
+                  borderRadius: 9,
+                  background: "oklch(0.93 0.006 75)",
+                }}
+                onClick={() => {
+                  setState((s) => ({
+                    ...s,
+                    beslag: item.code,
+                    answered: { ...s.answered, beslag: true },
+                  }));
+                  advanceFrom("beslag");
+                }}
+              />
+            ))}
+          </div>
+          <h3 style={{ margin: "0 0 12px", fontSize: 16 }}>Sluitwerk</h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+              gap: 14,
+            }}
+          >
+            {SLUITWERK.map((item) => (
+              <OptionCard
+                key={item.code}
+                label={item.label}
+                desc={item.desc}
+                priceMark={priceTier(
+                  item.price,
+                  SLUITWERK.map((option) => option.price),
+                )}
+                selected={state.sluitwerk === item.code}
+                thumbStyle={{
+                  height: 96,
+                  borderRadius: 9,
+                  background: "oklch(0.93 0.006 75)",
+                }}
+                onClick={() =>
+                  setState((s) => ({
+                    ...s,
+                    sluitwerk: item.code,
+                    answered: { ...s.answered, beslag: true },
+                  }))
+                }
+              />
+            ))}
+          </div>
+        </>
       );
     }
 

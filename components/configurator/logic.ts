@@ -1,6 +1,6 @@
 import React from "react";
 import { ACCENT } from "@/lib/site";
-import { COLORS, HARDWARE, findGlass, windowCountFromBars } from "./catalog";
+import { COLORS, DESIGN_SURCHARGES, HARDWARE, SLUITWERK, findGlass, windowCountFromBars } from "./catalog";
 
 export { ACCENT as CONFIGURATOR_ACCENT };
 
@@ -51,6 +51,7 @@ export type ConfiguratorState = {
   kleur: string;
   glas: string;
   beslag: string;
+  sluitwerk: string;
   panelLayout: PanelLayout;
   panelSide: PanelSide;
   leftPanelBreedte: number;
@@ -75,6 +76,7 @@ export const INITIAL_STATE: ConfiguratorState = {
   kleur: "standaard_mat_zwart",
   glas: "33.1",
   beslag: "standaard",
+  sluitwerk: "sluitwerk_a",
   panelLayout: "geen",
   panelSide: "rechts",
   leftPanelBreedte: 700,
@@ -301,6 +303,15 @@ export const VLAK_DESIGNS: {
 
 export function vlakDesign(id: string) {
   return VLAK_DESIGNS.find((design) => design.id === id) ?? null;
+}
+
+export function catalogVlakDesigns() {
+  return DESIGN_SURCHARGES.map((item) => ({
+    id: item.code,
+    label: item.name,
+    surcharge: item.surcharge,
+    sketch: vlakDesign(item.code)?.sketch ?? ({ kind: "custom" as const }),
+  }));
 }
 
 export const KLEUREN = [
@@ -825,6 +836,8 @@ export function doorSummaryRows(
   const glas = findGlass(state.glas);
   const beslag =
     HARDWARE.find((item) => item.code === state.beslag) ?? HARDWARE[1];
+  const sluitwerk =
+    SLUITWERK.find((item) => item.code === state.sluitwerk) ?? SLUITWERK[0];
   return [
     a.product ? { label: "Product", value: product.label } : null,
     product.hasFixedPanel && a.paneel
@@ -835,7 +848,7 @@ export function doorSummaryRows(
     a.glas ? { label: "Glas", value: glas.customerName } : null,
     a.kleur ? { label: "Kleur", value: kleur.label } : null,
     product.hasHardware && a.beslag
-      ? { label: "Beslag", value: beslag.label }
+      ? { label: "Sluiting", value: `${beslag.label} · ${sluitwerk.label}` }
       : null,
   ].filter(Boolean) as { label: string; value: string }[];
 }
@@ -899,12 +912,14 @@ function barPhrase(liggers: number, staanders: number) {
 
 export function vlakLabel(state: ConfiguratorState): string {
   const design = state.vlakMode === "ontwerp" ? vlakDesign(state.vlakPreset) : null;
-  if (design && design.id === VLAK_CUSTOM_ID) return "Anders";
+  const catalogName = DESIGN_SURCHARGES.find((item) => item.code === state.vlakPreset)?.name;
+  const label = catalogName || design?.label;
+  if (design && design.id === VLAK_CUSTOM_ID) return label || "Anders";
   if (design && design.id !== VLAK_CUSTOM_ID) {
-    if (!hasPanels(state)) return design.label;
+    if (!hasPanels(state)) return label ?? design.label;
     const panelWindows = windowCountFromBars(state.panelLiggers, state.panelStaanders);
     const panelWord = state.panelLayout === "beide" ? "Panelen" : "Paneel";
-    return `${design.label}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}`;
+    return `${label ?? design.label}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}`;
   }
   const windows = windowCountFromBars(state.liggers, state.staanders);
   const door = `${barPhrase(state.liggers, state.staanders)} · ${windows} ${windows === 1 ? "raam" : "ramen"}`;

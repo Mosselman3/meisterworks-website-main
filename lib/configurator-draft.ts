@@ -39,6 +39,7 @@ function asState(value: unknown): ConfiguratorState | null {
     vlakPreset:
       typeof record.vlakPreset === "string" ? record.vlakPreset : INITIAL_STATE.vlakPreset,
     vlakMode: record.vlakMode === "ontwerp" ? "ontwerp" : "zelf",
+    sluitwerk: typeof record.sluitwerk === "string" ? record.sluitwerk : INITIAL_STATE.sluitwerk,
     answered:
       record.answered && typeof record.answered === "object"
         ? record.answered

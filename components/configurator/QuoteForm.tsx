@@ -18,6 +18,7 @@ export type QuoteConfiguration = {
   glassCode: string | null;
   colorCode: string | null;
   hardwareCode: string | null;
+  sluitwerkCode: string | null;
   hasFixedPanel: boolean;
   fixedPanelSquareMetres: number;
   panelLayout: "geen" | "een" | "beide";
@@ -28,6 +29,8 @@ export type QuoteConfiguration = {
   rightPanelWidthMm: number;
   panelLiggers: number;
   panelStaanders: number;
+  vlakMode: "zelf" | "ontwerp";
+  vlakPreset: string;
 };
 
 export type QuoteDoor = {
