@@ -13,7 +13,7 @@ export type InspirationMedia = {
 
 function mediaId(filename: string): bigint {
   const stem = path.parse(filename).name;
-  return /^\d+$/.test(stem) ? BigInt(stem) : 0n;
+  return /^\d+$/.test(stem) ? BigInt(stem) : BigInt(0);
 }
 
 function isVideo(filename: string): boolean {
