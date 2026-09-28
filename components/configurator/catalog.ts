@@ -16,13 +16,38 @@ export type CatalogGlass = {
 };
 
 export const GLASS_CATEGORIES = [
-  { id: "helder", title: "Helder", text: "Transparant, maximaal licht" },
-  { id: "mat", title: "Mat", text: "Meer privacy, met behoud van veel licht" },
-  { id: "brons", title: "Brons", text: "Warme, luxe uitstraling" },
-  { id: "grijs", title: "Grijs", text: "Strakke, moderne uitstraling" },
-  { id: "structuur", title: "Structuur", text: "Decoratief glas met karakter" },
-  { id: "speciaal", title: "Speciale opties", text: "Bijzondere folie- en afwerkingen" },
+  { id: "helder", title: "Helder glas", text: "Transparant, maximaal licht", image: "/assets/glas/helder.jpg" },
+  { id: "mat", title: "Mat glas", text: "Meer privacy, met behoud van veel licht", image: "/assets/glas/mat.jpg" },
+  { id: "brons", title: "Brons glas", text: "Warme, luxe uitstraling", image: "/assets/glas/brons.jpg" },
+  { id: "grijs", title: "Grijs glas", text: "Strakke, moderne uitstraling", image: "/assets/glas/grijs.jpg" },
+  { id: "structuur", title: "Structuur glas", text: "Decoratief glas met karakter", image: "/assets/glas/structuur.jpg" },
+  { id: "speciaal", title: "Speciale opties", text: "Bijzondere folie- en afwerkingen", image: "/assets/glas/zwarte-folie.jpg" },
 ] as const;
+
+/** Only folie asks for a second choice. The other categories store this glass. */
+export const GLASS_CATEGORY_CODE: Partial<
+  Record<(typeof GLASS_CATEGORIES)[number]["id"], string>
+> = {
+  helder: "33.1",
+  mat: "4mm_satijn",
+  brons: "33.1_2x_brons",
+  grijs: "33.1_2x_grijs",
+  structuur: "4mm_cathedraal_grof",
+};
+
+export const FOLIE_GLASS_CATEGORY = "speciaal";
+
+const GLASS_IMAGE_OVERRIDE: Record<string, string> = {
+  "33.1_matte_folie": "/assets/glas/mat.jpg",
+};
+
+export function glassCardImage(code: string, category: string) {
+  return (
+    GLASS_IMAGE_OVERRIDE[code] ??
+    GLASS_CATEGORIES.find((item) => item.id === category)?.image ??
+    "/assets/glas/helder.jpg"
+  );
+}
 
 const helder: GlassVisual = { fill: "#dfe7e6", opacity: 0.55, pattern: "none" };
 const mat: GlassVisual = { fill: "#e4e1db", opacity: 0.82, pattern: "none" };
@@ -58,30 +83,86 @@ export const COLORS = [
   { code: "design_kleur", label: "Designkleur", desc: "Brons en andere designkleuren.", surcharge: 0, hex: "#6b5340" },
 ] as const;
 
-/** Display catalog. The CRM prices the quote; surcharges start at 0. */
+/**
+ * Display catalog. The CRM prices the quote; surcharges stay 0 until a
+ * design formula exists. `indication` only drives the € / €€ / €€€ mark.
+ */
 export const DESIGN_SURCHARGES = [
-  { code: "jade", name: "Jade", surcharge: 0 },
-  { code: "saffier", name: "Saffier", surcharge: 0 },
-  { code: "diamant", name: "Diamant", surcharge: 0 },
-  { code: "hematiet", name: "Hematiet", surcharge: 0 },
-  { code: "opaal", name: "Opaal", surcharge: 0 },
-  { code: "parel", name: "Parel", surcharge: 0 },
-  { code: "serpetijn", name: "Serpetijn", surcharge: 0 },
-  { code: "anders", name: "Anders", surcharge: 0 },
+  { code: "minimal", name: "Minimal", subtitle: "Eén verdeling", surcharge: 0, indication: 1, image: "/assets/ontwerpen/minimal.png" },
+  { code: "linea", name: "Linea", subtitle: "Verdeling + smalle stijl", surcharge: 0, indication: 2, image: "/assets/ontwerpen/linea.png" },
+  { code: "classic", name: "Classic", subtitle: "Vier vlakken", surcharge: 0, indication: 2, image: "/assets/ontwerpen/classic.png" },
+  { code: "grid", name: "Grid", subtitle: "Kruisverdeling", surcharge: 0, indication: 2, image: "/assets/ontwerpen/grid.png" },
+  { code: "frame", name: "Frame", subtitle: "Bovenlicht + zijstrook", surcharge: 0, indication: 3, image: "/assets/ontwerpen/frame.png" },
+  { code: "asymmetry", name: "Asymmetry", subtitle: "Vrij lijnenspel", surcharge: 0, indication: 3, image: "/assets/ontwerpen/asymmetry.png" },
+  { code: "arco", name: "Arco", subtitle: "Boog met zijstrook", surcharge: 0, indication: 3, image: "/assets/ontwerpen/arco.png" },
+  { code: "grande", name: "Grande", subtitle: "Dubbele stijlen + rail", surcharge: 0, indication: 3, image: "/assets/ontwerpen/grande.png" },
+  { code: "anders", name: "Anders", subtitle: "", surcharge: 0, indication: null, image: "/assets/ontwerpen/anders.png" },
 ] as const;
 
+export function designPriceMark(indication: number | null | undefined) {
+  if (indication === 1) return "€";
+  if (indication === 2) return "€€";
+  if (indication === 3) return "€€€";
+  return null;
+}
+
+/** Customer meerprijs incl. btw. The CRM stores the matching cost price. */
 export const SLUITWERK = [
-  { code: "sluitwerk_a", label: "Sluitwerk A", desc: "Optie A.", price: 0 },
-  { code: "sluitwerk_b", label: "Sluitwerk B", desc: "Optie B.", price: 0 },
-  { code: "sluitwerk_c", label: "Sluitwerk C", desc: "Optie C.", price: 0 },
-  { code: "sluitwerk_d", label: "Sluitwerk D", desc: "Optie D.", price: 0 },
-  { code: "sluitwerk_e", label: "Sluitwerk E", desc: "Optie E.", price: 0 },
+  {
+    code: "recht_hoekgreep",
+    label: "Recht hoekgreep",
+    desc: "Slanke hoek handgreep. Tijdloos en minimalistisch.",
+    price: 0,
+    image: "/assets/handgrepen/recht_hoekgreep.jpg",
+  },
+  {
+    code: "recht_vierkant",
+    label: "Recht vierkant",
+    desc: "Strakke vierkante handgreep met een moderne uitstraling.",
+    price: 35,
+    image: "/assets/handgrepen/recht_vierkant.jpg",
+  },
+  {
+    code: "plat",
+    label: "Plat",
+    desc: "Platte, subtiele handgreep die dicht tegen het deurvlak ligt.",
+    price: 50,
+    image: "/assets/handgrepen/plat.jpg",
+  },
+  {
+    code: "u_greep",
+    label: "U-greep",
+    desc: "U-vormige handgreep met twee bevestigingspunten.",
+    price: 75,
+    image: "/assets/handgrepen/u_greep.jpg",
+  },
+  {
+    code: "gebogen",
+    label: "Gebogen",
+    desc: "Handgreep met subtiel gebogen/afgeronde uiteinden.",
+    price: 100,
+    image: "/assets/handgrepen/gebogen.jpg",
+  },
+  {
+    code: "deurklink",
+    label: "Deurklink",
+    desc: "Klassieke deurklink voor een meer traditionele uitstraling.",
+    price: 50,
+    image: "/assets/handgrepen/deurklink.jpg",
+  },
+  {
+    code: "half_ronde_plaat",
+    label: "Half ronde plaat",
+    desc: "Unieke greep voor een rustige, minimalistische uitstraling.",
+    price: 100,
+    image: "/assets/handgrepen/half_ronde_plaat.jpg",
+  },
 ] as const;
 
 export const HARDWARE = [
-  { code: "basis", label: "Basis", desc: "Standaard kruk en cilinderslot.", price: 95 },
-  { code: "standaard", label: "Standaard", desc: "Kruk mat zwart en dag-nachtslot.", price: 145 },
-  { code: "luxe", label: "Luxe", desc: "Designgreep, dag-nachtslot en verborgen scharnieren.", price: 240 },
+  { code: "basis", label: "Basis", desc: "Standaard kruk en cilinderslot.", price: 95, image: "/assets/sluitwerk/basis.jpg" },
+  { code: "standaard", label: "Standaard", desc: "Kruk mat zwart en dag-nachtslot.", price: 145, image: "/assets/sluitwerk/standaard.jpg" },
+  { code: "luxe", label: "Luxe", desc: "Designgreep, dag-nachtslot en verborgen scharnieren.", price: 240, image: "/assets/sluitwerk/luxe.jpg" },
 ] as const;
 
 const RATES = {

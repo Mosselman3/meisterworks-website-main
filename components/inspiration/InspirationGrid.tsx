@@ -249,7 +249,7 @@ function InspirationCta({ variant }: { variant: CtaVariant }) {
   return (
     <Link
       href={variant.href}
-      className={`@container flex aspect-square flex-col justify-between p-2.5 min-[720px]:p-6 ${TONE_CLASS[variant.tone]}`}
+      className={`@container flex aspect-square flex-col items-center justify-between p-2.5 text-center min-[720px]:p-6 ${TONE_CLASS[variant.tone]}`}
     >
       <span className="text-[9px] tracking-[0.16em] uppercase opacity-70 @[150px]:text-[11px] @[220px]:text-[12px]">
         {variant.eyebrow}
@@ -258,7 +258,7 @@ function InspirationCta({ variant }: { variant: CtaVariant }) {
         {variant.title}
       </span>
       <span
-        className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[10px] tracking-[0.04em] @[150px]:px-3.5 @[150px]:py-1.5 @[150px]:text-[12px] @[220px]:text-[13px] ${ACTION_CLASS[variant.tone]}`}
+        className={`inline-flex items-center justify-center rounded-full px-2.5 py-1 text-[10px] tracking-[0.04em] @[150px]:px-3.5 @[150px]:py-1.5 @[150px]:text-[12px] @[220px]:px-5 @[220px]:text-[13px] ${ACTION_CLASS[variant.tone]}`}
       >
         {variant.action}
       </span>

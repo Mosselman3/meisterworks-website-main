@@ -31,6 +31,7 @@ export type QuoteConfiguration = {
   panelStaanders: number;
   vlakMode: "zelf" | "ontwerp";
   vlakPreset: string;
+  openingDirection: "links" | "rechts" | null;
 };
 
 export type QuoteDoor = {

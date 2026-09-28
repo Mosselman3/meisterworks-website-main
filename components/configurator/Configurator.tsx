@@ -27,6 +27,9 @@ import { ACCENT, ROUTES } from "@/lib/site";
 import {
   COLORS,
   GLASS_CATEGORIES,
+  GLASS_CATEGORY_CODE,
+  FOLIE_GLASS_CATEGORY,
+  glassCardImage,
   GLASS_TYPES,
   HARDWARE,
   SLUITWERK,
@@ -44,6 +47,9 @@ import {
   catalogVlakDesigns,
   buildPreviewSvg,
   configurationProgress,
+  directionChoiceLabel,
+  directionOptions,
+  dirThumbStyle,
   doorSummaryRows,
   firstUnconfirmedStep,
   freshDoorState,
@@ -70,7 +76,6 @@ import {
   type ConfiguratorState,
   type PanelLayout,
   type StepId,
-  type VlakSketch,
 } from "./logic";
 
 const accent = ACCENT;
@@ -299,74 +304,15 @@ function OptionCard({
   );
 }
 
-function VlakSketch({ sketch }: { sketch: VlakSketch }) {
-  const frame = "oklch(0.22 0.01 60)";
-  const bar = "oklch(0.18 0.01 60)";
-  return (
-    <svg viewBox="0 0 48 78" width="48" height="78" aria-hidden>
-      <rect x="8" y="6" width="32" height="62" rx="2" fill="none" stroke={frame} strokeWidth="2.4" />
-      <rect x="8" y="62" width="32" height="6" fill={bar} />
-      {sketch.kind === "bars"
-        ? sketch.y.map((y) => (
-            <rect key={y} x="8" y={6 + 62 * y} width="32" height="2.4" fill={bar} />
-          ))
-        : null}
-      {sketch.kind === "grid" ? (
-        <>
-          {sketch.y.map((y) => (
-            <rect key={`y-${y}`} x="8" y={6 + 62 * y} width="32" height="2.2" fill={bar} />
-          ))}
-          {sketch.x.map((x) => (
-            <rect key={`x-${x}`} x={8 + 32 * x - 1.1} y="6" width="2.2" height="62" fill={bar} />
-          ))}
-        </>
-      ) : null}
-      {sketch.kind === "split-bottom" ? (
-        <>
-          <rect x="8" y={6 + 62 * sketch.y} width="32" height="2.4" fill={bar} />
-          <rect
-            x="23"
-            y={6 + 62 * sketch.y}
-            width="2.2"
-            height={62 - 62 * sketch.y}
-            fill={bar}
-          />
-        </>
-      ) : null}
-      {sketch.kind === "inset" ? (
-        <rect x="16" y="18" width="16" height="34" rx="1" fill="none" stroke={bar} strokeWidth="2.2" />
-      ) : null}
-      {sketch.kind === "custom" ? (
-        <text
-          x="24"
-          y="42"
-          textAnchor="middle"
-          fontSize="16"
-          fontWeight="600"
-          fill={frame}
-        >
-          ?
-        </text>
-      ) : null}
-    </svg>
-  );
-}
-
-function glassThumb(visual?: {
-  fill: string;
-  pattern: "none" | "reeded";
-}): CSSProperties {
-  if (!visual) {
-    return { height: 96, borderRadius: 9, background: "#dfe7e6" };
-  }
-  if (visual.pattern === "reeded") {
-    return {
-      height: 96,
-      borderRadius: 9,
-      background: `repeating-linear-gradient(90deg, ${visual.fill} 0 5px, oklch(1 0 0 / 0.55) 5px 7px)`,
-    };
-  }
-  return { height: 96, borderRadius: 9, background: visual.fill };
+function glassThumb(src: string): CSSProperties {
+  return {
+    height: 96,
+    borderRadius: 9,
+    backgroundImage: `url('${src}')`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundColor: "oklch(0.93 0.006 75)",
+  };
 }
 
 
@@ -455,6 +401,7 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
       panelStaanders: 0,
       vlakMode: "zelf",
       vlakPreset: "",
+      openingDirection: null,
     };
   }
   return {
@@ -487,6 +434,10 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
     panelStaanders: hasPanels(state) ? state.panelStaanders : 0,
     vlakMode: state.vlakMode === "ontwerp" ? "ontwerp" : "zelf",
     vlakPreset: state.vlakMode === "ontwerp" ? state.vlakPreset : "",
+    openingDirection:
+      product.hasHardware && (state.richting === "links" || state.richting === "rechts")
+        ? state.richting
+        : null,
   };
 }
 
@@ -620,8 +571,31 @@ function isUntouchedProductStart(state: ConfiguratorState, productParam: string)
     state.glas === initial.glas &&
     state.beslag === initial.beslag &&
     state.sluitwerk === initial.sluitwerk &&
+    state.richting === initial.richting &&
     JSON.stringify(state.answered) === JSON.stringify(initial.answered)
   );
+}
+
+/** Places the start of a follow-up question in the middle of the usable mobile screen. */
+function scrollFollowUpIntoView(node: HTMLElement | null) {
+  if (!node) return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mobile = window.matchMedia("(max-width: 960px)").matches;
+  if (!mobile) {
+    node.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
+    return;
+  }
+  const rect = node.getBoundingClientRect();
+  const topInset = 76;
+  const bottomInset = 148;
+  const visibleHeight = Math.max(160, window.innerHeight - topInset - bottomInset);
+  const focusHeight = Math.min(rect.height, visibleHeight * 0.72);
+  const focusMid = rect.top + focusHeight / 2;
+  const targetMid = topInset + visibleHeight / 2;
+  window.scrollTo({
+    top: Math.max(0, window.scrollY + focusMid - targetMid),
+    behavior: reduce ? "auto" : "smooth",
+  });
 }
 
 export function Configurator() {
@@ -641,6 +615,10 @@ export function Configurator() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [attachment, setAttachment] = useState<File | null>(null);
   const quoteAutoShown = useRef(false);
+  const panelFollowRef = useRef<HTMLDivElement>(null);
+  const glassFollowRef = useRef<HTMLDivElement>(null);
+  const skipGlassScroll = useRef(true);
+  const skipPanelScroll = useRef(true);
 
   useLayoutEffect(() => {
     if (!productParam) {
@@ -728,6 +706,17 @@ export function Configurator() {
           "Kies het model dat bij uw opening past. U kunt dit later nog aanpassen.",
         summary: product.label,
       },
+      product.hasHardware
+        ? {
+            id: "richting" as StepId,
+            title: product.doorTypeCode === "schuifdeur" ? "Schuifrichting" : "Draairichting",
+            intro:
+              product.doorTypeCode === "schuifdeur"
+                ? "Kies of de deur naar links of naar rechts open schuift."
+                : "Kies of de deur linksdraaiend of rechtsdraaiend opent.",
+            summary: directionChoiceLabel(state.richting, product.doorTypeCode),
+          }
+        : null,
       product.hasFixedPanel
         ? {
             id: "paneel" as StepId,
@@ -766,10 +755,19 @@ export function Configurator() {
       },
       product.hasHardware
         ? {
+            id: "handgreep" as StepId,
+            title: "Handgreep",
+            intro:
+              "Kies de handgreep die het beste bij jouw deur past. De lengte en uitvoering kunnen worden afgestemd op de deur en de gewenste uitstraling.",
+            summary: sluitwerk.label,
+          }
+        : null,
+      product.hasHardware
+        ? {
             id: "beslag" as StepId,
-            title: "Sluiting",
-            intro: "Kies eerst de handgreep en daarna het sluitwerk.",
-            summary: `${beslag.label} · ${sluitwerk.label}`,
+            title: "Sluitwerk",
+            intro: "Kies het sluitwerk voor de deur.",
+            summary: beslag.label,
           }
         : null,
       {
@@ -800,6 +798,8 @@ export function Configurator() {
     kleur.label,
     glas.customerName,
     beslag.label,
+    sluitwerk.label,
+    state.richting,
   ]);
 
   const summaryRows = useMemo(() => {
@@ -819,6 +819,13 @@ export function Configurator() {
             label: "Product",
             value: product.label,
             onEdit: () => openAndScroll("product"),
+          }
+        : null,
+      product.hasHardware && a.richting
+        ? {
+            label: product.doorTypeCode === "schuifdeur" ? "Schuifrichting" : "Draairichting",
+            value: directionChoiceLabel(state.richting, product.doorTypeCode),
+            onEdit: () => openAndScroll("richting"),
           }
         : null,
       product.hasFixedPanel && a.paneel
@@ -856,10 +863,17 @@ export function Configurator() {
             onEdit: () => openAndScroll("kleur"),
           }
         : null,
+      product.hasHardware && a.handgreep
+        ? {
+            label: "Handgreep",
+            value: sluitwerk.label,
+            onEdit: () => openAndScroll("handgreep"),
+          }
+        : null,
       product.hasHardware && a.beslag
         ? {
-            label: "Sluiting",
-            value: `${beslag.label} · ${sluitwerk.label}`,
+            label: "Sluitwerk",
+            value: beslag.label,
             onEdit: () => openAndScroll("beslag"),
           }
         : null,
@@ -881,6 +895,8 @@ export function Configurator() {
     kleur.label,
     glas.customerName,
     beslag.label,
+    sluitwerk.label,
+    state.richting,
     openAndScroll,
   ]);
 
@@ -1099,6 +1115,24 @@ export function Configurator() {
   }, [allDone, currentStepId, product, requestQuote, scrollToSection]);
 
   useEffect(() => {
+    if (skipPanelScroll.current) {
+      skipPanelScroll.current = false;
+      return;
+    }
+    if (state.vlakMode !== "ontwerp" || !state.vlakPreset || !hasPanels(state)) return;
+    scrollFollowUpIntoView(panelFollowRef.current);
+  }, [state.vlakPreset, state.vlakMode, state.panelLayout]);
+
+  useEffect(() => {
+    if (skipGlassScroll.current) {
+      skipGlassScroll.current = false;
+      return;
+    }
+    if (!glassCategory) return;
+    scrollFollowUpIntoView(glassFollowRef.current);
+  }, [glassCategory]);
+
+  useEffect(() => {
     if (missingStep && isStepConfirmed(missingStep, state, product)) {
       setMissingStep(null);
     }
@@ -1193,6 +1227,37 @@ export function Configurator() {
       );
     }
 
+    if (id === "richting") {
+      const mechanisme = product.doorTypeCode === "schuifdeur" ? "schuif" : "draai";
+      return (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+            gap: 14,
+          }}
+        >
+          {directionOptions(mechanisme).map((option) => (
+            <OptionCard
+              key={option.id}
+              label={option.label}
+              desc={option.desc}
+              selected={state.richting === option.id}
+              thumbStyle={dirThumbStyle(option.dia)}
+              onClick={() => {
+                setState((s) => ({
+                  ...s,
+                  richting: option.id,
+                  answered: { ...s.answered, richting: true },
+                }));
+                advanceFrom("richting");
+              }}
+            />
+          ))}
+        </div>
+      );
+    }
+
     if (id === "vlak") {
       const chooseDesign = state.vlakMode === "ontwerp";
       const andersChosen = chooseDesign && state.vlakPreset === VLAK_CUSTOM_ID;
@@ -1209,6 +1274,8 @@ export function Configurator() {
               borderRadius: 999,
               background: "oklch(0.96 0.004 75)",
               width: "fit-content",
+              maxWidth: "100%",
+              flexWrap: "wrap",
             }}
           >
             {(
@@ -1244,14 +1311,8 @@ export function Configurator() {
           </div>
           {chooseDesign ? (
           <>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(92px, 1fr))",
-              gap: 10,
-              marginBottom: 22,
-            }}
-          >
+          <div className="vlak-design-frame">
+          <div className="vlak-design-grid">
             {catalogVlakDesigns().map((design) => {
               const selected = state.vlakPreset === design.id;
               return (
@@ -1262,53 +1323,107 @@ export function Configurator() {
                     setState((s) => ({ ...s, vlakPreset: design.id }))
                   }
                   style={{
+                    position: "relative",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     gap: 8,
                     padding: "12px 8px 0",
                     borderRadius: 16,
-                    border: `1.5px solid ${selected ? accent : "oklch(0.86 0.006 75)"}`,
-                    background: "oklch(0.97 0.003 75)",
+                    border: `2px solid ${selected ? accent : "oklch(0.86 0.006 75)"}`,
+                    background: "oklch(0.985 0.002 75)",
+                    boxShadow: selected
+                      ? `0 0 0 3px color-mix(in srgb, ${accent} 38%, transparent)`
+                      : "none",
                     cursor: "pointer",
                     fontFamily: "inherit",
                     overflow: "hidden",
                   }}
+                  aria-pressed={selected}
                 >
-                  <VlakSketch sketch={design.sketch} />
+                  {selected ? (
+                    <span
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        width: 22,
+                        height: 22,
+                        borderRadius: "50%",
+                        background: accent,
+                        color: "oklch(1 0 0)",
+                        display: "grid",
+                        placeItems: "center",
+                        boxShadow: "0 0 0 2px oklch(1 0 0)",
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path
+                          d="M2.2 6.2 4.7 8.7 9.8 3.4"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  ) : null}
+                  <img
+                    src={design.image}
+                    alt=""
+                    style={{ width: "78%", height: "auto", display: "block" }}
+                  />
                   <span
                     style={{
                       width: "calc(100% + 16px)",
                       marginTop: 2,
-                      padding: "7px 6px",
-                      background: accent,
-                      color: "oklch(1 0 0)",
+                      padding: "8px 6px",
+                      background: selected ? accent : "oklch(0.94 0.004 75)",
+                      color: selected ? "oklch(1 0 0)" : "oklch(0.32 0.008 60)",
                       fontSize: 12,
                       fontWeight: 600,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
                       textAlign: "center",
+                      overflowWrap: "anywhere",
                     }}
                   >
                     {design.label}
-                    <span
-                      style={{
-                        display: "block",
-                        marginTop: 2,
-                        fontSize: 11,
-                        fontWeight: 500,
-                        opacity: 0.85,
-                      }}
-                    >
-                      Toeslag{" "}
-                      {new Intl.NumberFormat("nl-NL", {
-                        style: "currency",
-                        currency: "EUR",
-                        maximumFractionDigits: 0,
-                      }).format(design.surcharge)}
-                    </span>
+                    {design.subtitle ? (
+                      <span
+                        style={{
+                          display: "block",
+                          marginTop: 2,
+                          fontSize: 11,
+                          fontWeight: 500,
+                          letterSpacing: 0,
+                          textTransform: "none",
+                          opacity: 0.85,
+                        }}
+                      >
+                        {design.subtitle}
+                      </span>
+                    ) : null}
+                    {design.priceMark ? (
+                      <span
+                        style={{
+                          display: "block",
+                          marginTop: 2,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          letterSpacing: "0.04em",
+                          textTransform: "none",
+                        }}
+                      >
+                        {design.priceMark}
+                      </span>
+                    ) : null}
                   </span>
                 </button>
               );
             })}
+          </div>
           </div>
           {andersChosen ? (
             <AttachmentField
@@ -1328,6 +1443,90 @@ export function Configurator() {
             >
               Voorbeeldverdeling. De exacte positie van liggers en staanders volgt nog.
             </p>
+          ) : null}
+          {hasPanels(state) && state.vlakPreset ? (
+            <div key={state.vlakPreset} ref={panelFollowRef} className="vlak-panel-follow">
+              <p
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  margin: "0 0 6px",
+                  color: "oklch(0.22 0.008 60)",
+                }}
+              >
+                {state.panelLayout === "beide"
+                  ? "Verdeling vaste panelen"
+                  : "Verdeling vast paneel"}
+              </p>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "oklch(0.55 0.008 60)",
+                  lineHeight: 1.5,
+                  margin: "0 0 14px",
+                }}
+              >
+                Het ontwerp geldt voor de deur. Stel hier de liggers en staanders van{" "}
+                {state.panelLayout === "beide" ? "de panelen" : "het paneel"} in.
+              </p>
+              <div className="vlak-panel-steps">
+                <StepperField
+                  title={
+                    state.panelLayout === "beide"
+                      ? "Liggers vaste panelen"
+                      : "Liggers vast paneel"
+                  }
+                  subtitle="Horizontale onderverdeling"
+                  value={state.panelLiggers}
+                  onMinus={() =>
+                    setState((s) => ({
+                      ...s,
+                      panelLiggers: Math.max(0, s.panelLiggers - 1),
+                    }))
+                  }
+                  onPlus={() =>
+                    setState((s) => ({
+                      ...s,
+                      panelLiggers: Math.min(5, s.panelLiggers + 1),
+                    }))
+                  }
+                />
+                <StepperField
+                  title={
+                    state.panelLayout === "beide"
+                      ? "Staanders vaste panelen"
+                      : "Staanders vast paneel"
+                  }
+                  subtitle="Verticale onderverdeling"
+                  value={state.panelStaanders}
+                  onMinus={() =>
+                    setState((s) => ({
+                      ...s,
+                      panelStaanders: Math.max(0, s.panelStaanders - 1),
+                    }))
+                  }
+                  onPlus={() =>
+                    setState((s) => ({
+                      ...s,
+                      panelStaanders: Math.min(5, s.panelStaanders + 1),
+                    }))
+                  }
+                />
+              </div>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "oklch(0.55 0.008 60)",
+                  lineHeight: 1.5,
+                  margin: "16px 0 0",
+                }}
+              >
+                {state.panelLayout === "beide"
+                  ? "De vaste panelen hebben"
+                  : "Het vaste paneel heeft"}{" "}
+                {panelWindows} {panelWindows === 1 ? "raam" : "ramen"}.
+              </p>
+            </div>
           ) : null}
           </>
           ) : (
@@ -1608,9 +1807,6 @@ export function Configurator() {
             }}
           >
             {GLASS_CATEGORIES.map((category, index) => {
-              const sample = GLASS_TYPES.find(
-                (item) => item.category === category.id,
-              );
               return (
                 <OptionCard
                   key={category.id}
@@ -1618,8 +1814,21 @@ export function Configurator() {
                   desc={category.text}
                   priceMark={priceTier(categoryAmounts[index], categoryAmounts)}
                   selected={glas.category === category.id}
-                  thumbStyle={glassThumb(sample?.visual)}
-                  onClick={() => setGlassCategory(category.id)}
+                  thumbStyle={glassThumb(category.image)}
+                  onClick={() => {
+                    if (category.id === FOLIE_GLASS_CATEGORY) {
+                      setGlassCategory(category.id);
+                      return;
+                    }
+                    const code = GLASS_CATEGORY_CODE[category.id];
+                    if (!code) return;
+                    setState((s) => ({
+                      ...s,
+                      glas: code,
+                      answered: { ...s.answered, glas: true },
+                    }));
+                    advanceFrom("glas");
+                  }}
                 />
               );
             })}
@@ -1630,7 +1839,7 @@ export function Configurator() {
         (item) => item.category === glassCategory,
       );
       return (
-        <>
+        <div ref={glassFollowRef}>
           <button
             type="button"
             onClick={() => setGlassCategory(null)}
@@ -1664,7 +1873,7 @@ export function Configurator() {
                   variants.map((item) => item.pricePerM2),
                 )}
                 selected={state.glas === variant.code}
-                thumbStyle={glassThumb(variant.visual)}
+                thumbStyle={glassThumb(glassCardImage(variant.code, variant.category))}
                 onClick={() => {
                   setState((s) => ({
                     ...s,
@@ -1676,7 +1885,7 @@ export function Configurator() {
               />
             ))}
           </div>
-        </>
+        </div>
       );
     }
 
@@ -1718,78 +1927,84 @@ export function Configurator() {
       );
     }
 
+    if (id === "handgreep") {
+      return (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+            gap: 14,
+          }}
+        >
+          {SLUITWERK.map((item) => (
+            <OptionCard
+              key={item.code}
+              label={item.label}
+              desc={item.desc}
+              priceMark={priceTier(
+                item.price,
+                SLUITWERK.map((option) => option.price),
+              )}
+              selected={state.sluitwerk === item.code}
+              thumbStyle={{
+                height: 96,
+                borderRadius: 9,
+                backgroundImage: `url('${item.image}')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundColor: "oklch(0.93 0.006 75)",
+              }}
+              onClick={() => {
+                setState((s) => ({
+                  ...s,
+                  sluitwerk: item.code,
+                  answered: { ...s.answered, handgreep: true },
+                }));
+                advanceFrom("handgreep");
+              }}
+            />
+          ))}
+        </div>
+      );
+    }
+
     if (id === "beslag") {
       return (
-        <>
-          <h3 style={{ margin: "0 0 12px", fontSize: 16 }}>Handgreep</h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-              gap: 14,
-              marginBottom: 22,
-            }}
-          >
-            {HARDWARE.map((item) => (
-              <OptionCard
-                key={item.code}
-                label={item.label}
-                desc={item.desc}
-                priceMark={priceTier(
-                  item.price,
-                  HARDWARE.map((option) => option.price),
-                )}
-                selected={state.beslag === item.code}
-                thumbStyle={{
-                  height: 96,
-                  borderRadius: 9,
-                  background: "oklch(0.93 0.006 75)",
-                }}
-                onClick={() => {
-                  setState((s) => ({
-                    ...s,
-                    beslag: item.code,
-                    answered: { ...s.answered, beslag: true },
-                  }));
-                  advanceFrom("beslag");
-                }}
-              />
-            ))}
-          </div>
-          <h3 style={{ margin: "0 0 12px", fontSize: 16 }}>Sluitwerk</h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-              gap: 14,
-            }}
-          >
-            {SLUITWERK.map((item) => (
-              <OptionCard
-                key={item.code}
-                label={item.label}
-                desc={item.desc}
-                priceMark={priceTier(
-                  item.price,
-                  SLUITWERK.map((option) => option.price),
-                )}
-                selected={state.sluitwerk === item.code}
-                thumbStyle={{
-                  height: 96,
-                  borderRadius: 9,
-                  background: "oklch(0.93 0.006 75)",
-                }}
-                onClick={() =>
-                  setState((s) => ({
-                    ...s,
-                    sluitwerk: item.code,
-                    answered: { ...s.answered, beslag: true },
-                  }))
-                }
-              />
-            ))}
-          </div>
-        </>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+            gap: 14,
+          }}
+        >
+          {HARDWARE.map((item) => (
+            <OptionCard
+              key={item.code}
+              label={item.label}
+              desc={item.desc}
+              priceMark={priceTier(
+                item.price,
+                HARDWARE.map((option) => option.price),
+              )}
+              selected={state.beslag === item.code}
+              thumbStyle={{
+                height: 96,
+                borderRadius: 9,
+                backgroundImage: `url('${item.image}')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+              onClick={() => {
+                setState((s) => ({
+                  ...s,
+                  beslag: item.code,
+                  answered: { ...s.answered, beslag: true },
+                }));
+                advanceFrom("beslag");
+              }}
+            />
+          ))}
+        </div>
       );
     }
 

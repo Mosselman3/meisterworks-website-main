@@ -3,11 +3,13 @@ import { ArrowIcon, CoverImage } from "@/components/ui";
 import {
   COLOR_OPTIONS,
   GLASS_CATEGORIES,
+  HANDGREEP_OPTIONS,
   HARDWARE_OPTIONS,
   VLAK_OPTIONS,
   relatedProducts,
   type ProductPageCopy,
 } from "@/lib/products";
+import { directionOptions, dirThumbStyle } from "@/components/configurator/logic";
 import { ROUTES, getProduct } from "@/lib/site";
 
 const GRID_IMAGE_SIZES = "(min-width: 900px) 33vw, 50vw";
@@ -59,11 +61,13 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
   const product = getProduct(page.slug);
   const configureHref = `${ROUTES.configurator}?product=${page.slug}`;
   let step = 1;
+  const directionStep = page.hasHardware ? step++ : null;
   const panelStep = page.hasFixedPanel ? step++ : null;
   const maatStep = step++;
   const vlakStep = step++;
   const glassStep = step++;
   const colorStep = step++;
+  const gripStep = page.hasHardware ? step++ : null;
   const hardwareStep = page.hasHardware ? step++ : null;
 
   return (
@@ -99,6 +103,36 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
           {page.introBody}
         </p>
       </section>
+
+      {directionStep ? (
+        <section className="mx-auto max-w-[var(--max-width)] px-7 py-20">
+          <StepIntro
+            kicker={`Stap ${directionStep} — ${page.slug === "schuifdeur" ? "Schuifrichting" : "Draairichting"}`}
+            title={
+              page.slug === "schuifdeur"
+                ? "De deur schuift naar links of naar rechts."
+                : "De deur draait naar links of naar rechts."
+            }
+            body={
+              page.slug === "schuifdeur"
+                ? "Kies de kant waar de deur naartoe schuift."
+                : "Linksdraaiend heeft het scharnier links en de greep rechts. Rechtsdraaiend is dat omgekeerd."
+            }
+          />
+          <div className="grid max-w-[640px] grid-cols-2 gap-4">
+            {directionOptions(page.slug === "schuifdeur" ? "schuif" : "draai").map((option) => (
+              <div key={option.id}>
+                <div className="mb-3 overflow-hidden rounded-[12px]" style={dirThumbStyle(option.dia)} />
+                <div className="text-[15px] text-[oklch(0.25_0.008_60)]">{option.label}</div>
+                <p className="m-0 mt-1 text-[14px] leading-[1.5] text-[oklch(0.45_0.008_60)]">
+                  {option.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+          <ComposeLink href={configureHref}>Kies richting</ComposeLink>
+        </section>
+      ) : null}
 
       {panelStep ? (
         <section className="mx-auto max-w-[var(--max-width)] px-7 py-20">
@@ -151,14 +185,17 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
         <StepIntro
           kicker={`Stap ${glassStep} — Glas`}
           title="Hoe wil je dat het glas eruitziet?"
-          body="Eerst kiest u de uitstraling. De passende varianten volgen in de configurator."
+          body="Kies de uitstraling van het glas. Bij folie kiest u daarna nog de uitvoering."
         />
         <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-6">
           {GLASS_CATEGORIES.map((option) => (
             <div key={option.title}>
-              <div
-                className="mb-3.5 aspect-[4/3] rounded-[14px]"
-                style={{ background: option.sample }}
+              <CoverImage
+                src={option.image}
+                alt={option.alt}
+                className="mb-3.5 aspect-[4/3]"
+                radius={14}
+                sizes={GRID_IMAGE_SIZES}
               />
               <div className="font-serif-display mb-1.5 text-[16px] min-[560px]:text-[19px]">
                 {option.title}
@@ -203,16 +240,16 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
         </div>
       </section>
 
-      {hardwareStep ? (
+      {gripStep ? (
         <section className="bg-[oklch(0.93_0.006_75)] px-7 py-20">
           <div className="mx-auto max-w-[var(--max-width)]">
             <StepIntro
-              kicker={`Stap ${hardwareStep} — Beslag`}
-              title="Kruk, slot en afwerking."
-              body="Drie pakketten. Het beslag wordt in dezelfde lijn als het staal gekozen."
+              kicker={`Stap ${gripStep} — Handgreep`}
+              title="Kies je handgreep."
+              body="Kies de handgreep die het beste bij jouw deur past. De lengte en uitvoering kunnen worden afgestemd op de deur en de gewenste uitstraling."
             />
             <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
-              {HARDWARE_OPTIONS.map((option) => (
+              {HANDGREEP_OPTIONS.map((option) => (
                 <div key={option.title}>
                   <CoverImage
                     src={option.image}
@@ -226,10 +263,43 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
                   <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
                     {option.body}
                   </p>
+                  <div className="mt-1.5 text-[13px] text-[oklch(0.4_0.01_60)]">{option.price}</div>
                 </div>
               ))}
             </div>
-            <ComposeLink href={configureHref}>Kies beslag</ComposeLink>
+            <ComposeLink href={configureHref}>Kies handgreep</ComposeLink>
+          </div>
+        </section>
+      ) : null}
+
+      {hardwareStep ? (
+        <section className="bg-[oklch(0.16_0.006_60)] px-7 py-20">
+          <div className="mx-auto max-w-[var(--max-width)]">
+            <StepIntro
+              kicker={`Stap ${hardwareStep} — Sluitwerk`}
+              title="Sluitwerk."
+              body="Drie pakketten, van basis tot luxe."
+              dark
+            />
+            <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
+              {HARDWARE_OPTIONS.map((option) => (
+                <div key={option.title}>
+                  <CoverImage
+                    src={option.image}
+                    alt={option.alt}
+                    className="mb-3.5 aspect-[4/5]"
+                    sizes={GRID_IMAGE_SIZES}
+                  />
+                  <div className="font-serif-display mb-1.5 text-[16px] text-[oklch(0.94_0.004_75)] min-[560px]:text-[19px]">
+                    {option.title}
+                  </div>
+                  <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.72_0.008_75)]">
+                    {option.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <ComposeLink href={configureHref}>Kies sluitwerk</ComposeLink>
           </div>
         </section>
       ) : null}

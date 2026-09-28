@@ -1,6 +1,6 @@
 import React from "react";
 import { ACCENT } from "@/lib/site";
-import { COLORS, DESIGN_SURCHARGES, HARDWARE, SLUITWERK, findGlass, windowCountFromBars } from "./catalog";
+import { COLORS, DESIGN_SURCHARGES, HARDWARE, SLUITWERK, designPriceMark, findGlass, windowCountFromBars } from "./catalog";
 
 export { ACCENT as CONFIGURATOR_ACCENT };
 
@@ -54,6 +54,7 @@ export type ConfiguratorState = {
   sluitwerk: string;
   panelLayout: PanelLayout;
   panelSide: PanelSide;
+  richting: "links" | "rechts" | "";
   leftPanelBreedte: number;
   rightPanelBreedte: number;
   groupOpen: Record<string, number>;
@@ -76,9 +77,10 @@ export const INITIAL_STATE: ConfiguratorState = {
   kleur: "standaard_mat_zwart",
   glas: "33.1",
   beslag: "standaard",
-  sluitwerk: "sluitwerk_a",
+  sluitwerk: "recht_hoekgreep",
   panelLayout: "geen",
   panelSide: "rechts",
+  richting: "",
   leftPanelBreedte: 700,
   rightPanelBreedte: 700,
   groupOpen: {},
@@ -275,42 +277,18 @@ export const VLAK_PRESETS = [
 
 export const VLAK_CUSTOM_ID = "anders";
 
-export type VlakSketch =
-  | { kind: "bars"; y: number[] }
-  | { kind: "grid"; y: number[]; x: number[] }
-  | { kind: "split-bottom"; y: number }
-  | { kind: "inset" }
-  | { kind: "custom" };
-
-export const VLAK_DESIGNS: {
-  id: string;
-  label: string;
-  sketch: VlakSketch;
-}[] = [
-  { id: "jade", label: "Jade", sketch: { kind: "bars", y: [0.36] } },
-  { id: "saffier", label: "Saffier", sketch: { kind: "bars", y: [0.22, 0.5] } },
-  { id: "diamant", label: "Diamant", sketch: { kind: "bars", y: [0.25, 0.5, 0.75] } },
-  {
-    id: "hematiet",
-    label: "Hematiet",
-    sketch: { kind: "grid", y: [0.34, 0.67], x: [0.5] },
-  },
-  { id: "opaal", label: "Opaal", sketch: { kind: "bars", y: [0.68] } },
-  { id: "parel", label: "Parel", sketch: { kind: "split-bottom", y: 0.64 } },
-  { id: "serpetijn", label: "Serpetijn", sketch: { kind: "inset" } },
-  { id: VLAK_CUSTOM_ID, label: "Anders", sketch: { kind: "custom" } },
-];
-
 export function vlakDesign(id: string) {
-  return VLAK_DESIGNS.find((design) => design.id === id) ?? null;
+  return DESIGN_SURCHARGES.find((design) => design.code === id) ?? null;
 }
 
 export function catalogVlakDesigns() {
   return DESIGN_SURCHARGES.map((item) => ({
     id: item.code,
     label: item.name,
+    subtitle: item.subtitle,
+    image: item.image,
+    priceMark: designPriceMark(item.indication),
     surcharge: item.surcharge,
-    sketch: vlakDesign(item.code)?.sketch ?? ({ kind: "custom" as const }),
   }));
 }
 
@@ -384,11 +362,13 @@ export const GREPEN = [
 
 export const STEP_ORDER = [
   "product",
+  "richting",
   "paneel",
   "maat",
   "vlak",
   "glas",
   "kleur",
+  "handgreep",
   "beslag",
   "overzicht",
 ] as const;
@@ -397,7 +377,7 @@ export type StepId = (typeof STEP_ORDER)[number];
 
 export function stepApplies(id: StepId, product: ConfigProduct) {
   if (product.custom) return id === "product" || id === "overzicht";
-  if (id === "beslag") return product.hasHardware;
+  if (id === "handgreep" || id === "beslag" || id === "richting") return product.hasHardware;
   if (id === "paneel") return product.hasFixedPanel;
   return true;
 }
@@ -771,10 +751,12 @@ export function isStepConfirmed(
   const a = state.answered;
   if (!stepApplies(stepId as StepId, product)) return true;
   if (stepId === "product") return !!a.product;
+  if (stepId === "richting") return state.richting === "links" || state.richting === "rechts";
   if (stepId === "maat") return !!a.maat;
   if (stepId === "vlak") return !!a.vlak;
   if (stepId === "glas") return !!a.glas;
   if (stepId === "kleur") return !!a.kleur;
+  if (stepId === "handgreep") return !!a.handgreep;
   if (stepId === "beslag") return !!a.beslag;
   if (stepId === "paneel") return !!a.paneel;
   return false;
@@ -840,6 +822,12 @@ export function doorSummaryRows(
     SLUITWERK.find((item) => item.code === state.sluitwerk) ?? SLUITWERK[0];
   return [
     a.product ? { label: "Product", value: product.label } : null,
+    product.hasHardware && a.richting
+      ? {
+          label: product.doorTypeCode === "schuifdeur" ? "Schuifrichting" : "Draairichting",
+          value: directionChoiceLabel(state.richting, product.doorTypeCode),
+        }
+      : null,
     product.hasFixedPanel && a.paneel
       ? { label: "Vast paneel", value: paneelLabel(state) }
       : null,
@@ -847,18 +835,33 @@ export function doorSummaryRows(
     a.vlak ? { label: "Vlakverdeling", value: vlakLabel(state) } : null,
     a.glas ? { label: "Glas", value: glas.customerName } : null,
     a.kleur ? { label: "Kleur", value: kleur.label } : null,
+    product.hasHardware && a.handgreep
+      ? { label: "Handgreep", value: sluitwerk.label }
+      : null,
     product.hasHardware && a.beslag
-      ? { label: "Sluiting", value: `${beslag.label} · ${sluitwerk.label}` }
+      ? { label: "Sluitwerk", value: beslag.label }
       : null,
   ].filter(Boolean) as { label: string; value: string }[];
 }
 
+export type OpeningDirection = "links" | "rechts";
+
 export type DirectionOption = {
-  id: string;
+  id: OpeningDirection;
   label: string;
   desc: string;
   dia: string;
 };
+
+export function handleOnLeft(doorTypeCode: string, direction: string | null | undefined) {
+  if (doorTypeCode === "schuifdeur") return direction === "links";
+  return direction === "rechts";
+}
+
+export function directionChoiceLabel(direction: string, doorTypeCode: string) {
+  const mechanisme = doorTypeCode === "schuifdeur" ? "schuif" : "draai";
+  return directionOptions(mechanisme).find((option) => option.id === direction)?.label ?? "n.t.b.";
+}
 
 export function directionOptions(
   mechanisme: string,
@@ -912,14 +915,12 @@ function barPhrase(liggers: number, staanders: number) {
 
 export function vlakLabel(state: ConfiguratorState): string {
   const design = state.vlakMode === "ontwerp" ? vlakDesign(state.vlakPreset) : null;
-  const catalogName = DESIGN_SURCHARGES.find((item) => item.code === state.vlakPreset)?.name;
-  const label = catalogName || design?.label;
-  if (design && design.id === VLAK_CUSTOM_ID) return label || "Anders";
-  if (design && design.id !== VLAK_CUSTOM_ID) {
-    if (!hasPanels(state)) return label ?? design.label;
+  if (design && design.code === VLAK_CUSTOM_ID) return design.name;
+  if (design) {
+    if (!hasPanels(state)) return design.name;
     const panelWindows = windowCountFromBars(state.panelLiggers, state.panelStaanders);
     const panelWord = state.panelLayout === "beide" ? "Panelen" : "Paneel";
-    return `${label ?? design.label}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}`;
+    return `${design.name}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}`;
   }
   const windows = windowCountFromBars(state.liggers, state.staanders);
   const door = `${barPhrase(state.liggers, state.staanders)} · ${windows} ${windows === 1 ? "raam" : "ramen"}`;
@@ -927,6 +928,51 @@ export function vlakLabel(state: ConfiguratorState): string {
   const panelWindows = windowCountFromBars(state.panelLiggers, state.panelStaanders);
   const panelWord = state.panelLayout === "beide" ? "Panelen" : "Paneel";
   return `Deur: ${door}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}`;
+}
+
+export type PreviewDesignMark =
+  | { kind: "line"; x1: number; y1: number; x2: number; y2: number }
+  | { kind: "arc"; cx: number; cy: number; rx: number; ry: number };
+
+/** Fractions of the door glass, matching the ontwerp cards. */
+export function doorDesignMarks(code: string): PreviewDesignMark[] {
+  const h = (y: number, x1 = 0, x2 = 1): PreviewDesignMark => ({
+    kind: "line",
+    x1,
+    y1: y,
+    x2,
+    y2: y,
+  });
+  const v = (x: number, y1 = 0, y2 = 1): PreviewDesignMark => ({
+    kind: "line",
+    x1: x,
+    y1,
+    x2: x,
+    y2,
+  });
+  switch (code) {
+    case "minimal":
+      return [h(0.674)];
+    case "linea":
+      return [h(0.674), v(0.856)];
+    case "classic":
+      return [h(0.227), h(0.49), h(0.745)];
+    case "grid":
+      return [h(0.49), v(0.5)];
+    case "frame":
+      return [h(0.153), h(0.846), v(0.889, 0, 0.851)];
+    case "asymmetry":
+      return [h(0.287), h(0.541), v(0.497, 0, 0.293), v(0.627, 0.534, 1)];
+    case "arco":
+      return [
+        v(0.17),
+        { kind: "arc", cx: 0.17, cy: 0.361, rx: 0.693, ry: 0.278 },
+      ];
+    case "grande":
+      return [v(0.085), v(0.19), h(0.674), h(0.754)];
+    default:
+      return [];
+  }
 }
 
 export function buildPreviewSvg(
@@ -1014,8 +1060,18 @@ export function buildPreviewSvg(
       }
     }
 
-    const liggerCount = bay.type === "panel" ? state.panelLiggers : state.liggers;
-    const staanderCount = bay.type === "panel" ? state.panelStaanders : state.staanders;
+    const designOnDoor =
+      bay.type === "door" && state.vlakMode === "ontwerp" && state.vlakPreset !== "";
+    const liggerCount = designOnDoor
+      ? 0
+      : bay.type === "panel"
+        ? state.panelLiggers
+        : state.liggers;
+    const staanderCount = designOnDoor
+      ? 0
+      : bay.type === "panel"
+        ? state.panelStaanders
+        : state.staanders;
     for (let l = 1; l <= liggerCount; l++) {
       const ly = gy + (gh * l) / (liggerCount + 1);
       e.push(
@@ -1045,6 +1101,38 @@ export function buildPreviewSvg(
       );
     }
 
+    if (designOnDoor) {
+      for (const mark of doorDesignMarks(state.vlakPreset)) {
+        if (mark.kind === "line") {
+          e.push(
+            React.createElement("line", {
+              key: key(ki++),
+              x1: gx + mark.x1 * gw,
+              y1: gy + mark.y1 * gh,
+              x2: gx + mark.x2 * gw,
+              y2: gy + mark.y2 * gh,
+              stroke: kleur.hex,
+              strokeWidth: mullion,
+            }),
+          );
+        } else {
+          const ax = gx + mark.cx * gw;
+          const ay = gy + mark.cy * gh;
+          const rx = mark.rx * gw;
+          const ry = mark.ry * gh;
+          e.push(
+            React.createElement("path", {
+              key: key(ki++),
+              d: `M ${ax} ${ay - ry} A ${rx} ${ry} 0 0 1 ${ax + rx} ${ay} L ${ax + rx} ${gy + gh}`,
+              fill: "none",
+              stroke: kleur.hex,
+              strokeWidth: mullion,
+            }),
+          );
+        }
+      }
+    }
+
     if (bay.type === "panel") {
       e.push(
         React.createElement(
@@ -1064,8 +1152,9 @@ export function buildPreviewSvg(
       );
     }
 
-    if (bay.type === "door" && product.hasHardware) {
-      const hx = gx + gw - 12;
+    if (bay.type === "door" && product.hasHardware && !designOnDoor) {
+      const gripLeft = handleOnLeft(product.doorTypeCode, state.richting);
+      const hx = gripLeft ? gx + 10 : gx + gw - 12;
       e.push(
         React.createElement("rect", {
           key: key(ki++),
@@ -1253,12 +1342,34 @@ export function buildPreviewSvg(
   );
   badge(dimX, y0 + H / 2, `${state.hoogte}`, 40);
 
-  if (state.liggers > 0) {
+  const designOnDoor = state.vlakMode === "ontwerp" && state.vlakPreset !== "";
+  if (!designOnDoor && state.liggers > 0) {
     const gh0 = H - frame - mullion;
     const gy0 = y0 + frame / 2 + mullion / 2;
     for (let l = 1; l <= state.liggers; l++) {
       const ly = gy0 + (gh0 * l) / (state.liggers + 1);
       const posMm = Math.round(state.hoogte * (1 - l / (state.liggers + 1)));
+      badge(x0 - 30, ly, `${posMm}`, 40);
+      e.push(
+        React.createElement("line", {
+          key: key(ki++),
+          x1: x0 - 8,
+          y1: ly,
+          x2: x0,
+          y2: ly,
+          stroke: dimColor,
+          strokeWidth: 1,
+        }),
+      );
+    }
+  }
+
+  if (designOnDoor && hasPanels(state) && state.panelLiggers > 0) {
+    const gh0 = H - frame - mullion;
+    const gy0 = y0 + frame / 2 + mullion / 2;
+    for (let l = 1; l <= state.panelLiggers; l++) {
+      const ly = gy0 + (gh0 * l) / (state.panelLiggers + 1);
+      const posMm = Math.round(state.hoogte * (1 - l / (state.panelLiggers + 1)));
       badge(x0 - 30, ly, `${posMm}`, 40);
       e.push(
         React.createElement("line", {

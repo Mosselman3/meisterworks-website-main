@@ -67,35 +67,40 @@ export const COLOR_OPTIONS: OptionCard[] = [
 
 export const GLASS_CATEGORIES = [
   {
-    title: "Helder",
+    title: "Helder glas",
     body: "Transparant, maximaal licht",
-    sample: "oklch(0.93 0.004 75)",
+    image: "/assets/glas/helder.jpg",
+    alt: "Helder glas in een stalen deur",
   },
   {
-    title: "Mat",
+    title: "Mat glas",
     body: "Meer privacy, met behoud van veel licht",
-    sample: "oklch(0.86 0.006 75)",
+    image: "/assets/glas/mat.jpg",
+    alt: "Mat glas in een stalen deur",
   },
   {
-    title: "Brons",
+    title: "Brons glas",
     body: "Warme, luxe uitstraling",
-    sample: "oklch(0.62 0.04 55)",
+    image: "/assets/glas/brons.jpg",
+    alt: "Brons getint glas in een stalen deur",
   },
   {
-    title: "Grijs",
+    title: "Grijs glas",
     body: "Strakke, moderne uitstraling",
-    sample: "oklch(0.55 0.01 250)",
+    image: "/assets/glas/grijs.jpg",
+    alt: "Grijs getint glas in een stalen deur",
   },
   {
-    title: "Structuur",
+    title: "Structuur glas",
     body: "Decoratief glas met karakter",
-    sample:
-      "repeating-linear-gradient(70deg, oklch(0.9 0.004 75) 0px, oklch(0.9 0.004 75) 6px, oklch(0.82 0.004 75) 6px, oklch(0.82 0.004 75) 8px)",
+    image: "/assets/glas/structuur.jpg",
+    alt: "Structuurglas met verticale ribbels",
   },
   {
     title: "Speciale opties",
     body: "Bijzondere folie- en afwerkingen",
-    sample: "oklch(0.28 0.01 60)",
+    image: "/assets/glas/zwarte-folie.jpg",
+    alt: "Ondoorzichtig zwart folie op glas",
   },
 ];
 
@@ -103,20 +108,78 @@ export const HARDWARE_OPTIONS: OptionCard[] = [
   {
     title: "Basis",
     body: "Standaard kruk en cilinderslot.",
-    image: "/assets/hero-open-door.jpg",
-    alt: "Basis beslag",
+    image: "/assets/sluitwerk/basis.jpg",
+    alt: "Basis sluitwerk",
   },
   {
     title: "Standaard",
     body: "Kruk mat zwart en dag-nachtslot.",
-    image: "/assets/double-doors-black.jpg",
-    alt: "Standaard beslag",
+    image: "/assets/sluitwerk/standaard.jpg",
+    alt: "Standaard sluitwerk",
   },
   {
     title: "Luxe",
     body: "Designgreep, dag-nachtslot en verborgen scharnieren.",
-    image: "/assets/arched-bronze-door.jpg",
-    alt: "Luxe beslag",
+    image: "/assets/sluitwerk/luxe.jpg",
+    alt: "Luxe sluitwerk",
+  },
+];
+
+export const HANDGREEP_OPTIONS: {
+  title: string;
+  body: string;
+  price: string;
+  image: string;
+  alt: string;
+}[] = [
+  {
+    title: "Recht hoekgreep",
+    body: "Slanke hoek handgreep. Tijdloos en minimalistisch.",
+    price: "€",
+    image: "/assets/handgrepen/recht_hoekgreep.jpg",
+    alt: "Recht hoekgreep handgreep",
+  },
+  {
+    title: "Recht vierkant",
+    body: "Strakke vierkante handgreep met een moderne uitstraling.",
+    price: "€€",
+    image: "/assets/handgrepen/recht_vierkant.jpg",
+    alt: "Recht vierkant handgreep",
+  },
+  {
+    title: "Plat",
+    body: "Platte, subtiele handgreep die dicht tegen het deurvlak ligt.",
+    price: "€€",
+    image: "/assets/handgrepen/plat.jpg",
+    alt: "Platte handgreep",
+  },
+  {
+    title: "U-greep",
+    body: "U-vormige handgreep met twee bevestigingspunten.",
+    price: "€€€",
+    image: "/assets/handgrepen/u_greep.jpg",
+    alt: "U-greep handgreep",
+  },
+  {
+    title: "Gebogen",
+    body: "Handgreep met subtiel gebogen/afgeronde uiteinden.",
+    price: "€€€",
+    image: "/assets/handgrepen/gebogen.jpg",
+    alt: "Gebogen handgreep",
+  },
+  {
+    title: "Deurklink",
+    body: "Klassieke deurklink voor een meer traditionele uitstraling.",
+    price: "€€",
+    image: "/assets/handgrepen/deurklink.jpg",
+    alt: "Klassieke deurklink",
+  },
+  {
+    title: "Half ronde plaat",
+    body: "Unieke greep voor een rustige, minimalistische uitstraling.",
+    price: "€€€",
+    image: "/assets/handgrepen/half_ronde_plaat.jpg",
+    alt: "Half ronde plaat handgreep",
   },
 ];
 
@@ -146,7 +209,7 @@ export const PRODUCT_PAGES: ProductPageCopy[] = [
     introLead:
       "Bij de scharnierdeur zijn kozijn en scharnieren inbegrepen. De deur draait aan het kozijn, strak uitgevoerd in staal.",
     introBody:
-      "Afmeting, vlakverdeling, glas, kleur en beslag kiest u in de configurator. Een vast paneel kan de opening aanvullen.",
+      "Afmeting, vlakverdeling, glas, kleur, sluitwerk en handgreep kiest u in de configurator. Een vast paneel kan de opening aanvullen.",
     composeCta: "Scharnierdeur samenstellen",
     hasHardware: true,
     hasFixedPanel: true,
@@ -161,7 +224,7 @@ export const PRODUCT_PAGES: ProductPageCopy[] = [
     introLead:
       "De schuifdeur is bedoeld waar naast de opening weinig ruimte is om een deur open te draaien. Rail en loopwerk zijn inbegrepen.",
     introBody:
-      "Afmeting, vlakverdeling, glas, kleur en beslag kiest u in de configurator. Softclose zit niet standaard in dit product.",
+      "Afmeting, vlakverdeling, glas, kleur, sluitwerk en handgreep kiest u in de configurator. Softclose zit niet standaard in dit product.",
     composeCta: "Schuifdeur samenstellen",
     hasHardware: true,
     hasFixedPanel: true,
@@ -176,7 +239,7 @@ export const PRODUCT_PAGES: ProductPageCopy[] = [
     introLead:
       "Het vaste paneel is een los product. Het vult een opening met staal en glas wanneer er geen deur hoeft te bewegen.",
     introBody:
-      "Afmeting, vlakverdeling, glas en kleur kiest u in de configurator. Er is geen beslag en geen mechanisme.",
+      "Afmeting, vlakverdeling, glas en kleur kiest u in de configurator. Er is geen sluitwerk, geen handgreep en geen mechanisme.",
     composeCta: "Paneel samenstellen",
     hasHardware: false,
     hasFixedPanel: false,

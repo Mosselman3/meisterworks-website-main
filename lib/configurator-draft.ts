@@ -1,3 +1,4 @@
+import { DESIGN_SURCHARGES, SLUITWERK } from "@/components/configurator/catalog";
 import {
   configurationProgress,
   getProduct,
@@ -6,6 +7,9 @@ import {
   snapshotDoor,
   type ConfiguratorState,
 } from "@/components/configurator/logic";
+
+const HANDGREEP_CODES = new Set<string>(SLUITWERK.map((item) => item.code));
+const DESIGN_CODES = new Set<string>(DESIGN_SURCHARGES.map((item) => item.code));
 
 const STORAGE_KEY = "meisterworks.configurator.draft";
 const DISMISS_KEY = "meisterworks.configurator.resume.dismissedAt";
@@ -37,9 +41,15 @@ function asState(value: unknown): ConfiguratorState | null {
     ...INITIAL_STATE,
     ...record,
     vlakPreset:
-      typeof record.vlakPreset === "string" ? record.vlakPreset : INITIAL_STATE.vlakPreset,
+      typeof record.vlakPreset === "string" && DESIGN_CODES.has(record.vlakPreset)
+        ? record.vlakPreset
+        : INITIAL_STATE.vlakPreset,
     vlakMode: record.vlakMode === "ontwerp" ? "ontwerp" : "zelf",
-    sluitwerk: typeof record.sluitwerk === "string" ? record.sluitwerk : INITIAL_STATE.sluitwerk,
+    richting: record.richting === "links" || record.richting === "rechts" ? record.richting : "",
+    sluitwerk:
+      typeof record.sluitwerk === "string" && HANDGREEP_CODES.has(record.sluitwerk)
+        ? record.sluitwerk
+        : INITIAL_STATE.sluitwerk,
     answered:
       record.answered && typeof record.answered === "object"
         ? record.answered

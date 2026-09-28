@@ -1134,6 +1134,66 @@ img {
   background: oklch(0.95 0.004 75);
 }
 
+.vlak-design-frame {
+  container-type: inline-size;
+  margin-bottom: 22px;
+}
+
+.vlak-design-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@container (min-width: 560px) {
+  .vlak-design-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.vlak-design-grid button > span {
+  overflow-wrap: anywhere;
+}
+
+.vlak-panel-follow {
+  margin-top: 4px;
+  padding-top: 18px;
+  border-top: 1px solid oklch(0.9 0.006 75);
+  container-type: inline-size;
+  animation: vlak-panel-in 0.4s ease;
+}
+
+.vlak-panel-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@container (min-width: 480px) {
+  .vlak-panel-steps {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+}
+
+@keyframes vlak-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vlak-panel-follow {
+    animation: none;
+  }
+}
+
 @media (max-width: 960px) {
   [data-cfg-shell] {
     grid-template-columns: minmax(0, 1fr) !important;
