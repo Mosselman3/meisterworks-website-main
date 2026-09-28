@@ -975,6 +975,60 @@ export function doorDesignMarks(code: string): PreviewDesignMark[] {
   }
 }
 
+/** Glass panes in a named ontwerp. Anders and unknown codes stay one pane. Keep in sync with the CRM. */
+export const DESIGN_PANE_COUNTS: Record<string, number> = {
+  minimal: 2,
+  linea: 4,
+  classic: 4,
+  grid: 4,
+  frame: 6,
+  asymmetry: 5,
+  arco: 3,
+  grande: 9,
+  anders: 1,
+};
+
+export function designPaneCount(code: string | null | undefined) {
+  if (!code) return 1;
+  return DESIGN_PANE_COUNTS[code] ?? 1;
+}
+
+export function fixedPanelCount(layout: PanelLayout) {
+  if (layout === "beide") return 2;
+  if (layout === "een") return 1;
+  return 0;
+}
+
+export function doorPaneCount(state: Pick<ConfiguratorState, "vlakMode" | "vlakPreset" | "liggers" | "staanders">) {
+  if (state.vlakMode === "ontwerp") return designPaneCount(state.vlakPreset);
+  return windowCountFromBars(state.liggers, state.staanders);
+}
+
+/** Door panes plus every fixed panel's panes. The first pane of each field is included labor. */
+export function laborWindowCount(
+  state: Pick<
+    ConfiguratorState,
+    "vlakMode" | "vlakPreset" | "liggers" | "staanders" | "panelLayout" | "panelLiggers" | "panelStaanders"
+  >,
+) {
+  const panels = fixedPanelCount(state.panelLayout);
+  const panelPanes =
+    panels > 0 ? windowCountFromBars(state.panelLiggers, state.panelStaanders) : 0;
+  return doorPaneCount(state) + panels * panelPanes;
+}
+
+/** Panes beyond the one included pane on the door and on each fixed panel. */
+export function extraLaborPanes(
+  state: Pick<
+    ConfiguratorState,
+    "vlakMode" | "vlakPreset" | "liggers" | "staanders" | "panelLayout" | "panelLiggers" | "panelStaanders"
+  >,
+) {
+  const panels = fixedPanelCount(state.panelLayout);
+  const panelPanes = windowCountFromBars(state.panelLiggers, state.panelStaanders);
+  return Math.max(0, doorPaneCount(state) - 1) + panels * Math.max(0, panelPanes - 1);
+}
+
 export function buildPreviewSvg(
   state: ConfiguratorState,
   product: ConfigProduct,
