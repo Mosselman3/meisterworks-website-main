@@ -1,6 +1,6 @@
 import React from "react";
 import { ACCENT } from "@/lib/site";
-import { COLORS, DESIGN_SURCHARGES, HARDWARE, SLUITWERK, designPriceMark, findGlass, windowCountFromBars } from "./catalog";
+import { DESIGN_SURCHARGES, HARDWARE, SLUITWERK, colorLabel, designPriceMark, findColor, findGlass, normalizeRalCode, ralPreviewHex, windowCountFromBars } from "./catalog";
 
 export { ACCENT as CONFIGURATOR_ACCENT };
 
@@ -49,6 +49,7 @@ export type ConfiguratorState = {
   vlakMode: "zelf" | "ontwerp";
   hoogte: number;
   kleur: string;
+  ralCode: string;
   glas: string;
   beslag: string;
   sluitwerk: string;
@@ -72,9 +73,10 @@ export const INITIAL_STATE: ConfiguratorState = {
   panelLiggers: 0,
   panelStaanders: 0,
   vlakPreset: "",
-  vlakMode: "zelf",
+  vlakMode: "ontwerp",
   hoogte: 2100,
   kleur: "standaard_mat_zwart",
+  ralCode: "",
   glas: "33.1",
   beslag: "standaard",
   sluitwerk: "recht_hoekgreep",
@@ -134,8 +136,8 @@ export const CFG_PRODUCTS: ConfigProduct[] = [
 
 export const CUSTOM_PRODUCT: ConfigProduct = {
   id: "custom",
-  label: "Staat er niet tussen",
-  desc: "Uw situatie past niet in de vier standaardproducten. We nemen de wens mee in de offerte.",
+  label: "Staat er niet tussen / Custom",
+  desc: "Staat uw product niet tussen de de vier standaardproducten? Geen probleem, vraag direct een offerte aan en we nemen custom wensen mee in de offerte.",
   img: "",
   doorTypeCode: "custom",
   basePrice: 0,
@@ -755,7 +757,10 @@ export function isStepConfirmed(
   if (stepId === "maat") return !!a.maat;
   if (stepId === "vlak") return !!a.vlak;
   if (stepId === "glas") return !!a.glas;
-  if (stepId === "kleur") return !!a.kleur;
+  if (stepId === "kleur") {
+    if (state.kleur !== "afwijkende_ral") return !!a.kleur;
+    return !!a.kleur && Boolean(normalizeRalCode(state.ralCode));
+  }
   if (stepId === "handgreep") return !!a.handgreep;
   if (stepId === "beslag") return !!a.beslag;
   if (stepId === "paneel") return !!a.paneel;
@@ -814,7 +819,6 @@ export function doorSummaryRows(
   if (product.custom && a.product) {
     return [{ label: "Product", value: "Buiten de vier standaardproducten" }];
   }
-  const kleur = COLORS.find((item) => item.code === state.kleur) ?? COLORS[0];
   const glas = findGlass(state.glas);
   const beslag =
     HARDWARE.find((item) => item.code === state.beslag) ?? HARDWARE[1];
@@ -834,7 +838,7 @@ export function doorSummaryRows(
     a.maat ? { label: "Afmeting", value: maatLabel(state) } : null,
     a.vlak ? { label: "Vlakverdeling", value: vlakLabel(state) } : null,
     a.glas ? { label: "Glas", value: glas.customerName } : null,
-    a.kleur ? { label: "Kleur", value: kleur.label } : null,
+    a.kleur ? { label: "Kleur", value: colorLabel(state.kleur, state.ralCode) } : null,
     product.hasHardware && a.handgreep
       ? { label: "Handgreep", value: sluitwerk.label }
       : null,
@@ -1033,7 +1037,11 @@ export function buildPreviewSvg(
   state: ConfiguratorState,
   product: ConfigProduct,
 ): React.ReactElement {
-  const kleur = COLORS.find((k) => k.code === state.kleur) ?? COLORS[0];
+  const kleur = findColor(state.kleur);
+  const frameHex =
+    state.kleur === "afwijkende_ral"
+      ? ralPreviewHex(state.ralCode, kleur.hex)
+      : kleur.hex;
   const glas = findGlass(state.glas);
   const doorWidth = Math.max(300, state.breedte || 900);
   const leftWidth = leftPanelActive(state) ? state.leftPanelBreedte : 0;
@@ -1069,7 +1077,7 @@ export function buildPreviewSvg(
       width: W,
       height: H,
       fill: "none",
-      stroke: kleur.hex,
+      stroke: frameHex,
       strokeWidth: frame,
       rx: 2,
     }),
@@ -1092,7 +1100,7 @@ export function buildPreviewSvg(
         height: gh,
         fill: glas.visual.fill,
         fillOpacity: glas.visual.opacity,
-        stroke: kleur.hex,
+        stroke: frameHex,
         strokeWidth: mullion,
       }),
     );
@@ -1135,7 +1143,7 @@ export function buildPreviewSvg(
           y1: ly,
           x2: gx + gw,
           y2: ly,
-          stroke: kleur.hex,
+          stroke: frameHex,
           strokeWidth: mullion,
         }),
       );
@@ -1149,7 +1157,7 @@ export function buildPreviewSvg(
           y1: gy,
           x2: sx,
           y2: gy + gh,
-          stroke: kleur.hex,
+          stroke: frameHex,
           strokeWidth: mullion,
         }),
       );
@@ -1165,7 +1173,7 @@ export function buildPreviewSvg(
               y1: gy + mark.y1 * gh,
               x2: gx + mark.x2 * gw,
               y2: gy + mark.y2 * gh,
-              stroke: kleur.hex,
+              stroke: frameHex,
               strokeWidth: mullion,
             }),
           );
@@ -1179,7 +1187,7 @@ export function buildPreviewSvg(
               key: key(ki++),
               d: `M ${ax} ${ay - ry} A ${rx} ${ry} 0 0 1 ${ax + rx} ${ay} L ${ax + rx} ${gy + gh}`,
               fill: "none",
-              stroke: kleur.hex,
+              stroke: frameHex,
               strokeWidth: mullion,
             }),
           );
@@ -1197,7 +1205,7 @@ export function buildPreviewSvg(
             y: gy + gh - 10,
             textAnchor: "middle",
             fontSize: 9,
-            fill: kleur.hex,
+            fill: frameHex,
             fillOpacity: 0.55,
             fontFamily: "monospace",
           },
@@ -1217,7 +1225,7 @@ export function buildPreviewSvg(
           width: 4,
           height: 30,
           rx: 2,
-          fill: kleur.hex,
+          fill: frameHex,
         }),
       );
     }
@@ -1230,7 +1238,7 @@ export function buildPreviewSvg(
           cx: hingeX,
           cy: y0 + H - frame / 2 - 3,
           r: 3,
-          fill: kleur.hex,
+          fill: frameHex,
           fillOpacity: 0.75,
         }),
       );
@@ -1240,7 +1248,7 @@ export function buildPreviewSvg(
           cx: hingeX,
           cy: y0 + frame / 2 + 3,
           r: 3,
-          fill: kleur.hex,
+          fill: frameHex,
           fillOpacity: 0.75,
         }),
       );
@@ -1252,7 +1260,7 @@ export function buildPreviewSvg(
           y1: y0 - 4,
           x2: x0 + W,
           y2: y0 - 4,
-          stroke: kleur.hex,
+          stroke: frameHex,
           strokeWidth: 3,
           strokeOpacity: 0.6,
         }),

@@ -46,22 +46,16 @@ export const VLAK_OPTIONS: OptionCard[] = [
 
 export const COLOR_OPTIONS: OptionCard[] = [
   {
-    title: "Standaard mat zwart",
-    note: "Standaard",
+    title: "Standaard RAL zwart",
+    note: "€",
     image: "/assets/double-doors-black.jpg",
-    alt: "Mat zwarte coating",
+    alt: "Standaard RAL zwart",
   },
   {
     title: "Afwijkende RAL-kleur",
-    note: "Op aanvraag",
+    note: "€€",
     image: "/assets/detail-green.jpg",
-    alt: "Afwijkende kleur coating",
-  },
-  {
-    title: "Designkleur",
-    note: "Brons en andere tinten",
-    image: "/assets/arched-bronze-door.jpg",
-    alt: "Designkleur, brons",
+    alt: "Afwijkende RAL-kleur",
   },
 ];
 

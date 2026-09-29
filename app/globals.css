@@ -1141,19 +1141,172 @@ img {
 
 .vlak-design-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 
-@container (min-width: 560px) {
+@container (min-width: 640px) {
   .vlak-design-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
   }
 }
 
 .vlak-design-grid button > span {
   overflow-wrap: anywhere;
+}
+
+.glass-families {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.glass-family__title {
+  margin: 0;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: oklch(0.22 0.008 60);
+}
+
+.glass-family__text {
+  max-width: 62ch;
+  margin: 6px 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: oklch(0.42 0.008 60);
+}
+
+.ral-picker {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid oklch(0.9 0.006 75);
+}
+
+.ral-picker__intro {
+  margin: 0 0 14px;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.45;
+  color: oklch(0.42 0.008 60);
+}
+
+.ral-raster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 8px;
+}
+
+.ral-swatch {
+  position: relative;
+  aspect-ratio: 1;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid oklch(0.82 0.01 75);
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.ral-swatch > span {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 3px 2px;
+  background: oklch(1 0 0 / 0.82);
+  color: oklch(0.22 0.008 60);
+  font-size: 8px;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+
+.ral-swatch[data-selected="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ral-code-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+  max-width: 280px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: oklch(0.4 0.008 60);
+}
+
+.ral-code-field input {
+  padding: 11px 12px;
+  border: 1px solid oklch(0.86 0.006 75);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: oklch(0.22 0.008 60);
+  background: oklch(1 0 0);
+}
+
+.glass-group__title {
+  margin: 16px 0 10px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: oklch(0.4 0.008 60);
+}
+
+.glass-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@container (min-width: 720px) {
+  .glass-option-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 639px) {
+  .vlak-design-grid button {
+    gap: 4px !important;
+    padding: 6px 4px 0 !important;
+    border-radius: 12px !important;
+  }
+
+  .vlak-design-grid button > img {
+    width: 88% !important;
+  }
+
+  .vlak-design-grid button > span[aria-hidden] {
+    top: 4px !important;
+    right: 4px !important;
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .vlak-design-grid button > span:last-of-type {
+    width: calc(100% + 8px) !important;
+    margin-top: 0 !important;
+    padding: 5px 2px !important;
+    font-size: 9px !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1.15;
+  }
+
+  .vlak-design-grid button > span:last-of-type span {
+    margin-top: 1px !important;
+    font-size: 9px !important;
+    letter-spacing: 0 !important;
+    line-height: 1.2;
+  }
 }
 
 .vlak-panel-follow {

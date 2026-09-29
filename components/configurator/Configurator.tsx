@@ -26,14 +26,24 @@ import { FoldIcon } from "@/components/ui";
 import { ACCENT, ROUTES } from "@/lib/site";
 import {
   COLORS,
-  GLASS_CATEGORIES,
-  GLASS_CATEGORY_CODE,
-  FOLIE_GLASS_CATEGORY,
+  GLASS_LOOK_GROUPS,
+  GLASS_PRESENTATION,
+  GLASS_TYPE_COPY,
   glassCardImage,
+  glassConstructionLabel,
+  glassLookFor,
+  glassLookNextHint,
   GLASS_TYPES,
   HARDWARE,
   SLUITWERK,
   findGlass,
+  colorLabel,
+  colorThumbBackground,
+  RAL_SWATCHES,
+  findRalSwatch,
+  normalizeRalCode,
+  ralPreviewHex,
+  findColor,
   priceTier,
   windowCountFromBars,
 } from "./catalog";
@@ -210,18 +220,45 @@ function OptionCard({
   priceMark,
   footnote,
   info,
+  previewSrc,
+  badge,
+  meta,
+  technicalName,
+  hint,
 }: {
   label: string;
   desc: string;
   selected: boolean;
-  thumbStyle: CSSProperties;
+  thumbStyle?: CSSProperties;
   onClick: () => void;
   priceMark?: string | null;
   footnote?: string;
   info?: string;
+  previewSrc?: string;
+  badge?: string;
+  meta?: string;
+  technicalName?: string;
+  hint?: string;
 }) {
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    if (!previewOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPreviewOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [previewOpen]);
+
   return (
     <div style={optionCardStyle(selected)}>
+      <div style={{ position: "relative" }}>
       <button
         type="button"
         onClick={onClick}
@@ -229,6 +266,7 @@ function OptionCard({
           display: "flex",
           flexDirection: "column",
           gap: 10,
+          width: "100%",
           padding: 0,
           border: "none",
           background: "transparent",
@@ -237,7 +275,7 @@ function OptionCard({
           textAlign: "left",
         }}
       >
-        <div style={thumbStyle} />
+        {thumbStyle ? <div style={thumbStyle} /> : null}
         <div
           style={{
             display: "flex",
@@ -281,6 +319,42 @@ function OptionCard({
         >
           {desc}
         </div>
+        {badge ? (
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              color: "oklch(0.4 0.008 60)",
+              textAlign: "left",
+            }}
+          >
+            {badge}
+          </div>
+        ) : null}
+        {meta ? (
+          <div
+            style={{
+              fontSize: 12,
+              color: "oklch(0.42 0.008 60)",
+              textAlign: "left",
+            }}
+          >
+            {meta}
+          </div>
+        ) : null}
+        {technicalName ? (
+          <div
+            style={{
+              fontSize: 11,
+              color: "oklch(0.62 0.008 60)",
+              textAlign: "left",
+            }}
+          >
+            {technicalName}
+          </div>
+        ) : null}
         {footnote ? (
           <div
             style={{
@@ -293,12 +367,132 @@ function OptionCard({
             {footnote}
           </div>
         ) : null}
+        {hint ? (
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 500,
+              color: "oklch(0.58 0.008 60)",
+              textAlign: "left",
+            }}
+          >
+            {hint} →
+          </div>
+        ) : null}
       </button>
+      {previewSrc ? (
+        <button
+          type="button"
+          aria-label={`Afbeelding van ${label} vergroten`}
+          onClick={() => setPreviewOpen(true)}
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            display: "grid",
+            placeItems: "center",
+            width: 32,
+            height: 32,
+            padding: 0,
+            border: "none",
+            borderRadius: 999,
+            background: "oklch(1 0 0 / 0.94)",
+            boxShadow: "0 1px 4px oklch(0 0 0 / 0.18)",
+            color: "oklch(0.28 0.008 60)",
+            cursor: "pointer",
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+            <circle cx="7" cy="7" r="4.25" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M10.2 10.2 13.2 13.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M7 5.1v3.8M5.1 7h3.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </button>
+      ) : null}
+      </div>
       {info ? (
         <details style={{ fontSize: 12, color: "oklch(0.45 0.008 60)" }}>
           <summary style={{ cursor: "pointer" }}>Meer informatie</summary>
           <p style={{ margin: "8px 0 0", lineHeight: 1.45 }}>{info}</p>
         </details>
+      ) : null}
+      {previewOpen && previewSrc ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={label}
+          onClick={() => setPreviewOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 90,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            background: "oklch(0.16 0.006 60 / 0.45)",
+          }}
+        >
+          <div
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "min(420px, 100%)",
+              padding: 12,
+              borderRadius: 16,
+              background: "oklch(0.985 0.002 75)",
+              boxShadow: "0 16px 40px oklch(0 0 0 / 0.2)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                marginBottom: 10,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "oklch(0.2 0.008 60)",
+                }}
+              >
+                {label}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPreviewOpen(false)}
+                style={{
+                  padding: "6px 12px",
+                  border: "1px solid oklch(0.86 0.006 75)",
+                  borderRadius: 999,
+                  background: "oklch(1 0 0)",
+                  fontFamily: "inherit",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "oklch(0.28 0.008 60)",
+                  cursor: "pointer",
+                }}
+              >
+                Sluiten
+              </button>
+            </div>
+            <img
+              src={previewSrc}
+              alt={label}
+              style={{
+                display: "block",
+                width: "100%",
+                maxHeight: "70vh",
+                objectFit: "contain",
+                borderRadius: 10,
+                background: "oklch(0.93 0.006 75)",
+              }}
+            />
+          </div>
+        </div>
       ) : null}
     </div>
   );
@@ -387,6 +581,7 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
       windowCount: 0,
       glassCode: null,
       colorCode: null,
+      ralCode: null,
       hardwareCode: null,
       sluitwerkCode: null,
       hasFixedPanel: false,
@@ -411,6 +606,7 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
     windowCount: windowCountFromBars(state.liggers, state.staanders),
     glassCode: state.glas,
     colorCode: state.kleur,
+    ralCode: state.kleur === "afwijkende_ral" ? normalizeRalCode(state.ralCode) || null : null,
     hardwareCode: product.hasHardware ? state.beslag : null,
     sluitwerkCode: product.hasHardware ? state.sluitwerk : null,
     hasFixedPanel: hasPanels(state),
@@ -568,6 +764,7 @@ function isUntouchedProductStart(state: ConfiguratorState, productParam: string)
     state.vlakMode === initial.vlakMode &&
     state.panelLayout === initial.panelLayout &&
     state.kleur === initial.kleur &&
+    state.ralCode === initial.ralCode &&
     state.glas === initial.glas &&
     state.beslag === initial.beslag &&
     state.sluitwerk === initial.sluitwerk &&
@@ -610,15 +807,19 @@ export function Configurator() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [draftReady, setDraftReady] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
-  const [glassCategory, setGlassCategory] = useState<string | null>(null);
   const [missingStep, setMissingStep] = useState<StepId | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
   const [attachment, setAttachment] = useState<File | null>(null);
+  const [glassLook, setGlassLook] = useState<string | null | undefined>(
+    undefined,
+  );
   const quoteAutoShown = useRef(false);
   const panelFollowRef = useRef<HTMLDivElement>(null);
   const glassFollowRef = useRef<HTMLDivElement>(null);
-  const skipGlassScroll = useRef(true);
+  const ralFollowRef = useRef<HTMLDivElement>(null);
   const skipPanelScroll = useRef(true);
+  const skipGlassScroll = useRef(true);
+  const skipRalScroll = useRef(true);
 
   useLayoutEffect(() => {
     if (!productParam) {
@@ -638,12 +839,34 @@ export function Configurator() {
     writeConfiguratorDraft(state, doors, activeIndex);
   }, [draftReady, productParam, state, doors, activeIndex]);
 
+  useEffect(() => {
+    if (!draftReady || state.openSection !== "vlak" || state.answered.vlak) return;
+    setState((current) => {
+      if (current.openSection !== "vlak" || current.answered.vlak) return current;
+      if (current.vlakMode === "ontwerp" || current.vlakPreset) return current;
+      if (
+        current.liggers !== 0 ||
+        current.staanders !== 0 ||
+        current.panelLiggers !== 0 ||
+        current.panelStaanders !== 0
+      ) {
+        return current;
+      }
+      return { ...current, vlakMode: "ontwerp" };
+    });
+  }, [draftReady, state.openSection, state.answered.vlak]);
+
   const product = useMemo(
     () => getProduct(state.productId),
     [state.productId],
   );
 
-  const kleur = COLORS.find((k) => k.code === state.kleur) ?? COLORS[0];
+  const kleur = findColor(state.kleur);
+  const kleurLabel = colorLabel(state.kleur, state.ralCode);
+  const kleurHex =
+    state.kleur === "afwijkende_ral"
+      ? ralPreviewHex(state.ralCode, kleur.hex)
+      : kleur.hex;
   const glas = findGlass(state.glas);
   const beslag = HARDWARE.find((item) => item.code === state.beslag) ?? HARDWARE[1];
   const sluitwerk = SLUITWERK.find((item) => item.code === state.sluitwerk) ?? SLUITWERK[0];
@@ -744,14 +967,14 @@ export function Configurator() {
       {
         id: "glas" as StepId,
         title: "Glas",
-        intro: "Hoe wilt u dat het glas eruitziet?",
+        intro: "Kies hoe het glas eruitziet.",
         summary: glas.customerName,
       },
       {
         id: "kleur" as StepId,
         title: "Kleur",
         intro: "Kies de afwerking van het frame.",
-        summary: kleur.label,
+        summary: kleurLabel,
       },
       product.hasHardware
         ? {
@@ -795,7 +1018,7 @@ export function Configurator() {
     state.panelSide,
     state.leftPanelBreedte,
     state.rightPanelBreedte,
-    kleur.label,
+    kleurLabel,
     glas.customerName,
     beslag.label,
     sluitwerk.label,
@@ -859,7 +1082,7 @@ export function Configurator() {
       a.kleur
         ? {
             label: "Kleur",
-            value: kleur.label,
+            value: kleurLabel,
             onEdit: () => openAndScroll("kleur"),
           }
         : null,
@@ -892,7 +1115,7 @@ export function Configurator() {
     product,
     vlak,
     totW,
-    kleur.label,
+    kleurLabel,
     glas.customerName,
     beslag.label,
     sluitwerk.label,
@@ -912,11 +1135,11 @@ export function Configurator() {
     }
     return [
       { label: product.label, kind: "door" as const, color: undefined },
-      { label: kleur.label, kind: "brush" as const, color: kleur.hex },
+      { label: kleurLabel, kind: "brush" as const, color: kleurHex },
       { label: glas.customerName, kind: "glass" as const, color: undefined },
       { label: vlak, kind: "layout" as const, color: undefined },
     ];
-  }, [product.custom, product.label, kleur, glas.customerName, vlak]);
+  }, [product.custom, product.label, kleurLabel, kleurHex, glas.customerName, vlak]);
 
   const confirmedCount = sectionDefs.filter(
     (s) => s.id !== "overzicht" && isStepConfirmed(s.id, state, product),
@@ -943,6 +1166,44 @@ export function Configurator() {
     const timer = window.setTimeout(() => setProgressPulse(false), 900);
     return () => window.clearTimeout(timer);
   }, [progressPct]);
+  const previewRevision = [
+    state.productId,
+    state.breedte,
+    state.hoogte,
+    state.liggers,
+    state.staanders,
+    state.panelLiggers,
+    state.panelStaanders,
+    state.vlakPreset,
+    state.vlakMode,
+    state.kleur,
+    state.ralCode,
+    state.glas,
+    state.beslag,
+    state.sluitwerk,
+    state.panelLayout,
+    state.panelSide,
+    state.richting,
+    state.leftPanelBreedte,
+    state.rightPanelBreedte,
+    activeIndex,
+    doors.length,
+  ].join(":");
+  const previewSeen = useRef(previewRevision);
+  const [previewPulse, setPreviewPulse] = useState(false);
+  useEffect(() => {
+    if (previewRevision === previewSeen.current) return;
+    const previous = previewSeen.current;
+    previewSeen.current = previewRevision;
+    setPreviewPulse(false);
+    const frame = window.requestAnimationFrame(() => setPreviewPulse(true));
+    const timer = window.setTimeout(() => setPreviewPulse(false), 900);
+    return () => {
+      previewSeen.current = previous;
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
+  }, [previewRevision]);
 
   const committedDoors = useMemo(
     () => withActiveDoors(doors, activeIndex, state),
@@ -1048,7 +1309,7 @@ export function Configurator() {
         summaryOpen: current.summaryOpen,
       }));
       setQuoteOpen(false);
-      setGlassCategory(null);
+      setGlassLook(undefined);
       setMissingStep(null);
       quoteAutoShown.current = isDoorComplete(next);
       scrollToSection(next.openSection ?? "product");
@@ -1082,7 +1343,7 @@ export function Configurator() {
     setActiveIndex(0);
     setState(fresh);
     setQuoteOpen(false);
-    setGlassCategory(null);
+    setGlassLook(undefined);
     setMissingStep(null);
     quoteAutoShown.current = false;
     clearConfiguratorDraft();
@@ -1105,6 +1366,14 @@ export function Configurator() {
       requestQuote();
       return;
     }
+    if (
+      currentStepId === "kleur" &&
+      state.kleur === "afwijkende_ral" &&
+      !normalizeRalCode(state.ralCode)
+    ) {
+      setMissingStep("kleur");
+      return;
+    }
     const next = nextStepId(currentStepId, product);
     setState((s) => ({
       ...s,
@@ -1112,7 +1381,15 @@ export function Configurator() {
       openSection: next,
     }));
     scrollToSection(next);
-  }, [allDone, currentStepId, product, requestQuote, scrollToSection]);
+  }, [
+    allDone,
+    currentStepId,
+    product,
+    requestQuote,
+    scrollToSection,
+    state.kleur,
+    state.ralCode,
+  ]);
 
   useEffect(() => {
     if (skipPanelScroll.current) {
@@ -1128,9 +1405,18 @@ export function Configurator() {
       skipGlassScroll.current = false;
       return;
     }
-    if (!glassCategory) return;
+    if (!glassLook) return;
     scrollFollowUpIntoView(glassFollowRef.current);
-  }, [glassCategory]);
+  }, [glassLook]);
+
+  useEffect(() => {
+    if (skipRalScroll.current) {
+      skipRalScroll.current = false;
+      return;
+    }
+    if (state.kleur !== "afwijkende_ral") return;
+    scrollFollowUpIntoView(ralFollowRef.current);
+  }, [state.kleur]);
 
   useEffect(() => {
     if (missingStep && isStepConfirmed(missingStep, state, product)) {
@@ -1191,6 +1477,7 @@ export function Configurator() {
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
+              previewSrc={o.img}
               onClick={() => {
                 setState((s) => ({
                   ...s,
@@ -1209,8 +1496,12 @@ export function Configurator() {
             thumbStyle={{
               height: 96,
               borderRadius: 9,
-              background:
-                "repeating-linear-gradient(135deg, oklch(0.94 0.004 75) 0 10px, oklch(0.9 0.006 75) 10px 11px)",
+              backgroundColor: "oklch(0.94 0.004 75)",
+              backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><text x="48" y="66" text-anchor="middle" font-family="Georgia, Times New Roman, serif" font-size="52" fill="#6a6560">?</text></svg>',
+              )}")`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
             }}
             onClick={() => {
               setState((s) => ({
@@ -1790,14 +2081,23 @@ export function Configurator() {
     }
 
     if (id === "glas") {
-      const categoryAmounts = GLASS_CATEGORIES.map((category) =>
-        Math.min(
-          ...GLASS_TYPES.filter((item) => item.category === category.id).map(
-            (item) => item.pricePerM2,
-          ),
-        ),
-      );
-      if (!glassCategory) {
+      const activeLookId =
+        glassLook === undefined
+          ? state.answered.glas
+            ? (glassLookFor(state.glas)?.id ?? null)
+            : null
+          : glassLook;
+      const look = GLASS_LOOK_GROUPS.find((item) => item.id === activeLookId);
+      const glassPrices = GLASS_TYPES.map((item) => item.pricePerM2);
+      const chooseGlass = (code: string) => {
+        setState((s) => ({
+          ...s,
+          glas: code,
+          answered: { ...s.answered, glas: true },
+        }));
+        advanceFrom("glas");
+      };
+      if (!look) {
         return (
           <div
             style={{
@@ -1806,45 +2106,39 @@ export function Configurator() {
               gap: 14,
             }}
           >
-            {GLASS_CATEGORIES.map((category, index) => {
-              return (
-                <OptionCard
-                  key={category.id}
-                  label={category.title}
-                  desc={category.text}
-                  priceMark={priceTier(categoryAmounts[index], categoryAmounts)}
-                  selected={glas.category === category.id}
-                  thumbStyle={glassThumb(category.image)}
-                  onClick={() => {
-                    if (category.id === FOLIE_GLASS_CATEGORY) {
-                      setGlassCategory(category.id);
-                      return;
-                    }
-                    const code = GLASS_CATEGORY_CODE[category.id];
-                    if (!code) return;
-                    setState((s) => ({
-                      ...s,
-                      glas: code,
-                      answered: { ...s.answered, glas: true },
-                    }));
-                    advanceFrom("glas");
-                  }}
-                />
-              );
-            })}
+            {GLASS_LOOK_GROUPS.map((item) => (
+              <OptionCard
+                key={item.id}
+                label={item.title}
+                desc={item.text}
+                badge={item.privacy}
+                hint={glassLookNextHint(item) ?? undefined}
+                selected={glassLookFor(state.glas)?.id === item.id && Boolean(state.answered.glas)}
+                thumbStyle={glassThumb(item.image)}
+                previewSrc={item.image}
+                onClick={() => {
+                  if (item.codes.length === 1) {
+                    chooseGlass(item.codes[0]);
+                    return;
+                  }
+                  setGlassLook(item.id);
+                }}
+              />
+            ))}
           </div>
         );
       }
-      const variants = GLASS_TYPES.filter(
-        (item) => item.category === glassCategory,
-      );
+      const variants = look.codes
+        .map((code) => GLASS_TYPES.find((item) => item.code === code))
+        .filter((item): item is (typeof GLASS_TYPES)[number] => Boolean(item));
+      const siblingTypes = variants.map((item) => item.glassType);
       return (
-        <div ref={glassFollowRef}>
+        <div ref={glassFollowRef} className="glass-families">
           <button
             type="button"
-            onClick={() => setGlassCategory(null)}
+            onClick={() => setGlassLook(null)}
             style={{
-              marginBottom: 16,
+              marginBottom: 4,
               padding: 0,
               border: "none",
               background: "transparent",
@@ -1854,8 +2148,54 @@ export function Configurator() {
               color: "oklch(0.4 0.008 60)",
             }}
           >
-            ← Alle uitstralingen
+            ← Uitstraling
           </button>
+          <div className="glass-option-grid">
+            {variants.map((variant) => {
+              const copy = GLASS_PRESENTATION[variant.code];
+              if (!copy) return null;
+              const image = glassCardImage(variant.code, variant.category);
+              const typeCopy =
+                variant.glassType === "Gelaagd" || variant.glassType === "Gehard"
+                  ? GLASS_TYPE_COPY[variant.glassType]
+                  : null;
+              if (look.kind === "pattern") {
+                return (
+                  <OptionCard
+                    key={variant.code}
+                    label={copy.customerName}
+                    desc={copy.description}
+                    badge={copy.privacy}
+                    meta={`${variant.thicknessMm} mm dikte`}
+                    priceMark={priceTier(variant.pricePerM2, glassPrices)}
+                    selected={state.glas === variant.code}
+                    thumbStyle={glassThumb(image)}
+                    previewSrc={image}
+                    onClick={() => chooseGlass(variant.code)}
+                  />
+                );
+              }
+              return (
+                <OptionCard
+                  key={variant.code}
+                  label={glassConstructionLabel(look.title, variant.code, variant.glassType, siblingTypes)}
+                  desc={typeCopy?.text ?? copy.description}
+                  meta={`${variant.thicknessMm} mm dikte`}
+                  priceMark={priceTier(variant.pricePerM2, glassPrices)}
+                  selected={state.glas === variant.code}
+                  onClick={() => chooseGlass(variant.code)}
+                />
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    if (id === "kleur") {
+      const selectedSwatch = findRalSwatch(state.ralCode);
+      return (
+        <div>
           <div
             style={{
               display: "grid",
@@ -1863,66 +2203,104 @@ export function Configurator() {
               gap: 14,
             }}
           >
-            {variants.map((variant) => (
+            {COLORS.map((item) => (
               <OptionCard
-                key={variant.code}
-                label={variant.customerName}
-                desc={`${variant.glassType} veiligheidsglas · ${variant.thicknessMm} mm`}
-                priceMark={priceTier(
-                  variant.pricePerM2,
-                  variants.map((item) => item.pricePerM2),
-                )}
-                selected={state.glas === variant.code}
-                thumbStyle={glassThumb(glassCardImage(variant.code, variant.category))}
+                key={item.code}
+                label={item.label}
+                desc={item.desc}
+                priceMark={item.priceMark}
+                selected={state.kleur === item.code}
+                thumbStyle={{
+                  height: 96,
+                  borderRadius: 9,
+                  background: colorThumbBackground(item.code, item.hex),
+                }}
                 onClick={() => {
+                  if (item.code === "afwijkende_ral") {
+                    setState((s) => ({
+                      ...s,
+                      kleur: item.code,
+                      answered: { ...s.answered, kleur: false },
+                    }));
+                    return;
+                  }
                   setState((s) => ({
                     ...s,
-                    glas: variant.code,
-                    answered: { ...s.answered, glas: true },
+                    kleur: item.code,
+                    ralCode: "",
+                    answered: { ...s.answered, kleur: true },
                   }));
-                  advanceFrom("glas");
+                  advanceFrom("kleur");
                 }}
               />
             ))}
           </div>
-        </div>
-      );
-    }
-
-    if (id === "kleur") {
-      return (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-            gap: 14,
-          }}
-        >
-          {COLORS.map((item) => (
-            <OptionCard
-              key={item.code}
-              label={item.label}
-              desc={item.desc}
-              priceMark={priceTier(
-                item.surcharge,
-                COLORS.map((color) => color.surcharge),
-              )}
-              selected={state.kleur === item.code}
-              thumbStyle={{
-                height: 96,
-                borderRadius: 9,
-                background: item.hex,
-              }}
-              onClick={() => {
-                setState((s) => ({
-                  ...s,
-                  kleur: item.code,
-                  answered: { ...s.answered, kleur: true },
-                }));
-                advanceFrom("kleur");
-              }}
-            />
-          ))}
+          {state.kleur === "afwijkende_ral" ? (
+            <div ref={ralFollowRef} className="ral-picker">
+              <p className="ral-picker__intro">
+                Kies een kleur in het raster. De kleurcode wordt automatisch ingevuld
+                en kunt u zelf nog aanpassen.
+              </p>
+              <div className="ral-raster" role="listbox" aria-label="RAL-kleuren">
+                {RAL_SWATCHES.map((swatch) => {
+                  const selected = selectedSwatch?.code === swatch.code;
+                  return (
+                    <button
+                      key={swatch.code}
+                      type="button"
+                      role="option"
+                      aria-selected={selected}
+                      className="ral-swatch"
+                      data-selected={selected ? "true" : undefined}
+                      title={`RAL ${swatch.code} ${swatch.name}`}
+                      style={{ background: swatch.hex }}
+                      onClick={() => {
+                        setState((s) => ({
+                          ...s,
+                          kleur: "afwijkende_ral",
+                          ralCode: `RAL ${swatch.code}`,
+                          answered: { ...s.answered, kleur: true },
+                        }));
+                      }}
+                    >
+                      <span>RAL {swatch.code}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <label className="ral-code-field">
+                Kleurcode
+                <input
+                  type="text"
+                  value={state.ralCode}
+                  placeholder="RAL 9010"
+                  autoComplete="off"
+                  spellCheck={false}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setState((s) => ({
+                      ...s,
+                      ralCode: value,
+                      answered: {
+                        ...s.answered,
+                        kleur: Boolean(normalizeRalCode(value)),
+                      },
+                    }));
+                  }}
+                  onBlur={() => {
+                    setState((s) => {
+                      const next = normalizeRalCode(s.ralCode);
+                      return {
+                        ...s,
+                        ralCode: next,
+                        answered: { ...s.answered, kleur: Boolean(next) },
+                      };
+                    });
+                  }}
+                />
+              </label>
+            </div>
+          ) : null}
         </div>
       );
     }
@@ -1954,6 +2332,7 @@ export function Configurator() {
                 backgroundPosition: "center",
                 backgroundColor: "oklch(0.93 0.006 75)",
               }}
+              previewSrc={item.image}
               onClick={() => {
                 setState((s) => ({
                   ...s,
@@ -1994,6 +2373,7 @@ export function Configurator() {
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
+              previewSrc={item.image}
               onClick={() => {
                 setState((s) => ({
                   ...s,
@@ -2652,9 +3032,9 @@ export function Configurator() {
         <button
           type="button"
           data-cfg-summary-float
-          data-cfg-just-updated={progressPulse ? "true" : undefined}
+          data-cfg-just-updated={previewPulse ? "true" : undefined}
           onClick={() => setState((s) => ({ ...s, summaryOpen: true }))}
-          aria-label={`Bekijk uw samenstelling, ${committedDoors.length} ${committedDoors.length === 1 ? "deur" : "deuren"}, ${progressPct}% voltooid`}
+          aria-label={`Bekijk voorbeeld, ${committedDoors.length} ${committedDoors.length === 1 ? "deur" : "deuren"}, ${progressPct}% voltooid`}
         >
           <span
             aria-hidden
@@ -2665,7 +3045,7 @@ export function Configurator() {
             }}
           />
           <span>
-            Bekijk uw samenstelling
+            Bekijk voorbeeld
             {committedDoors.length > 1 ? ` · ${committedDoors.length}` : ""}
           </span>
           <span>

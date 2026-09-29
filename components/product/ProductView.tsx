@@ -214,10 +214,10 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
           <StepIntro
             kicker={`Stap ${colorStep} — Kleur`}
             title="De afwerking van het staal."
-            body="Standaard is mat zwart. Een afwijkende RAL-kleur of een designkleur, zoals brons, is ook mogelijk."
+            body="Standaard is RAL zwart. Een afwijkende RAL-kleur is ook mogelijk."
             dark
           />
-          <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-6">
+          <div className="grid grid-cols-2 gap-4 min-[900px]:gap-6">
             {COLOR_OPTIONS.map((color) => (
               <div key={color.title}>
                 <CoverImage

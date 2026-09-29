@@ -17,6 +17,7 @@ export type QuoteConfiguration = {
   windowCount: number;
   glassCode: string | null;
   colorCode: string | null;
+  ralCode: string | null;
   hardwareCode: string | null;
   sluitwerkCode: string | null;
   hasFixedPanel: boolean;

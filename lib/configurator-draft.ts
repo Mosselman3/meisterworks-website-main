@@ -44,12 +44,16 @@ function asState(value: unknown): ConfiguratorState | null {
       typeof record.vlakPreset === "string" && DESIGN_CODES.has(record.vlakPreset)
         ? record.vlakPreset
         : INITIAL_STATE.vlakPreset,
-    vlakMode: record.vlakMode === "ontwerp" ? "ontwerp" : "zelf",
+    vlakMode:
+      record.vlakMode === "ontwerp" || record.vlakMode === "zelf"
+        ? record.vlakMode
+        : INITIAL_STATE.vlakMode,
     richting: record.richting === "links" || record.richting === "rechts" ? record.richting : "",
     sluitwerk:
       typeof record.sluitwerk === "string" && HANDGREEP_CODES.has(record.sluitwerk)
         ? record.sluitwerk
         : INITIAL_STATE.sluitwerk,
+    ralCode: typeof record.ralCode === "string" ? record.ralCode : INITIAL_STATE.ralCode,
     answered:
       record.answered && typeof record.answered === "object"
         ? record.answered
