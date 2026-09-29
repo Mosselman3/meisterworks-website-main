@@ -96,7 +96,7 @@ export const CFG_PRODUCTS: ConfigProduct[] = [
     id: "taatsdeur",
     label: "Taatsdeur",
     desc: "Taatsmechaniek vloer en boven.",
-    img: "/assets/pivot-door-slats.jpg",
+    img: "/assets/doors/taatsdeur.jpeg",
     doorTypeCode: "taatsdeur",
     basePrice: 380,
     hasHardware: true,
@@ -106,7 +106,7 @@ export const CFG_PRODUCTS: ConfigProduct[] = [
     id: "scharnierdeur-kozijn",
     label: "Scharnierdeur incl. kozijn",
     desc: "Kozijn en scharnieren inbegrepen.",
-    img: "/assets/arched-bronze-door.jpg",
+    img: "/assets/doors/scharnierdeur-kozijn.jpeg",
     doorTypeCode: "scharnierdeur_kozijn",
     basePrice: 450,
     hasHardware: true,
@@ -116,7 +116,7 @@ export const CFG_PRODUCTS: ConfigProduct[] = [
     id: "schuifdeur",
     label: "Schuifdeur",
     desc: "Inclusief rail en loopwerk.",
-    img: "/assets/sliding-wall-herringbone.jpg",
+    img: "/assets/doors/schuifdeur.jpeg",
     doorTypeCode: "schuifdeur",
     basePrice: 520,
     hasHardware: true,
@@ -126,7 +126,7 @@ export const CFG_PRODUCTS: ConfigProduct[] = [
     id: "vast-paneel",
     label: "Vast paneel (los)",
     desc: "Alleen een bevestigingsframe, geen mechaniek.",
-    img: "/assets/hero-open-door.jpg",
+    img: "/assets/doors/vast-paneel.jpeg",
     doorTypeCode: "vast_paneel",
     basePrice: 150,
     hasHardware: false,
@@ -720,7 +720,10 @@ export function sizeLines(state: ConfiguratorState): SizeLine[] {
   return lines;
 }
 
-export function panelLayoutThumb(kind: PanelLayout): React.CSSProperties {
+export function panelLayoutThumb(
+  kind: PanelLayout,
+  side: "links" | "rechts" = "rechts",
+): React.CSSProperties {
   const door =
     '<rect x="70" y="12" width="60" height="176" fill="#ffffff" stroke="#2f4a63" stroke-width="4"/>';
   const left =
@@ -731,7 +734,9 @@ export function panelLayoutThumb(kind: PanelLayout): React.CSSProperties {
     kind === "geen"
       ? door
       : kind === "een"
-        ? `${door}${right}`
+        ? side === "links"
+          ? `${left}${door}`
+          : `${door}${right}`
         : `${left}${door}${right}`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f4f2ef"/>${parts}</svg>`;
   return {

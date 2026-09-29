@@ -1,16 +1,50 @@
 import Link from "next/link";
 import { ArrowIcon, CoverImage } from "@/components/ui";
+import { relatedProducts, type ProductPageCopy } from "@/lib/products";
+import { DesignCard, DesignMoreCarousel } from "@/components/product/DesignMoreCarousel";
 import {
-  COLOR_OPTIONS,
-  GLASS_CATEGORIES,
-  HANDGREEP_OPTIONS,
-  HARDWARE_OPTIONS,
-  VLAK_OPTIONS,
-  relatedProducts,
-  type ProductPageCopy,
-} from "@/lib/products";
-import { directionOptions, dirThumbStyle } from "@/components/configurator/logic";
+  COLORS,
+  DESIGN_SURCHARGES,
+  GLASS_LOOK_GROUPS,
+  HARDWARE,
+  SLUITWERK,
+  colorThumbBackground,
+} from "@/components/configurator/catalog";
+import {
+  directionOptions,
+  dirThumbStyle,
+  panelLayoutThumb,
+  type PanelLayout,
+} from "@/components/configurator/logic";
 import { ROUTES, getProduct } from "@/lib/site";
+
+const FEATURED_DESIGNS = ["minimal", "classic"] as const;
+
+const PANEL_CHOICES: {
+  label: string;
+  desc: string;
+  kind: PanelLayout;
+  side?: "links" | "rechts";
+}[] = [
+  { label: "Geen vast paneel", desc: "Alleen de deur.", kind: "geen" },
+  {
+    label: "Paneel links",
+    desc: "Een vast vlak links van de deur.",
+    kind: "een",
+    side: "links",
+  },
+  {
+    label: "Paneel rechts",
+    desc: "Een vast vlak rechts van de deur.",
+    kind: "een",
+    side: "rechts",
+  },
+  {
+    label: "Twee vaste panelen",
+    desc: "Een paneel links én rechts.",
+    kind: "beide",
+  },
+];
 
 const GRID_IMAGE_SIZES = "(min-width: 900px) 33vw, 50vw";
 const RELATED_IMAGE_SIZES = "(min-width: 900px) 33vw, 50vw";
@@ -45,6 +79,66 @@ function StepIntro({
       </p>
     </div>
   );
+}
+
+function MaatDiagram({ withPanel }: { withPanel: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 360 200"
+      className="h-[160px] w-full max-w-[460px]"
+      role="img"
+      aria-label={
+        withPanel
+          ? "Schets van deur en vast paneel met breedte en hoogte"
+          : "Schets van een deur met breedte en hoogte"
+      }
+    >
+      <rect width="360" height="200" fill="#f4f2ef" rx="12" />
+      {withPanel ? (
+        <>
+          <rect x="78" y="28" width="92" height="128" fill="#ffffff" stroke="#2f4a63" strokeWidth="3" />
+          <rect x="176" y="28" width="58" height="128" fill="#e3e9e8" stroke="#2f4a63" strokeWidth="2.5" />
+          <text x="107" y="176" textAnchor="middle" fill="#5c574f" fontSize="11">
+            Breedte deur
+          </text>
+          <text x="205" y="176" textAnchor="middle" fill="#5c574f" fontSize="11">
+            Paneel
+          </text>
+        </>
+      ) : (
+        <>
+          <rect x="118" y="28" width="78" height="128" fill="#ffffff" stroke="#2f4a63" strokeWidth="3" />
+          <text x="157" y="176" textAnchor="middle" fill="#5c574f" fontSize="12">
+            Breedte
+          </text>
+        </>
+      )}
+      <line x1="268" y1="28" x2="268" y2="156" stroke="#2f4a63" strokeWidth="1.4" />
+      <path d="M268 28 l-4 7 h8 z" fill="#2f4a63" />
+      <path d="M268 156 l-4 -7 h8 z" fill="#2f4a63" />
+      <text x="278" y="96" fill="#5c574f" fontSize="12">
+        Hoogte
+      </text>
+    </svg>
+  );
+}
+
+function ZelfOntwerpThumb() {
+  return (
+    <svg viewBox="0 0 560 920" className="h-full w-full" aria-hidden>
+      <rect width="560" height="920" fill="#f7f5f2" />
+      <rect x="96" y="28" width="368" height="864" fill="#ffffff" stroke="#2f4a63" strokeWidth="8" />
+      <line x1="96" y1="390" x2="464" y2="390" stroke="#2f4a63" strokeWidth="6" />
+      <line x1="280" y1="390" x2="280" y2="892" stroke="#2f4a63" strokeWidth="6" />
+    </svg>
+  );
+}
+
+function designsByCode(codes: readonly string[]) {
+  return codes.flatMap((code) => {
+    const design = DESIGN_SURCHARGES.find((item) => item.code === code);
+    return design ? [design] : [];
+  });
 }
 
 function ComposeLink({ href, children }: { href: string; children: string }) {
@@ -141,6 +235,20 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
             title="Een vast vlak naast de deur."
             body="Kies geen paneel, één paneel links of rechts, of twee panelen aan beide zijden. Zelfde staal, zelfde glas, zonder mechaniek."
           />
+          <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-4 min-[900px]:gap-5">
+            {PANEL_CHOICES.map((option) => (
+              <div key={option.label}>
+                <div
+                  className="mb-3 overflow-hidden rounded-[12px]"
+                  style={panelLayoutThumb(option.kind, option.side)}
+                />
+                <div className="text-[15px] text-[oklch(0.25_0.008_60)]">{option.label}</div>
+                <p className="m-0 mt-1 text-[14px] leading-[1.5] text-[oklch(0.45_0.008_60)]">
+                  {option.desc}
+                </p>
+              </div>
+            ))}
+          </div>
           <ComposeLink href={configureHref}>Paneel toevoegen</ComposeLink>
         </section>
       ) : null}
@@ -149,34 +257,49 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
         <StepIntro
           kicker={`Stap ${maatStep} — Afmeting`}
           title="Breedte en hoogte van de opening."
-          body="U vult breedte en hoogte in millimeters in. Heeft u een vast paneel, dan vult u ook die breedte in. Wij meten de opening zelf in voordat we in productie gaan."
+          body={
+            page.hasFixedPanel
+              ? "U vult breedte en hoogte in millimeters in, en de breedte van een vast paneel als u dat kiest. Wij meten de opening zelf in voordat we in productie gaan."
+              : "U vult breedte en hoogte in millimeters in. Wij meten de opening zelf in voordat we in productie gaan."
+          }
         />
+        <MaatDiagram withPanel={page.hasFixedPanel} />
         <ComposeLink href={configureHref}>{page.composeCta}</ComposeLink>
       </section>
 
       <section className="bg-[oklch(0.93_0.006_75)] px-7 py-20">
         <div className="mx-auto max-w-[var(--max-width)]">
           <StepIntro
-            kicker={`Stap ${vlakStep} — Liggers en staanders`}
-            title="Het ritme van het glas."
-            body="Liggers en staanders verdelen het vlak. Heeft u vaste panelen, dan stelt u die verdeling apart in voor de deur en de panelen."
+            kicker={`Stap ${vlakStep} — Vlakverdeling`}
+            title="Kies een ontwerp, of stel het zelf samen."
+            body="Een paar voorbeelden van hoe het glas verdeeld kan worden. In de configurator staan meer ontwerpen, en u kunt liggers en staanders ook zelf bepalen."
           />
-          <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-4 min-[900px]:gap-5">
-            {VLAK_OPTIONS.map((option) => (
-              <div key={option.title}>
-                <CoverImage
-                  src={option.image}
-                  alt={option.alt}
-                  className="mb-3 aspect-[4/3]"
-                  radius={12}
-                  sizes={GRID_IMAGE_SIZES}
-                />
-                <div className="text-[14px] text-[oklch(0.25_0.008_60)]">
-                  {option.title}
-                </div>
-              </div>
+          <div className="grid max-w-[720px] grid-cols-3 gap-3 min-[900px]:gap-4">
+            {designsByCode(FEATURED_DESIGNS).map((design) => (
+              <DesignCard
+                key={design.code}
+                name={design.name}
+                subtitle={design.subtitle}
+                image={design.image}
+              />
             ))}
+            <DesignCard
+              name="Zelf ontwerpen"
+              subtitle="U bepaalt zelf het aantal liggers en staanders."
+              thumb={
+                <div className="mb-2 aspect-[560/920] overflow-hidden rounded-[12px] bg-[oklch(0.97_0.004_75)]">
+                  <ZelfOntwerpThumb />
+                </div>
+              }
+            />
           </div>
+          <details className="group mt-5 max-w-[720px]">
+            <summary className="w-fit cursor-pointer list-none text-[14px] tracking-[0.03em] text-[oklch(0.28_0.008_60)] underline decoration-[oklch(0.75_0.01_60)] underline-offset-4 [&::-webkit-details-marker]:hidden">
+              <span className="group-open:hidden">Bekijk meer</span>
+              <span className="hidden group-open:inline">Minder</span>
+            </summary>
+            <DesignMoreCarousel exclude={FEATURED_DESIGNS} />
+          </details>
           <ComposeLink href={configureHref}>Kies indeling</ComposeLink>
         </div>
       </section>
@@ -185,14 +308,14 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
         <StepIntro
           kicker={`Stap ${glassStep} — Glas`}
           title="Hoe wil je dat het glas eruitziet?"
-          body="Kies de uitstraling van het glas. Bij folie kiest u daarna nog de uitvoering."
+          body="Kies de uitstraling. In de configurator kiest u daarna nog gelaagd of gehard, of het patroon bij figuren."
         />
         <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-6">
-          {GLASS_CATEGORIES.map((option) => (
-            <div key={option.title}>
+          {GLASS_LOOK_GROUPS.map((option) => (
+            <div key={option.id}>
               <CoverImage
                 src={option.image}
-                alt={option.alt}
+                alt={option.title}
                 className="mb-3.5 aspect-[4/3]"
                 radius={14}
                 sizes={GRID_IMAGE_SIZES}
@@ -201,7 +324,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
                 {option.title}
               </div>
               <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
-                {option.body}
+                {option.text}
               </p>
             </div>
           ))}
@@ -214,25 +337,20 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
           <StepIntro
             kicker={`Stap ${colorStep} — Kleur`}
             title="De afwerking van het staal."
-            body="Standaard is RAL zwart. Een afwijkende RAL-kleur is ook mogelijk."
+            body="Standaard is mat zwart. Bij een afwijkende RAL-kleur kiest u in de configurator een kleur; de kleurcode vult zichzelf in en kunt u nog aanpassen."
             dark
           />
-          <div className="grid grid-cols-2 gap-4 min-[900px]:gap-6">
-            {COLOR_OPTIONS.map((color) => (
-              <div key={color.title}>
-                <CoverImage
-                  src={color.image}
-                  alt={color.alt}
-                  className="mb-3 aspect-square"
-                  radius={12}
-                  sizes={GRID_IMAGE_SIZES}
+          <div className="grid max-w-[640px] grid-cols-2 gap-4">
+            {COLORS.map((color) => (
+              <div key={color.code}>
+                <div
+                  className="mb-3 aspect-[4/3] rounded-[12px]"
+                  style={{ background: colorThumbBackground(color.code, color.hex) }}
                 />
-                <div className="mb-1 text-[15px] text-[oklch(0.94_0.004_75)]">
-                  {color.title}
-                </div>
-                <div className="text-[13px] text-[oklch(0.55_0.008_75)]">
-                  {color.note}
-                </div>
+                <div className="mb-1 text-[15px] text-[oklch(0.94_0.004_75)]">{color.label}</div>
+                <p className="m-0 text-[14px] leading-[1.5] text-[oklch(0.65_0.008_75)]">
+                  {color.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -249,21 +367,20 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
               body="Kies de handgreep die het beste bij jouw deur past. De lengte en uitvoering kunnen worden afgestemd op de deur en de gewenste uitstraling."
             />
             <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
-              {HANDGREEP_OPTIONS.map((option) => (
-                <div key={option.title}>
+              {SLUITWERK.map((option) => (
+                <div key={option.code}>
                   <CoverImage
                     src={option.image}
-                    alt={option.alt}
+                    alt={option.label}
                     className="mb-3.5 aspect-[4/5]"
                     sizes={GRID_IMAGE_SIZES}
                   />
                   <div className="font-serif-display mb-1.5 text-[16px] min-[560px]:text-[19px]">
-                    {option.title}
+                    {option.label}
                   </div>
                   <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
-                    {option.body}
+                    {option.desc}
                   </p>
-                  <div className="mt-1.5 text-[13px] text-[oklch(0.4_0.01_60)]">{option.price}</div>
                 </div>
               ))}
             </div>
@@ -282,19 +399,19 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
               dark
             />
             <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
-              {HARDWARE_OPTIONS.map((option) => (
-                <div key={option.title}>
+              {HARDWARE.map((option) => (
+                <div key={option.code}>
                   <CoverImage
                     src={option.image}
-                    alt={option.alt}
+                    alt={option.label}
                     className="mb-3.5 aspect-[4/5]"
                     sizes={GRID_IMAGE_SIZES}
                   />
                   <div className="font-serif-display mb-1.5 text-[16px] text-[oklch(0.94_0.004_75)] min-[560px]:text-[19px]">
-                    {option.title}
+                    {option.label}
                   </div>
                   <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.72_0.008_75)]">
-                    {option.body}
+                    {option.desc}
                   </p>
                 </div>
               ))}

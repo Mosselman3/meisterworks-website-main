@@ -29,25 +29,25 @@ export const PRODUCTS: Product[] = [
   {
     slug: "taatsdeur",
     title: "Taatsdeur",
-    image: "/assets/pivot-door-slats.jpg",
+    image: "/assets/doors/taatsdeur.jpeg",
     doorTypeCode: "taatsdeur",
   },
   {
     slug: "scharnierdeur-kozijn",
     title: "Scharnierdeur incl. kozijn",
-    image: "/assets/arched-bronze-door.jpg",
+    image: "/assets/doors/scharnierdeur-kozijn.jpeg",
     doorTypeCode: "scharnierdeur_kozijn",
   },
   {
     slug: "schuifdeur",
     title: "Schuifdeur",
-    image: "/assets/sliding-wall-herringbone.jpg",
+    image: "/assets/doors/schuifdeur.jpeg",
     doorTypeCode: "schuifdeur",
   },
   {
     slug: "vast-paneel",
     title: "Vast paneel (los)",
-    image: "/assets/hero-open-door.jpg",
+    image: "/assets/doors/vast-paneel.jpeg",
     doorTypeCode: "vast_paneel",
   },
 ];

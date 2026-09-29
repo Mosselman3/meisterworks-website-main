@@ -9,6 +9,7 @@ export function CoverImage({
   radius = 14,
   priority = false,
   sizes = "(min-width: 1280px) 640px, 100vw",
+  fit = "cover",
 }: {
   src: string;
   alt: string;
@@ -16,6 +17,7 @@ export function CoverImage({
   radius?: number;
   priority?: boolean;
   sizes?: string;
+  fit?: "cover" | "contain";
 }) {
   return (
     <div
@@ -26,7 +28,7 @@ export function CoverImage({
         src={src}
         alt={alt}
         fill
-        className="object-cover"
+        className={fit === "contain" ? "object-contain" : "object-cover"}
         sizes={sizes}
         priority={priority}
       />
