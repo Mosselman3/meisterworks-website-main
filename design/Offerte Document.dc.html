@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/tokens/effects.css">
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/styles.css">
+  <script src="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/_ds_bundle.js"></script>
+  <style>body { margin: 0; } a { color: var(--color-accent-dark); } a:hover { color: var(--color-accent); }</style>
+</helmet>
+
+<div style="width:100%; min-height:100vh; background:var(--color-bg-dark); padding:var(--space-6) 0; box-sizing:border-box; display:flex; justify-content:center; font-family:var(--font-sans);">
+<div style="width:794px; min-height:1123px; flex-shrink:0; background:var(--color-white); box-shadow:var(--shadow-lg); padding:48px 60px 56px; box-sizing:border-box; display:flex; flex-direction:column; color:var(--color-text-body); font-size:14px; line-height:1.6;">
+
+  <!-- Header -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:32px;">
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <img src="assets/mw-logo-big-dark.png" alt="Meisterworks" style="display:block; width:150px; height:auto; margin-left:-4px;"></img>
+      <div style="font-family:var(--font-serif); font-size:44px; font-weight:500; line-height:1;">Offerte</div>
+    </div>
+    <div style="text-align:right; font-size:12.5px; line-height:1.6; color:var(--color-text-secondary);">
+      <div style="font-weight:700; color:var(--color-text-body);">MeisterWorks</div>
+      <div>Hoolstraat 19 F3</div>
+      <div>6006SL Weert</div>
+      <div style="margin-top:6px;">t +31636340675</div>
+      <div>e info@meisterworks.nl</div>
+      <div>i www.meisterworks.nl</div>
+      <div style="margin-top:6px;">IBAN NL53 KNAB 0775 9930 34</div>
+      <div>Btw-nr NL003296225B43</div>
+      <div>KvK 80717330</div>
+    </div>
+  </div>
+
+  <div style="height:1px; background:var(--color-divider); margin:28px 0;"></div>
+
+  <!-- Customer + meta -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:32px;">
+    <div style="line-height:1.6;">
+      <div style="font-weight:700;">{{ customerName }}</div>
+      <div>{{ customerStreet }}</div>
+      <div>{{ customerCity }}</div>
+    </div>
+    <div style="font-size:12.5px;">
+      <div style="color:var(--color-text-tertiary);">Offertenummer</div>
+      <div style="font-weight:700; font-family:var(--font-mono);">{{ number }}</div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px; color:var(--color-text-secondary); font-size:13px;">{{ placeDate }}</div>
+
+  <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px;">
+    <div>Beste heer/mevrouw,</div>
+    <div style="text-wrap:pretty;">Bedankt voor het vertrouwen in Meisterworks. Wij vervaardigen iedere deur nauwkeurig op maat in eigen werkplaats. Onze focus ligt op hoogwaardige afwerking en verfijnd lijnenspel en een perfect uitgelijnde montage. Na akkoord vragen wij een aanbetaling van 50%. De resterende 50% factureren wij na oplevering. Hieronder treft u een specificatie van uw maatwerk project:</div>
+  </div>
+
+  <!-- Lines -->
+  <div style="margin-top:24px;">
+    <div style="display:grid; grid-template-columns:1fr 64px 92px 100px; gap:12px; padding:8px 0; border-bottom:1.5px solid var(--color-text-body); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:var(--text-uppercase-letter-spacing);">
+      <div>Omschrijving</div><div style="text-align:right;">Aantal</div><div style="text-align:right;">Prijs</div><div style="text-align:right;">Totaal</div>
+    </div>
+    <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="2">
+      <div style="display:grid; grid-template-columns:1fr 64px 92px 100px; gap:12px; padding:14px 0; border-bottom:1px solid var(--color-divider);">
+        <div>
+          <div style="font-weight:700;">{{ ln.title }}</div>
+          <sc-for list="{{ ln.details }}" as="d" hint-placeholder-count="4">
+            <div style="font-size:13px; color:var(--color-text-secondary); line-height:1.55;">{{ d }}</div>
+          </sc-for>
+        </div>
+        <div style="text-align:right; font-family:var(--font-mono); font-size:13px;">{{ ln.qty }}</div>
+        <div style="text-align:right; font-family:var(--font-mono); font-size:13px;">{{ ln.price }}</div>
+        <div style="text-align:right; font-family:var(--font-mono); font-size:13px;">{{ ln.total }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="margin-top:20px; text-wrap:pretty;">We hopen u hiermee een passende aanbieding te hebben gedaan. Gemiddelde levertijd 6-8 weken, anders in overleg. Gelieve de algemene voorwaarden aandachtig te lezen voor akkoord. <a href="https://meisterworks.nl/algemene-voorwaarden/">https://meisterworks.nl/algemene-voorwaarden/</a></div>
+
+  <!-- Totals -->
+  <div style="margin-top:28px; display:flex; justify-content:flex-end;">
+    <div style="width:300px; font-size:13px;">
+      <div style="display:grid; grid-template-columns:1fr auto; gap:4px 16px; padding-bottom:10px; border-bottom:1px solid var(--color-divider); color:var(--color-text-secondary);">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:var(--text-uppercase-letter-spacing); color:var(--color-text-body);">Btw %</div>
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:var(--text-uppercase-letter-spacing); color:var(--color-text-body); text-align:right;">Grondslag / Bedrag</div>
+        <div>21,00%</div><div style="text-align:right; font-family:var(--font-mono);">{{ excl }} / {{ vat }}</div>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding-top:10px;"><span>Totaal excl. btw</span><span style="font-family:var(--font-mono);">€ {{ excl }}</span></div>
+      <div style="display:flex; justify-content:space-between;"><span>Totaal btw</span><span style="font-family:var(--font-mono);">€ {{ vat }}</span></div>
+      <div style="display:flex; justify-content:space-between; margin-top:8px; padding-top:10px; border-top:1.5px solid var(--color-text-body); font-weight:700; font-size:16px;"><span>Offertebedrag</span><span style="font-family:var(--font-mono);">€ {{ incl }}</span></div>
+    </div>
+  </div>
+
+  <div style="flex:1; min-height:40px;"></div>
+
+  <!-- Signature -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:48px; padding-top:24px;">
+    <div>
+      <div>Met vriendelijke groet,</div>
+      <div style="font-weight:700;">MeisterWorks</div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div><span>Voor akkoord:</span> <span style="font-weight:700;">{{ customerName }}</span></div>
+      <div style="display:grid; grid-template-columns:90px 1fr; align-items:end; gap:8px;">
+        <div style="font-size:12px; color:var(--color-text-tertiary);">Datum</div>
+        <div style="border-bottom:1px solid var(--color-border-dark); padding-bottom:2px; min-height:22px; font-size:13px;">{{ approvalDate }}</div>
+      </div>
+      <div style="display:grid; grid-template-columns:90px 1fr; align-items:end; gap:8px;">
+        <div style="font-size:12px; color:var(--color-text-tertiary);">Handtekening</div>
+        <div style="border-bottom:1px solid var(--color-border-dark); min-height:52px; display:flex; align-items:flex-end; padding-bottom:2px; font-family:var(--font-serif); font-style:italic; font-size:26px; line-height:1.1;">{{ approvalName }}</div>
+      </div>
+      <sc-if value="{{ approved }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:11px; color:oklch(0.4 0.12 145);">Digitaal goedgekeurd via het klantportaal</div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;900px&quot;,&quot;height&quot;:&quot;1200px&quot;},&quot;quote&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;approvalName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;approvalDate&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const eur = (n) => n.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const DEFAULT_QUOTE = {
+  number: '50454', placeDate: 'Weert, 25-05-2026',
+  customerName: 'Studio DIP', customerStreet: 'Heerlenersteenweg 119', customerCity: '6466KS KERKRADE',
+  lines: [
+    { title: 'Stalen Taatsdeur:', details: ['- afm: 1188x2367 (extra breed)', '- ontwerp: volgens voorbeeld 4 ramen', '- glassoort: helder gelaagd veiligheidsglas 33.1.', '- poedercoating: bronskleurig, exact ntb.', '- handgreep smalle hoekgreep ntb.'], qty: 1, price: 2350 },
+    { title: 'montage incl inmeten', details: [], qty: 1, price: 150 }
+  ]
+};
+
+class Component extends DCLogic {
+  renderVals() {
+    const q = Object.assign({}, DEFAULT_QUOTE, this.props.quote || {});
+    const lines = q.lines.map(l => ({ title: l.title, details: l.details, qty: eur(l.qty), price: eur(l.price), total: eur(l.qty * l.price) }));
+    const excl = q.lines.reduce((s, l) => s + l.qty * l.price, 0);
+    const vat = Math.round(excl * 21) / 100;
+    const name = this.props.approvalName || '';
+    return {
+      number: q.number, placeDate: q.placeDate,
+      customerName: q.customerName, customerStreet: q.customerStreet, customerCity: q.customerCity,
+      lines, excl: eur(excl), vat: eur(vat), incl: eur(excl + vat),
+      approvalName: name, approvalDate: this.props.approvalDate || '', approved: !!name
+    };
+  }
+}
+
+</script>
+</body>
+</html>

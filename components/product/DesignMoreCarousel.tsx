@@ -8,11 +8,13 @@ export function DesignCard({
   subtitle,
   image,
   thumb,
+  compact = false,
 }: {
   name: string;
   subtitle?: string;
   image?: string;
   thumb?: ReactNode;
+  compact?: boolean;
 }) {
   return (
     <div className="flex h-full flex-col items-center overflow-hidden rounded-xl border border-[oklch(0.86_0.006_75)] bg-[oklch(0.985_0.002_75)] pt-1.5 min-[720px]:rounded-2xl min-[720px]:pt-3">
@@ -21,10 +23,22 @@ export function DesignCard({
       ) : (
         thumb
       )}
-      <div className="mt-1.5 w-full bg-[oklch(0.94_0.004_75)] px-1 py-1.5 text-center text-[10px] leading-[1.15] font-semibold tracking-[0.04em] text-[oklch(0.32_0.008_60)] uppercase min-[720px]:mt-2 min-[720px]:px-1.5 min-[720px]:py-2 min-[720px]:text-[12px] min-[720px]:tracking-[0.08em]">
+      <div
+        className={
+          compact
+            ? "mt-1.5 w-full bg-[oklch(0.94_0.004_75)] px-1 py-1.5 text-center text-[10px] leading-[1.15] font-semibold tracking-[0.02em] text-[oklch(0.32_0.008_60)] uppercase"
+            : "mt-1.5 w-full bg-[oklch(0.94_0.004_75)] px-1 py-1.5 text-center text-[10px] leading-[1.15] font-semibold tracking-[0.04em] text-[oklch(0.32_0.008_60)] uppercase min-[720px]:mt-2 min-[720px]:px-1.5 min-[720px]:py-2 min-[720px]:text-[12px] min-[720px]:tracking-[0.08em]"
+        }
+      >
         {name}
         {subtitle ? (
-          <span className="mt-0.5 block text-[10px] leading-[1.2] font-medium tracking-normal text-[oklch(0.42_0.008_60)] normal-case min-[720px]:text-[11px]">
+          <span
+            className={
+              compact
+                ? "mt-0.5 block text-[10px] leading-[1.2] font-medium tracking-normal text-[oklch(0.42_0.008_60)] normal-case"
+                : "mt-0.5 block text-[10px] leading-[1.2] font-medium tracking-normal text-[oklch(0.42_0.008_60)] normal-case min-[720px]:text-[11px]"
+            }
+          >
             {subtitle}
           </span>
         ) : null}
@@ -97,39 +111,52 @@ export function DesignMoreCarousel() {
 
   return (
     <div className="relative mt-4 @container">
-      <div
-        ref={scroller}
-        className="overflow-x-auto scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        <div
-          data-design-grid
-          className="grid w-max grid-flow-col grid-rows-2 gap-2 [grid-auto-columns:calc((100cqw-1rem)/3)] @min-[28rem]:gap-3 @min-[28rem]:[grid-auto-columns:9rem]"
-        >
-          {designs.map((design) => (
-            <div key={design.code} data-design-card className="snap-start">
-              <DesignCard name={design.name} subtitle={design.subtitle} image={design.image} />
-            </div>
-          ))}
-        </div>
+      <div className="hidden gap-3 @min-[1100px]:grid @min-[1100px]:grid-cols-9">
+        {DESIGN_SURCHARGES.map((design) => (
+          <DesignCard
+            key={design.code}
+            compact
+            name={design.name}
+            subtitle={design.subtitle}
+            image={design.image}
+          />
+        ))}
       </div>
-      <button
-        type="button"
-        aria-label="Vorige ontwerpen"
-        disabled={edges.start}
-        onClick={() => step(-1)}
-        className="absolute top-1/2 left-0 z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-[oklch(0.82_0.006_75)] bg-white text-[oklch(0.25_0.008_60)] shadow-sm disabled:pointer-events-none disabled:opacity-0"
-      >
-        <Chevron direction="left" />
-      </button>
-      <button
-        type="button"
-        aria-label="Volgende ontwerpen"
-        disabled={edges.end}
-        onClick={() => step(1)}
-        className="absolute top-1/2 right-0 z-10 grid h-9 w-9 translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-[oklch(0.82_0.006_75)] bg-white text-[oklch(0.25_0.008_60)] shadow-sm disabled:pointer-events-none disabled:opacity-0"
-      >
-        <Chevron direction="right" />
-      </button>
+      <div className="relative @min-[1100px]:hidden">
+        <div
+          ref={scroller}
+          className="overflow-x-auto scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div
+            data-design-grid
+            className="grid w-max grid-flow-col grid-rows-2 gap-2 [grid-auto-columns:calc((100cqw-1rem)/3)] @min-[28rem]:gap-3 @min-[28rem]:[grid-auto-columns:9rem]"
+          >
+            {designs.map((design) => (
+              <div key={design.code} data-design-card className="snap-start">
+                <DesignCard name={design.name} subtitle={design.subtitle} image={design.image} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <button
+          type="button"
+          aria-label="Vorige ontwerpen"
+          disabled={edges.start}
+          onClick={() => step(-1)}
+          className="absolute top-1/2 left-0 z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-[oklch(0.82_0.006_75)] bg-white text-[oklch(0.25_0.008_60)] shadow-sm disabled:pointer-events-none disabled:opacity-0"
+        >
+          <Chevron direction="left" />
+        </button>
+        <button
+          type="button"
+          aria-label="Volgende ontwerpen"
+          disabled={edges.end}
+          onClick={() => step(1)}
+          className="absolute top-1/2 right-0 z-10 grid h-9 w-9 translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-[oklch(0.82_0.006_75)] bg-white text-[oklch(0.25_0.008_60)] shadow-sm disabled:pointer-events-none disabled:opacity-0"
+        >
+          <Chevron direction="right" />
+        </button>
+      </div>
     </div>
   );
 }

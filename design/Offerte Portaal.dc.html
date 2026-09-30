@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/tokens/effects.css">
+  <link rel="stylesheet" href="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/styles.css">
+  <script src="_ds/meisterworks-design-system-73ebefbd-b644-4b20-931e-20cd60c502ef/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; }
+    a { color: var(--color-accent-dark); } a:hover { color: var(--color-accent); }
+    input, textarea { font-family: var(--font-sans); }
+    .mw-field:focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .mw-btn-primary:hover { filter: brightness(0.92); }
+    .mw-btn-primary:active { transform: scale(0.97); }
+    .mw-btn-secondary:hover { opacity: 0.7; }
+    .mw-btn-primary:disabled { opacity: 0.55; cursor: default; filter: none; transform: none; }
+    @keyframes fade-in { from { opacity:0; } to { opacity:1; } }
+    @keyframes pop-in { from { opacity:0; transform:translateY(8px) scale(0.98); } to { opacity:1; transform:none; } }
+    .scrim { animation: fade-in 150ms ease; }
+    .dialog { animation: pop-in 200ms cubic-bezier(.22,1,.36,1); }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; width:100%; background:var(--color-bg-dark); font-family:var(--font-sans); color:var(--color-text-body);">
+
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:var(--space-4); padding:var(--space-5) var(--space-8); background:var(--color-dark);">
+    <div style="display:flex; align-items:center; gap:var(--space-3);">
+      <img src="assets/mw-mark-white.png" alt="Meisterworks" style="height:20px; width:auto;"></img>
+      <div style="font-family:var(--font-serif); font-size:18px; color:var(--color-white); font-weight:500;">Meisterworks</div>
+    </div>
+    <div style="font-size:var(--text-body-sm); color:var(--color-text-light-secondary);">Offerte 50454</div>
+  </div>
+
+  <div style="max-width:1220px; margin:0 auto; padding:var(--space-8) var(--space-6); display:flex; flex-wrap:wrap-reverse; gap:var(--space-6); align-items:flex-start; justify-content:center;">
+
+    <!-- Document -->
+    <div style="flex:1 1 794px; min-width:0; overflow-x:auto; display:flex; justify-content:center;">
+      <div style="width:794px; flex-shrink:0; box-shadow:var(--shadow-lg); border-radius:2px; overflow:hidden;">
+        <dc-import name="Offerte Document" approval-name="{{ approvalName }}" approval-date="{{ approvalDate }}" hint-size="794px,1123px"></dc-import>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div style="flex:1 1 300px; max-width:360px; min-width:280px; position:sticky; top:var(--space-6); display:flex; flex-direction:column; gap:var(--space-4);">
+
+      <div style="background:var(--color-surface-elevated); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:var(--space-6); display:flex; flex-direction:column; gap:var(--space-5);">
+
+        <div>
+          <div style="font-size:var(--text-label-sm); font-weight:600; text-transform:uppercase; letter-spacing:var(--text-uppercase-letter-spacing); color:var(--color-text-tertiary);">Offertebedrag</div>
+          <div style="font-family:var(--font-serif); font-size:36px; font-weight:500; line-height:1.15; margin-top:4px;">€ 3.025,00</div>
+          <div style="font-size:var(--text-label-sm); color:var(--color-text-secondary);">incl. 21% btw</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:var(--text-body-sm); color:var(--color-text-secondary);">
+          <div style="display:flex; justify-content:space-between;"><span>Excl. btw</span><span style="font-family:var(--font-mono); color:var(--color-text-body);">€ 2.500,00</span></div>
+          <div style="display:flex; justify-content:space-between;"><span>Aanbetaling na akkoord (50%)</span><span style="font-family:var(--font-mono); color:var(--color-text-body);">€ 1.512,50</span></div>
+          <div style="display:flex; justify-content:space-between;"><span>Gemiddelde levertijd</span><span style="color:var(--color-text-body);">6-8 weken</span></div>
+        </div>
+
+        <div style="height:1px; background:var(--color-divider);"></div>
+
+        <sc-if value="{{ isOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:var(--space-3);">
+            <button class="mw-btn-primary" onClick="{{ openApprove }}" style="background:var(--color-accent); color:white; border:none; border-radius:var(--radius-full); padding:14px 24px; font-size:var(--text-label-lg); font-weight:600; cursor:pointer; box-shadow:var(--shadow-lg); transition:filter var(--transition-fast), transform var(--transition-fast);">Offerte goedkeuren</button>
+            <button class="mw-btn-secondary" onClick="{{ openReject }}" style="background:transparent; border:1px solid var(--color-border-dark); border-radius:var(--radius-full); padding:13px 24px; font-size:var(--text-label-lg); font-weight:600; color:var(--color-text-body); cursor:pointer; transition:opacity var(--transition-fast);">Afwijzen</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isApproved }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:var(--space-3);">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:28px; height:28px; border-radius:999px; background:oklch(0.55 0.13 145); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2L4.8 8.5L9.5 3.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </div>
+              <div style="font-size:var(--text-body-lg); font-weight:600;">Offerte goedgekeurd</div>
+            </div>
+            <div style="font-size:var(--text-body-sm); color:var(--color-text-secondary); line-height:1.6;">Goedgekeurd door {{ approvalName }} op {{ approvalDate }}. Wij nemen contact met u op voor het inplannen van het inmeten. De factuur voor de aanbetaling van 50% volgt per e-mail.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isRejected }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:var(--space-3);">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:28px; height:28px; border-radius:999px; background:var(--color-text-tertiary); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3L9 9M9 3L3 9" stroke="white" stroke-width="1.6" stroke-linecap="round"></path></svg>
+              </div>
+              <div style="font-size:var(--text-body-lg); font-weight:600;">Offerte afgewezen</div>
+            </div>
+            <div style="font-size:var(--text-body-sm); color:var(--color-text-secondary); line-height:1.6;">Afgewezen op {{ decidedDate }}. Wilt u iets aangepast zien? Neem contact met ons op via <a href="mailto:info@meisterworks.nl">info@meisterworks.nl</a>.</div>
+            <sc-if value="{{ reason }}" hint-placeholder-val="{{ false }}">
+              <div style="background:var(--color-bg-dark); border-radius:var(--radius-md); padding:var(--space-3) var(--space-4); font-size:13px; color:var(--color-text-secondary); line-height:1.5;">{{ reason }}</div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:6px; padding:0 var(--space-2); font-size:var(--text-label-sm); color:var(--color-text-secondary);">
+        <a href="#" style="font-weight:600;">Download als PDF</a>
+        <div>Vragen? <a href="mailto:info@meisterworks.nl">info@meisterworks.nl</a> · +31636340675</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approve dialog -->
+  <sc-if value="{{ showApprove }}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" style="position:fixed; inset:0; background:oklch(0.16 0.006 60 / 0.55); display:flex; align-items:center; justify-content:center; z-index:50; padding:var(--space-6);">
+      <div class="dialog" style="width:100%; max-width:440px; background:var(--color-surface-elevated); border-radius:var(--radius-lg); box-shadow:var(--shadow-xl); padding:var(--space-7); display:flex; flex-direction:column; gap:var(--space-5);">
+        <div>
+          <div style="font-family:var(--font-serif); font-size:22px; font-weight:500;">Offerte goedkeuren</div>
+          <div style="font-size:var(--text-body-sm); color:var(--color-text-secondary); margin-top:4px; line-height:1.5;">Offertebedrag € 3.025,00 incl. btw. Uw naam wordt als digitale handtekening op de offerte geplaatst.</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:var(--text-label-sm); color:var(--color-text-secondary);">Volledige naam</label>
+          <input class="mw-field" type="text" placeholder="Voor- en achternaam" value="{{ name }}" onInput="{{ handleName }}" style="width:100%; box-sizing:border-box; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:var(--padding-input); font-size:var(--text-body-sm); background:var(--color-white);"></input>
+        </div>
+        <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:var(--text-body-sm); line-height:1.5;">
+          <input type="checkbox" checked="{{ agree }}" onChange="{{ handleAgree }}" style="margin-top:3px; width:16px; height:16px; accent-color:var(--color-accent); flex-shrink:0;"></input>
+          <span>Ik ga akkoord met de offerte en de <a href="https://meisterworks.nl/algemene-voorwaarden/">algemene voorwaarden</a>.</span>
+        </label>
+        <div style="display:flex; justify-content:flex-end; gap:var(--space-3);">
+          <button class="mw-btn-secondary" onClick="{{ closeDialog }}" style="background:transparent; border:1px solid var(--color-border-dark); border-radius:var(--radius-full); padding:var(--padding-button); font-size:var(--text-label-lg); font-weight:600; color:var(--color-text-body); cursor:pointer; transition:opacity var(--transition-fast);">Annuleren</button>
+          <button class="mw-btn-primary" disabled="{{ approveDisabled }}" onClick="{{ confirmApprove }}" style="background:var(--color-accent); color:white; border:none; border-radius:var(--radius-full); padding:var(--padding-button); font-size:var(--text-label-lg); font-weight:600; cursor:pointer; box-shadow:var(--shadow-lg); transition:filter var(--transition-fast), transform var(--transition-fast);">Goedkeuren</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- Reject dialog -->
+  <sc-if value="{{ showReject }}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" style="position:fixed; inset:0; background:oklch(0.16 0.006 60 / 0.55); display:flex; align-items:center; justify-content:center; z-index:50; padding:var(--space-6);">
+      <div class="dialog" style="width:100%; max-width:440px; background:var(--color-surface-elevated); border-radius:var(--radius-lg); box-shadow:var(--shadow-xl); padding:var(--space-7); display:flex; flex-direction:column; gap:var(--space-5);">
+        <div>
+          <div style="font-family:var(--font-serif); font-size:22px; font-weight:500;">Offerte afwijzen</div>
+          <div style="font-size:var(--text-body-sm); color:var(--color-text-secondary); margin-top:4px; line-height:1.5;">Laat gerust weten waarom, zodat wij u eventueel een aangepaste offerte kunnen sturen.</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:var(--text-label-sm); color:var(--color-text-secondary);">Reden (optioneel)</label>
+          <textarea class="mw-field" value="{{ reasonVal }}" onInput="{{ handleReason }}" style="width:100%; box-sizing:border-box; min-height:110px; resize:vertical; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:var(--space-3); font-size:var(--text-body-sm); line-height:1.5; background:var(--color-white);"></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:var(--space-3);">
+          <button class="mw-btn-secondary" onClick="{{ closeDialog }}" style="background:transparent; border:1px solid var(--color-border-dark); border-radius:var(--radius-full); padding:var(--padding-button); font-size:var(--text-label-lg); font-weight:600; color:var(--color-text-body); cursor:pointer; transition:opacity var(--transition-fast);">Annuleren</button>
+          <button class="mw-btn-primary" onClick="{{ confirmReject }}" style="background:var(--color-dark); color:white; border:none; border-radius:var(--radius-full); padding:var(--padding-button); font-size:var(--text-label-lg); font-weight:600; cursor:pointer; box-shadow:var(--shadow-lg); transition:filter var(--transition-fast), transform var(--transition-fast);">Afwijzen</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;decision&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;open&quot;,&quot;options&quot;:[&quot;open&quot;,&quot;approved&quot;,&quot;rejected&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Weergave&quot;}}">
+const today = () => new Date().toLocaleDateString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+
+class Component extends DCLogic {
+  state = { decision: null, dialog: null, name: '', agree: false, reasonVal: '', decidedName: '', decidedDate: '', reason: '' };
+
+  closeDialog = () => this.setState({ dialog: null });
+  openApprove = () => this.setState({ dialog: 'approve' });
+  openReject = () => this.setState({ dialog: 'reject' });
+  handleName = (e) => this.setState({ name: e.target.value });
+  handleAgree = (e) => this.setState({ agree: e.target.checked });
+  handleReason = (e) => this.setState({ reasonVal: e.target.value });
+  confirmApprove = () => {
+    if (!this.state.name.trim() || !this.state.agree) return;
+    this.setState({ decision: 'approved', dialog: null, decidedName: this.state.name.trim(), decidedDate: today() });
+  };
+  confirmReject = () => this.setState({ decision: 'rejected', dialog: null, reason: this.state.reasonVal.trim(), decidedDate: today() });
+
+  renderVals() {
+    const s = this.state;
+    const decision = s.decision || this.props.decision || 'open';
+    const demo = !s.decision;
+    const approvalName = decision === 'approved' ? (s.decidedName || 'Jan de Vries') : '';
+    const decidedDate = s.decidedDate || (demo ? '26-05-2026' : today());
+    return {
+      isOpen: decision === 'open', isApproved: decision === 'approved', isRejected: decision === 'rejected',
+      approvalName, approvalDate: decision === 'approved' ? decidedDate : '', decidedDate,
+      reason: demo && decision === 'rejected' ? '' : s.reason,
+      showApprove: s.dialog === 'approve', showReject: s.dialog === 'reject',
+      name: s.name, agree: s.agree, reasonVal: s.reasonVal,
+      approveDisabled: !(s.name.trim() && s.agree),
+      openApprove: this.openApprove, openReject: this.openReject, closeDialog: this.closeDialog,
+      handleName: this.handleName, handleAgree: this.handleAgree, handleReason: this.handleReason,
+      confirmApprove: this.confirmApprove, confirmReject: this.confirmReject
+    };
+  }
+}
+
+</script>
+</body>
+</html>
