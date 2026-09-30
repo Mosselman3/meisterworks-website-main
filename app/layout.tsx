@@ -21,6 +21,22 @@ const lato = Lato({
 export const metadata: Metadata = {
   title: "Meisterworks",
   description: "Maatwerk in staal en glas",
+  icons: {
+    icon: [
+      {
+        url: "/assets/logo.jpg",
+        type: "image/jpeg",
+        sizes: "180x180",
+      },
+    ],
+    apple: [
+      {
+        url: "/assets/logo.jpg",
+        type: "image/jpeg",
+        sizes: "180x180",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
