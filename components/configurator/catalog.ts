@@ -433,13 +433,6 @@ export const SLUITWERK = [
     image: "/assets/handgrepen/u_greep.jpg",
   },
   {
-    code: "gebogen",
-    label: "Gebogen",
-    desc: "Handgreep met subtiel gebogen/afgeronde uiteinden.",
-    price: 100,
-    image: "/assets/handgrepen/gebogen.jpg",
-  },
-  {
     code: "deurklink",
     label: "Deurklink",
     desc: "Klassieke deurklink voor een meer traditionele uitstraling.",
@@ -456,9 +449,9 @@ export const SLUITWERK = [
 ] as const;
 
 export const HARDWARE = [
-  { code: "basis", label: "Basis", desc: "Standaard kruk en cilinderslot.", price: 95, image: "/assets/sluitwerk/basis.jpg" },
-  { code: "standaard", label: "Standaard", desc: "Kruk mat zwart en dag-nachtslot.", price: 145, image: "/assets/sluitwerk/standaard.jpg" },
-  { code: "luxe", label: "Luxe", desc: "Designgreep, dag-nachtslot en verborgen scharnieren.", price: 240, image: "/assets/sluitwerk/luxe.jpg" },
+  { code: "loopslot", label: "Loopslot", desc: "Loopslot, zonder slot.", price: 95, indication: 1 },
+  { code: "wc_slot", label: "WC-slot", desc: "WC-slot.", price: 145, indication: 2 },
+  { code: "slot_met_cilinder", label: "Slot met cilinder", desc: "Slot met cilinder.", price: 240, indication: 3 },
 ] as const;
 
 const RATES = {

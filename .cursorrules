@@ -17,8 +17,9 @@ Koppel op stabiele codes, niet op Nederlandse labels.
 - `doorTypeCode`: `taatsdeur`, `scharnierdeur_kozijn`, `schuifdeur`, `vast_paneel`
 - App-configurator-id's gebruiken underscores (`scharnierdeur_kozijn`, `vast_paneel`). Website-slugs gebruiken koppeltekens. Match op `doorTypeCode`.
 - Kleur: `standaard_mat_zwart`, `afwijkende_ral`, `design_kleur`
-- Beslag (`hardwareCode`): `basis`, `standaard`, `luxe`. In de configurator is dit de groep Sluitwerk.
-- Handgreep (`sluitwerkCode`): `recht_hoekgreep`, `recht_vierkant`, `plat`, `u_greep`, `gebogen`, `deurklink`, `half_ronde_plaat`. Sluitwerk A–E is met pensioen.
+- Beslag (`hardwareCode`): `loopslot`, `wc_slot`, `slot_met_cilinder`. Alleen bij handgreep `deurklink`. In de configurator is dit de groep Sluitwerk. `basis`, `standaard` en `luxe` zijn met pensioen.
+- Handgreep (`sluitwerkCode`): `recht_hoekgreep`, `recht_vierkant`, `plat`, `u_greep`, `deurklink`, `half_ronde_plaat`. `gebogen` en Sluitwerk A–E zijn met pensioen.
+- Draairichting (`openingDirection`): `links` of `rechts` bij `scharnierdeur_kozijn`. Dezelfde waarden zijn de schuifrichting bij `schuifdeur`. Bij `taatsdeur` blijft het veld leeg.
 - Glas: dezelfde 15 SKU-codes in beide catalogi (`33.1` t/m `4mm_raywall_90t`)
 - Bronnen: `website_snelle_offerte`, `website_configurator`
 - Intake: site `POST /api/offerte` → RPC `submit_website_quote`. Parser: `src/domain/websiteQuote.ts` en `supabase/contracts/website-quote-submission.schema.json`. Totalen van de site zijn alleen weergave; de CRM prijst.

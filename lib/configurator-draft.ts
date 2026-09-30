@@ -1,4 +1,4 @@
-import { DESIGN_SURCHARGES, SLUITWERK } from "@/components/configurator/catalog";
+import { DESIGN_SURCHARGES, HARDWARE, SLUITWERK } from "@/components/configurator/catalog";
 import {
   configurationProgress,
   getProduct,
@@ -9,6 +9,7 @@ import {
 } from "@/components/configurator/logic";
 
 const HANDGREEP_CODES = new Set<string>(SLUITWERK.map((item) => item.code));
+const HARDWARE_CODES = new Set<string>(HARDWARE.map((item) => item.code));
 const DESIGN_CODES = new Set<string>(DESIGN_SURCHARGES.map((item) => item.code));
 
 const STORAGE_KEY = "meisterworks.configurator.draft";
@@ -53,6 +54,10 @@ function asState(value: unknown): ConfiguratorState | null {
       typeof record.sluitwerk === "string" && HANDGREEP_CODES.has(record.sluitwerk)
         ? record.sluitwerk
         : INITIAL_STATE.sluitwerk,
+    beslag:
+      typeof record.beslag === "string" && HARDWARE_CODES.has(record.beslag)
+        ? record.beslag
+        : INITIAL_STATE.beslag,
     ralCode: typeof record.ralCode === "string" ? record.ralCode : INITIAL_STATE.ralCode,
     answered:
       record.answered && typeof record.answered === "object"

@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { ArrowIcon, CoverImage } from "@/components/ui";
 import { relatedProducts, type ProductPageCopy } from "@/lib/products";
-import { DesignCard, DesignMoreCarousel } from "@/components/product/DesignMoreCarousel";
+import { DesignMoreCarousel } from "@/components/product/DesignMoreCarousel";
 import {
   COLORS,
-  DESIGN_SURCHARGES,
   GLASS_LOOK_GROUPS,
   HARDWARE,
   SLUITWERK,
   colorThumbBackground,
+  designPriceMark,
 } from "@/components/configurator/catalog";
 import {
   directionOptions,
@@ -17,8 +17,6 @@ import {
   type PanelLayout,
 } from "@/components/configurator/logic";
 import { ROUTES, getProduct } from "@/lib/site";
-
-const FEATURED_DESIGNS = ["minimal", "classic"] as const;
 
 const PANEL_CHOICES: {
   label: string;
@@ -123,24 +121,6 @@ function MaatDiagram({ withPanel }: { withPanel: boolean }) {
   );
 }
 
-function ZelfOntwerpThumb() {
-  return (
-    <svg viewBox="0 0 560 920" className="h-full w-full" aria-hidden>
-      <rect width="560" height="920" fill="#f7f5f2" />
-      <rect x="96" y="28" width="368" height="864" fill="#ffffff" stroke="#2f4a63" strokeWidth="8" />
-      <line x1="96" y1="390" x2="464" y2="390" stroke="#2f4a63" strokeWidth="6" />
-      <line x1="280" y1="390" x2="280" y2="892" stroke="#2f4a63" strokeWidth="6" />
-    </svg>
-  );
-}
-
-function designsByCode(codes: readonly string[]) {
-  return codes.flatMap((code) => {
-    const design = DESIGN_SURCHARGES.find((item) => item.code === code);
-    return design ? [design] : [];
-  });
-}
-
 function ComposeLink({ href, children }: { href: string; children: string }) {
   return (
     <Link href={href} className="btn-accent mt-10 inline-flex gap-2 px-[26px] py-3.5 text-[14px] tracking-[0.03em]">
@@ -155,7 +135,9 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
   const product = getProduct(page.slug);
   const configureHref = `${ROUTES.configurator}?product=${page.slug}`;
   let step = 1;
-  const directionStep = page.hasHardware ? step++ : null;
+  const asksDirection =
+    product?.doorTypeCode === "scharnierdeur_kozijn" || product?.doorTypeCode === "schuifdeur";
+  const directionStep = asksDirection ? step++ : null;
   const panelStep = page.hasFixedPanel ? step++ : null;
   const maatStep = step++;
   const vlakStep = step++;
@@ -272,34 +254,9 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
           <StepIntro
             kicker={`Stap ${vlakStep} — Vlakverdeling`}
             title="Kies een ontwerp, of stel het zelf samen."
-            body="Een paar voorbeelden van hoe het glas verdeeld kan worden. In de configurator staan meer ontwerpen, en u kunt liggers en staanders ook zelf bepalen."
+            body="Zo kan het glas verdeeld worden. In de configurator bepaalt u ook zelf het aantal liggers en staanders."
           />
-          <div className="grid max-w-[720px] grid-cols-3 gap-3 min-[900px]:gap-4">
-            {designsByCode(FEATURED_DESIGNS).map((design) => (
-              <DesignCard
-                key={design.code}
-                name={design.name}
-                subtitle={design.subtitle}
-                image={design.image}
-              />
-            ))}
-            <DesignCard
-              name="Zelf ontwerpen"
-              subtitle="U bepaalt zelf het aantal liggers en staanders."
-              thumb={
-                <div className="mb-2 aspect-[560/920] overflow-hidden rounded-[12px] bg-[oklch(0.97_0.004_75)]">
-                  <ZelfOntwerpThumb />
-                </div>
-              }
-            />
-          </div>
-          <details className="group mt-5 max-w-[720px]">
-            <summary className="w-fit cursor-pointer list-none text-[14px] tracking-[0.03em] text-[oklch(0.28_0.008_60)] underline decoration-[oklch(0.75_0.01_60)] underline-offset-4 [&::-webkit-details-marker]:hidden">
-              <span className="group-open:hidden">Bekijk meer</span>
-              <span className="hidden group-open:inline">Minder</span>
-            </summary>
-            <DesignMoreCarousel exclude={FEATURED_DESIGNS} />
-          </details>
+          <DesignMoreCarousel />
           <ComposeLink href={configureHref}>Kies indeling</ComposeLink>
         </div>
       </section>
@@ -395,23 +352,21 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
             <StepIntro
               kicker={`Stap ${hardwareStep} — Sluitwerk`}
               title="Sluitwerk."
-              body="Drie pakketten, van basis tot luxe."
+              body="Drie sloten, alleen bij een deurklink."
               dark
             />
             <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
               {HARDWARE.map((option) => (
                 <div key={option.code}>
-                  <CoverImage
-                    src={option.image}
-                    alt={option.label}
-                    className="mb-3.5 aspect-[4/5]"
-                    sizes={GRID_IMAGE_SIZES}
-                  />
+                  <div className="mb-3.5 aspect-[4/5] rounded-[12px] bg-[oklch(0.22_0.006_60)]" />
                   <div className="font-serif-display mb-1.5 text-[16px] text-[oklch(0.94_0.004_75)] min-[560px]:text-[19px]">
                     {option.label}
                   </div>
                   <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.72_0.008_75)]">
                     {option.desc}
+                  </p>
+                  <p className="m-0 mt-2 text-[14px] text-[oklch(0.72_0.008_75)]">
+                    {designPriceMark(option.indication)}
                   </p>
                 </div>
               ))}

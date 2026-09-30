@@ -44,6 +44,7 @@ import {
   normalizeRalCode,
   ralPreviewHex,
   findColor,
+  designPriceMark,
   priceTier,
   windowCountFromBars,
 } from "./catalog";
@@ -57,8 +58,10 @@ import {
   catalogVlakDesigns,
   buildPreviewSvg,
   configurationProgress,
+  directionApplies,
   directionChoiceLabel,
   directionOptions,
+  lockApplies,
   dirThumbStyle,
   doorSummaryRows,
   firstUnconfirmedStep,
@@ -607,7 +610,10 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
     glassCode: state.glas,
     colorCode: state.kleur,
     ralCode: state.kleur === "afwijkende_ral" ? normalizeRalCode(state.ralCode) || null : null,
-    hardwareCode: product.hasHardware ? state.beslag : null,
+    hardwareCode:
+      product.hasHardware && state.sluitwerk === "deurklink" && state.beslag
+        ? state.beslag
+        : null,
     sluitwerkCode: product.hasHardware ? state.sluitwerk : null,
     hasFixedPanel: hasPanels(state),
     fixedPanelSquareMetres: hasPanels(state) ? totalPanelM2(state) : 0,
@@ -631,7 +637,9 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
     vlakMode: state.vlakMode === "ontwerp" ? "ontwerp" : "zelf",
     vlakPreset: state.vlakMode === "ontwerp" ? state.vlakPreset : "",
     openingDirection:
-      product.hasHardware && (state.richting === "links" || state.richting === "rechts")
+      (product.doorTypeCode === "scharnierdeur_kozijn" ||
+        product.doorTypeCode === "schuifdeur") &&
+      (state.richting === "links" || state.richting === "rechts")
         ? state.richting
         : null,
   };
@@ -868,7 +876,7 @@ export function Configurator() {
       ? ralPreviewHex(state.ralCode, kleur.hex)
       : kleur.hex;
   const glas = findGlass(state.glas);
-  const beslag = HARDWARE.find((item) => item.code === state.beslag) ?? HARDWARE[1];
+  const beslag = HARDWARE.find((item) => item.code === state.beslag);
   const sluitwerk = SLUITWERK.find((item) => item.code === state.sluitwerk) ?? SLUITWERK[0];
   const vlak = vlakLabel(state);
   const totW = totalWidth(state);
@@ -894,12 +902,12 @@ export function Configurator() {
   );
 
   const advanceFrom = useCallback(
-    (fromId: string, nextProduct = product) => {
-      const next = nextStepId(fromId, nextProduct);
+    (fromId: string, nextProduct = product, sluitwerkCode = state.sluitwerk) => {
+      const next = nextStepId(fromId, nextProduct, sluitwerkCode);
       setState((s) => ({ ...s, openSection: next }));
       scrollToSection(next);
     },
-    [product, scrollToSection],
+    [product, state.sluitwerk, scrollToSection],
   );
 
   const toggleSection = useCallback((id: string) => {
@@ -929,7 +937,7 @@ export function Configurator() {
           "Kies het model dat bij uw opening past. U kunt dit later nog aanpassen.",
         summary: product.label,
       },
-      product.hasHardware
+      directionApplies(product)
         ? {
             id: "richting" as StepId,
             title: product.doorTypeCode === "schuifdeur" ? "Schuifrichting" : "Draairichting",
@@ -985,12 +993,12 @@ export function Configurator() {
             summary: sluitwerk.label,
           }
         : null,
-      product.hasHardware
+      lockApplies(product, state.sluitwerk)
         ? {
             id: "beslag" as StepId,
             title: "Sluitwerk",
-            intro: "Kies het sluitwerk voor de deur.",
-            summary: beslag.label,
+            intro: "Kies het slot bij de deurklink.",
+            summary: beslag?.label ?? "",
           }
         : null,
       {
@@ -1002,7 +1010,7 @@ export function Configurator() {
         summary: null as string | null,
       },
     ].filter((item): item is NonNullable<typeof item> =>
-      Boolean(item && stepApplies(item.id, product)),
+      Boolean(item && stepApplies(item.id, product, state.sluitwerk)),
     ) as {
       id: StepId;
       title: string;
@@ -1020,9 +1028,10 @@ export function Configurator() {
     state.rightPanelBreedte,
     kleurLabel,
     glas.customerName,
-    beslag.label,
+    beslag?.label,
     sluitwerk.label,
     state.richting,
+    state.sluitwerk,
   ]);
 
   const summaryRows = useMemo(() => {
@@ -1044,7 +1053,7 @@ export function Configurator() {
             onEdit: () => openAndScroll("product"),
           }
         : null,
-      product.hasHardware && a.richting
+      directionApplies(product) && a.richting
         ? {
             label: product.doorTypeCode === "schuifdeur" ? "Schuifrichting" : "Draairichting",
             value: directionChoiceLabel(state.richting, product.doorTypeCode),
@@ -1093,7 +1102,7 @@ export function Configurator() {
             onEdit: () => openAndScroll("handgreep"),
           }
         : null,
-      product.hasHardware && a.beslag
+      lockApplies(product, state.sluitwerk) && a.beslag && beslag
         ? {
             label: "Sluitwerk",
             value: beslag.label,
@@ -1117,9 +1126,10 @@ export function Configurator() {
     totW,
     kleurLabel,
     glas.customerName,
-    beslag.label,
+    beslag?.label,
     sluitwerk.label,
     state.richting,
+    state.sluitwerk,
     openAndScroll,
   ]);
 
@@ -1152,7 +1162,7 @@ export function Configurator() {
       ? state.openSection
       : nextUnanswered
   ) as StepId;
-  const previousStep = prevStepId(currentStepId, product);
+  const previousStep = prevStepId(currentStepId, product, state.sluitwerk);
   const progressPct = configurationProgress(state);
   const progressSeen = useRef(progressPct);
   const [progressPulse, setProgressPulse] = useState(false);
@@ -1374,7 +1384,7 @@ export function Configurator() {
       setMissingStep("kleur");
       return;
     }
-    const next = nextStepId(currentStepId, product);
+    const next = nextStepId(currentStepId, product, state.sluitwerk);
     setState((s) => ({
       ...s,
       answered: { ...s.answered, [currentStepId]: true },
@@ -1389,6 +1399,7 @@ export function Configurator() {
     scrollToSection,
     state.kleur,
     state.ralCode,
+    state.sluitwerk,
   ]);
 
   useEffect(() => {
@@ -1483,7 +1494,14 @@ export function Configurator() {
                   ...s,
                   productId: o.id,
                   panelLayout: "geen",
-                  answered: { ...s.answered, product: true },
+                  richting: directionApplies(o) ? s.richting : "",
+                  beslag: lockApplies(o, s.sluitwerk) ? s.beslag : "",
+                  answered: {
+                    ...s.answered,
+                    product: true,
+                    ...(directionApplies(o) ? {} : { richting: false }),
+                    ...(lockApplies(o, s.sluitwerk) ? {} : { beslag: false }),
+                  },
                 }));
                 advanceFrom("product", o);
               }}
@@ -2334,12 +2352,19 @@ export function Configurator() {
               }}
               previewSrc={item.image}
               onClick={() => {
+                const next = nextStepId("handgreep", product, item.code);
                 setState((s) => ({
                   ...s,
                   sluitwerk: item.code,
-                  answered: { ...s.answered, handgreep: true },
+                  beslag: item.code === "deurklink" && s.answered.beslag ? s.beslag : "",
+                  answered: {
+                    ...s.answered,
+                    handgreep: true,
+                    beslag: item.code === "deurklink" ? Boolean(s.answered.beslag) : false,
+                  },
+                  openSection: next,
                 }));
-                advanceFrom("handgreep");
+                scrollToSection(next);
               }}
             />
           ))}
@@ -2361,19 +2386,13 @@ export function Configurator() {
               key={item.code}
               label={item.label}
               desc={item.desc}
-              priceMark={priceTier(
-                item.price,
-                HARDWARE.map((option) => option.price),
-              )}
+              priceMark={designPriceMark(item.indication)}
               selected={state.beslag === item.code}
               thumbStyle={{
                 height: 96,
                 borderRadius: 9,
-                backgroundImage: `url('${item.image}')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
+                backgroundColor: "oklch(0.93 0.006 75)",
               }}
-              previewSrc={item.image}
               onClick={() => {
                 setState((s) => ({
                   ...s,

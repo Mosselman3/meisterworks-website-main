@@ -78,7 +78,7 @@ export const INITIAL_STATE: ConfiguratorState = {
   kleur: "standaard_mat_zwart",
   ralCode: "",
   glas: "33.1",
-  beslag: "standaard",
+  beslag: "",
   sluitwerk: "recht_hoekgreep",
   panelLayout: "geen",
   panelSide: "rechts",
@@ -377,9 +377,25 @@ export const STEP_ORDER = [
 
 export type StepId = (typeof STEP_ORDER)[number];
 
-export function stepApplies(id: StepId, product: ConfigProduct) {
+export function directionApplies(product: ConfigProduct) {
+  return (
+    product.doorTypeCode === "scharnierdeur_kozijn" || product.doorTypeCode === "schuifdeur"
+  );
+}
+
+export function lockApplies(product: ConfigProduct, sluitwerkCode: string | null | undefined) {
+  return product.hasHardware && sluitwerkCode === "deurklink";
+}
+
+export function stepApplies(
+  id: StepId,
+  product: ConfigProduct,
+  sluitwerkCode?: string | null,
+) {
   if (product.custom) return id === "product" || id === "overzicht";
-  if (id === "handgreep" || id === "beslag" || id === "richting") return product.hasHardware;
+  if (id === "richting") return directionApplies(product);
+  if (id === "beslag") return lockApplies(product, sluitwerkCode);
+  if (id === "handgreep") return product.hasHardware;
   if (id === "paneel") return product.hasFixedPanel;
   return true;
 }
@@ -389,11 +405,15 @@ export function getProduct(productId: string): ConfigProduct {
   return CFG_PRODUCTS.find((p) => p.id === productId) ?? CFG_PRODUCTS[0];
 }
 
-export function nextStepId(fromId: string, product: ConfigProduct): StepId {
+export function nextStepId(
+  fromId: string,
+  product: ConfigProduct,
+  sluitwerkCode?: string | null,
+): StepId {
   let i = STEP_ORDER.indexOf(fromId as StepId) + 1;
   while (i < STEP_ORDER.length) {
     const id = STEP_ORDER[i];
-    if (!stepApplies(id, product)) {
+    if (!stepApplies(id, product, sluitwerkCode)) {
       i++;
       continue;
     }
@@ -405,11 +425,12 @@ export function nextStepId(fromId: string, product: ConfigProduct): StepId {
 export function prevStepId(
   fromId: string,
   product: ConfigProduct,
+  sluitwerkCode?: string | null,
 ): StepId | null {
   let i = STEP_ORDER.indexOf(fromId as StepId) - 1;
   while (i >= 0) {
     const id = STEP_ORDER[i];
-    if (!stepApplies(id, product)) {
+    if (!stepApplies(id, product, sluitwerkCode)) {
       i--;
       continue;
     }
@@ -756,7 +777,7 @@ export function isStepConfirmed(
   product: ConfigProduct,
 ): boolean {
   const a = state.answered;
-  if (!stepApplies(stepId as StepId, product)) return true;
+  if (!stepApplies(stepId as StepId, product, state.sluitwerk)) return true;
   if (stepId === "product") return !!a.product;
   if (stepId === "richting") return state.richting === "links" || state.richting === "rechts";
   if (stepId === "maat") return !!a.maat;
@@ -778,7 +799,7 @@ export function firstUnconfirmedStep(
 ): StepId {
   for (const id of STEP_ORDER) {
     if (id === "overzicht") continue;
-    if (!stepApplies(id, product)) continue;
+    if (!stepApplies(id, product, state.sluitwerk)) continue;
     if (!isStepConfirmed(id, state, product)) return id;
   }
   return "overzicht";
@@ -787,7 +808,7 @@ export function firstUnconfirmedStep(
 export function configurationProgress(state: ConfiguratorState): number {
   const product = getProduct(state.productId);
   const steps = STEP_ORDER.filter(
-    (id) => id !== "overzicht" && stepApplies(id, product),
+    (id) => id !== "overzicht" && stepApplies(id, product, state.sluitwerk),
   );
   if (steps.length === 0) return 0;
   const confirmed = steps.filter((id) =>
@@ -825,13 +846,12 @@ export function doorSummaryRows(
     return [{ label: "Product", value: "Buiten de vier standaardproducten" }];
   }
   const glas = findGlass(state.glas);
-  const beslag =
-    HARDWARE.find((item) => item.code === state.beslag) ?? HARDWARE[1];
+  const beslag = HARDWARE.find((item) => item.code === state.beslag);
   const sluitwerk =
     SLUITWERK.find((item) => item.code === state.sluitwerk) ?? SLUITWERK[0];
   return [
     a.product ? { label: "Product", value: product.label } : null,
-    product.hasHardware && a.richting
+    directionApplies(product) && a.richting
       ? {
           label: product.doorTypeCode === "schuifdeur" ? "Schuifrichting" : "Draairichting",
           value: directionChoiceLabel(state.richting, product.doorTypeCode),
@@ -847,7 +867,7 @@ export function doorSummaryRows(
     product.hasHardware && a.handgreep
       ? { label: "Handgreep", value: sluitwerk.label }
       : null,
-    product.hasHardware && a.beslag
+    lockApplies(product, state.sluitwerk) && a.beslag && beslag
       ? { label: "Sluitwerk", value: beslag.label }
       : null,
   ].filter(Boolean) as { label: string; value: string }[];

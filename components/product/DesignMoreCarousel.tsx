@@ -53,8 +53,8 @@ function Chevron({ direction }: { direction: "left" | "right" }) {
   );
 }
 
-export function DesignMoreCarousel({ exclude }: { exclude: readonly string[] }) {
-  const designs = DESIGN_SURCHARGES.filter((design) => !exclude.includes(design.code));
+export function DesignMoreCarousel() {
+  const designs = DESIGN_SURCHARGES;
   const scroller = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ start: true, end: false });
 
@@ -100,7 +100,7 @@ export function DesignMoreCarousel({ exclude }: { exclude: readonly string[] }) 
           <div
             key={design.code}
             data-design-card
-            className="w-[calc((100%-1.5rem)/3)] shrink-0 snap-start min-[900px]:w-[calc((100%-2rem)/3)]"
+            className="w-[72%] shrink-0 snap-start min-[900px]:w-[calc((100%-3rem)/4)]"
           >
             <DesignCard name={design.name} subtitle={design.subtitle} image={design.image} />
           </div>
@@ -111,7 +111,7 @@ export function DesignMoreCarousel({ exclude }: { exclude: readonly string[] }) 
         aria-label="Vorige ontwerpen"
         disabled={edges.start}
         onClick={() => step(-1)}
-        className="absolute top-[18%] left-0 grid h-9 w-9 -translate-x-1/2 place-items-center rounded-full border border-[oklch(0.82_0.006_75)] bg-white text-[oklch(0.25_0.008_60)] shadow-sm disabled:pointer-events-none disabled:opacity-0"
+        className="absolute top-[18%] left-0 hidden h-9 w-9 -translate-x-1/2 place-items-center rounded-full border border-[oklch(0.82_0.006_75)] bg-white text-[oklch(0.25_0.008_60)] shadow-sm min-[900px]:grid disabled:pointer-events-none disabled:opacity-0"
       >
         <Chevron direction="left" />
       </button>
@@ -120,7 +120,7 @@ export function DesignMoreCarousel({ exclude }: { exclude: readonly string[] }) 
         aria-label="Volgende ontwerpen"
         disabled={edges.end}
         onClick={() => step(1)}
-        className="absolute top-[18%] right-0 grid h-9 w-9 translate-x-1/2 place-items-center rounded-full border border-[oklch(0.82_0.006_75)] bg-white text-[oklch(0.25_0.008_60)] shadow-sm disabled:pointer-events-none disabled:opacity-0"
+        className="absolute top-[18%] right-0 hidden h-9 w-9 translate-x-1/2 place-items-center rounded-full border border-[oklch(0.82_0.006_75)] bg-white text-[oklch(0.25_0.008_60)] shadow-sm min-[900px]:grid disabled:pointer-events-none disabled:opacity-0"
       >
         <Chevron direction="right" />
       </button>
