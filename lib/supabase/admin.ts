@@ -12,12 +12,17 @@ function isServiceRoleKey(value: string) {
   return value.startsWith("eyJ") && parts.length === 3 && parts.every((part) => part.length > 0);
 }
 
+export function serviceRoleAuth(): { url: string; key: string } | null {
+  const url = (env("SUPABASE_URL") || env("VITE_SUPABASE_URL")).replace(/\/$/, "");
+  const key = env("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !isServiceRoleKey(key)) return null;
+  return { url, key };
+}
+
 export function createAdminClient(): SupabaseClient | null {
-  const url = env("SUPABASE_URL") || env("VITE_SUPABASE_URL");
-  const serviceRole = env("SUPABASE_SERVICE_ROLE_KEY");
-  const key = isServiceRoleKey(serviceRole)
-    ? serviceRole
-    : env("VITE_SUPABASE_ANON_KEY");
+  const auth = serviceRoleAuth();
+  const url = auth?.url ?? (env("SUPABASE_URL") || env("VITE_SUPABASE_URL"));
+  const key = auth?.key || env("VITE_SUPABASE_ANON_KEY");
   if (!url || !key) return null;
 
   return createClient(url, key, {

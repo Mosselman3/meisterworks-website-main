@@ -8,8 +8,10 @@ export const ROUTES = {
   inspiratie: "/inspiratie",
   reviews: "/reviews",
   offerte: "/offerte",
+  offerteBedankt: "/offerte/bedankt",
   afspraak: "/afspraak",
   configurator: "/configurator",
+  configuratorBedankt: "/configurator/bedankt",
 } as const;
 
 export const CONTACT = {

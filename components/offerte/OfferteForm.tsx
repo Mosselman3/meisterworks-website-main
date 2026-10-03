@@ -2,8 +2,10 @@
 
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
 import { ArrowIcon } from "@/components/ui";
+import { storeQuoteThanks } from "@/lib/quotes/thank-you";
 import { submitQuoteRequest } from "@/lib/quotes/submit-quote";
 import { PRODUCTS, ROUTES } from "@/lib/site";
 
@@ -19,9 +21,9 @@ const INITIAL = {
 };
 
 export function OfferteForm() {
+  const router = useRouter();
   const [values, setValues] = useState(INITIAL);
   const [file, setFile] = useState<File | null>(null);
-  const [quoteNumber, setQuoteNumber] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const submitLock = useRef(false);
@@ -69,36 +71,16 @@ export function OfferteForm() {
         setError(result.error);
         return;
       }
-      setQuoteNumber(result.quoteNumber);
+      storeQuoteThanks({
+        source: "website_snelle_offerte",
+        quoteNumber: result.quoteNumber,
+        doorCount: 1,
+      });
+      router.replace(ROUTES.offerteBedankt);
     } finally {
       submitLock.current = false;
       setPending(false);
     }
-  }
-
-  if (quoteNumber) {
-    return (
-      <div className="rounded-[18px] border border-[oklch(0.88_0.006_75)] bg-white px-8 py-12 text-center">
-        <div className="mx-auto mb-5 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[color-mix(in_oklch,var(--accent)_10%,transparent)]">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M5 13l4 4L19 7"
-              stroke="var(--accent)"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-        <div className="font-serif-display mb-2.5 text-[22px]">
-          Bedankt voor uw aanvraag
-        </div>
-        <p className="mx-auto m-0 max-w-[380px] text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
-          We hebben uw gegevens ontvangen. Uw aanvraagnummer is {quoteNumber}.
-          We nemen binnen één werkdag contact met u op.
-        </p>
-      </div>
-    );
   }
 
   return (

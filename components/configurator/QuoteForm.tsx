@@ -1,9 +1,12 @@
 "use client";
 
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
 import { ArrowIcon, LockIcon } from "@/components/ui";
+import { storeQuoteThanks } from "@/lib/quotes/thank-you";
 import { submitQuoteRequest } from "@/lib/quotes/submit-quote";
+import { ROUTES } from "@/lib/site";
 
 type SummaryRow = {
   label: string;
@@ -115,8 +118,8 @@ export function QuoteForm({
   file: File | null;
   onFileChange: (file: File | null) => void;
 }) {
+  const router = useRouter();
   const [fields, setFields] = useState(INITIAL_FIELDS);
-  const [quoteNumber, setQuoteNumber] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const submitLock = useRef(false);
@@ -163,38 +166,17 @@ export function QuoteForm({
         return;
       }
 
-      setQuoteNumber(result.quoteNumber);
+      storeQuoteThanks({
+        source: "website_configurator",
+        quoteNumber: result.quoteNumber,
+        doorCount: doors?.length ?? 1,
+      });
       onSubmitted?.();
+      router.replace(ROUTES.configuratorBedankt);
     } finally {
       submitLock.current = false;
       setPending(false);
     }
-  }
-
-  if (quoteNumber) {
-    return (
-      <div className="cfg-quote-success">
-        <div className="cfg-quote-success-icon" aria-hidden>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M5 13l4 4L19 7"
-              stroke="var(--accent)"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-        <div className="font-serif-display cfg-quote-success-title">
-          Bedankt voor uw aanvraag
-        </div>
-        <p>
-          We hebben uw gegevens en {doors && doors.length > 1 ? "samenstellingen" : "samenstelling"} ontvangen. Uw aanvraagnummer
-          is {quoteNumber}. We nemen binnen één werkdag contact met u op met
-          een passende offerte.
-        </p>
-      </div>
-    );
   }
 
   return (

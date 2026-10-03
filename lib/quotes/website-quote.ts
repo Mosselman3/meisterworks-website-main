@@ -1,5 +1,5 @@
 import "server-only";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, serviceRoleAuth } from "@/lib/supabase/admin";
 
 const BUCKET = "meisterworks-private";
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
@@ -157,6 +157,8 @@ export async function submitWebsiteQuote(
     return { status: 500, body: { ok: false, error: UPLOAD_ERROR } };
   }
 
+  if (!quote.duplicate) await dispatchQueuedEmail();
+
   return {
     status: 200,
     body: {
@@ -166,6 +168,32 @@ export async function submitWebsiteQuote(
       duplicate: quote.duplicate,
     },
   };
+}
+
+async function dispatchQueuedEmail() {
+  const auth = serviceRoleAuth();
+  if (!auth) {
+    console.error("Offerte opgeslagen, bevestigingsmail niet gestart: service-role ontbreekt.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${auth.url}/functions/v1/dispatch-email`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${auth.key}`,
+        apikey: auth.key,
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    });
+    if (!response.ok) {
+      const detail = await response.text().catch(() => "");
+      console.error("Bevestigingsmail niet verzonden.", response.status, detail);
+    }
+  } catch (error) {
+    console.error("Bevestigingsmail niet verzonden.", error);
+  }
 }
 
 function readQuote(data: unknown) {
