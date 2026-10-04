@@ -1416,6 +1416,17 @@ img {
     gap: 20px !important;
   }
   [data-trust-divider] { display: none !important; }
+  [data-trust-quotes] {
+    min-height: 0 !important;
+  }
+  [data-trust-slide] {
+    position: static !important;
+    display: none;
+    transform: none !important;
+  }
+  [data-trust-slide][data-active="true"] {
+    display: block;
+  }
 }
 @media (max-width: 1100px) {
   .home-config-process {

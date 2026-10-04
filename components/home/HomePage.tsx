@@ -113,7 +113,8 @@ export function HomePage() {
 
       <WhyCustom />
 
-      <section className="mx-auto max-w-[var(--max-width)] px-7 py-[100px]">
+      <section className="bg-[oklch(0.93_0.006_75)] px-7 py-[100px]">
+        <div className="mx-auto max-w-[var(--max-width)]">
         <div className="mb-12 max-w-[640px]">
           <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
             Reviews
@@ -162,6 +163,7 @@ export function HomePage() {
             </div>
           </div>
           </div>
+        </div>
         </div>
       </section>
 
@@ -243,15 +245,33 @@ export function HomePage() {
             </div>
           );
         })}
+        <div className="bg-[oklch(0.93_0.006_75)] px-7 py-[90px]">
+          <div className="mx-auto max-w-[640px] text-center">
+            <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+              Configurator
+            </div>
+            <h2 className="font-serif-display m-0 mb-4 text-[clamp(28px,3.6vw,40px)] font-normal">
+              Zelf een deur samenstellen
+            </h2>
+            <p className="m-0 mb-8 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
+              Kies het type, de afmeting, het glas en de kleur. U ziet direct
+              hoe de deur eruitziet en vraagt daarna een offerte aan.
+            </p>
+            <Link href={ROUTES.configurator} className="btn-dark gap-2">
+              Open de configurator
+              <ArrowIcon />
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section
         id="vakmanschap"
-        className="mx-auto max-w-[var(--max-width)] px-7 py-[100px]"
+        className="border-t border-[oklch(0.82_0.008_75)] bg-white px-7 py-[100px]"
       >
         <div
           data-split-row="true"
-          className="grid items-center gap-16"
+          className="mx-auto grid max-w-[var(--max-width)] items-center gap-16"
           style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)" }}
         >
           <div className="grid grid-cols-2 gap-4">
@@ -286,6 +306,12 @@ export function HomePage() {
             </p>
           </div>
         </div>
+        <div className="mt-12 flex justify-center">
+          <Link href={ROUTES.afspraak} className="btn-dark gap-2">
+            Afspraak maken
+            <ArrowIcon />
+          </Link>
+        </div>
       </section>
 
       <ReviewMarquee rowA={MARQUEE_REVIEWS_A} rowB={MARQUEE_REVIEWS_B} />
@@ -297,7 +323,7 @@ export function HomePage() {
         className="bg-[var(--accent)] px-7 py-[90px] text-center"
       >
         <h2 className="font-serif-display m-0 mb-5 text-[clamp(30px,4.2vw,48px)] font-normal text-[oklch(0.14_0.006_60)]">
-          Klaar om te beginnen?
+          Creëer de stalen deur van uw dromen
         </h2>
         <p className="m-0 mb-9 text-[16px] text-[oklch(0.22_0.03_60)]">
           Vraag een vrijblijvende offerte aan, of plan een adviesgesprek in het

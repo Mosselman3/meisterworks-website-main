@@ -41,10 +41,12 @@ export function TrustBar() {
           data-trust-divider="true"
           className="h-14 w-px bg-[oklch(0.32_0.006_60)]"
         />
-        <div className="relative min-h-[84px]">
+        <div data-trust-quotes="true" className="relative min-h-[84px]">
           {TRUST_QUOTES.map((slide, index) => (
             <div
               key={slide.name}
+              data-trust-slide="true"
+              data-active={index === active ? "true" : "false"}
               className="absolute inset-0 transition-[opacity,transform] duration-700 ease-in-out"
               style={{
                 opacity: index === active ? 1 : 0,

@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { GoogleReviewsRating } from "@/components/reviews/GoogleReviewsRating";
 import type { MARQUEE_REVIEWS_A } from "@/lib/content";
+import { ROUTES } from "@/lib/site";
 
 type Review = (typeof MARQUEE_REVIEWS_A)[number];
 
@@ -120,6 +122,15 @@ export function ReviewMarquee({
             <ReviewCard key={`b-${review.name}-${index}`} review={review} />
           ))}
         </div>
+      </div>
+
+      <div className="mt-12 flex justify-center px-7">
+        <Link
+          href={ROUTES.reviews}
+          className="border-b border-[oklch(0.4_0.006_60)] pb-1 text-[13px] tracking-[0.05em] text-[oklch(0.85_0.004_75)] uppercase"
+        >
+          Alle reviews →
+        </Link>
       </div>
     </div>
   );

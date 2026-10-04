@@ -7,20 +7,20 @@ import { CoverImage } from "@/components/ui";
 const WORDS = WHY_CUSTOM_TEXT.split(" ");
 
 export function WhyCustom() {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLParagraphElement>(null);
   const [activeCount, setActiveCount] = useState(0);
 
   useEffect(() => {
     let frame = 0;
     const loop = () => {
-      const el = sectionRef.current;
+      const el = textRef.current;
       if (el) {
         const vh = window.innerHeight || 900;
         const rect = el.getBoundingClientRect();
-        const reveal = Math.max(
-          0,
-          Math.min(1, (vh * 0.8 - rect.top) / (rect.height * 0.75)),
-        );
+        const center = rect.top + rect.height / 2;
+        const start = vh * 0.9;
+        const end = vh * 0.5;
+        const reveal = Math.max(0, Math.min(1, (start - center) / (start - end)));
         const next = Math.round(reveal * WORDS.length);
         setActiveCount((current) => (current === next ? current : next));
       }
@@ -31,15 +31,15 @@ export function WhyCustom() {
   }, []);
 
   return (
-    <div
-      ref={sectionRef}
-      className="bg-[oklch(0.14_0.006_60)] px-7 pt-[110px] pb-[90px]"
-    >
+    <div className="bg-[oklch(0.14_0.006_60)] px-7 pt-[110px] pb-[90px]">
       <div className="mx-auto max-w-[var(--max-width)]">
         <div className="mb-7 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.008_75)] uppercase">
           — Waarom maatwerk
         </div>
-        <p className="font-serif-display m-0 max-w-[920px] text-[clamp(24px,3.4vw,38px)] leading-[1.55] tracking-[0.04em]">
+        <p
+          ref={textRef}
+          className="font-serif-display m-0 max-w-[920px] text-[clamp(24px,3.4vw,38px)] leading-[1.55] tracking-[0.04em]"
+        >
           {WORDS.map((word, index) => (
             <span
               key={`${word}-${index}`}
