@@ -112,7 +112,8 @@ export function QuotePortal({ token }: { token: string }) {
     <main className="portal-page">
       <header className="portal-header portal-no-print">
         <div className="portal-brand">
-          <img src="/assets/logo.jpg" alt="Meisterworks" />
+          <img src="/assets/logo.jpg" alt="" />
+          <span>Meisterworks</span>
         </div>
         <span>Offerte {portal.quoteNumber}</span>
       </header>

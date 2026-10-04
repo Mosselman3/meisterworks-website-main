@@ -227,12 +227,23 @@ body {
 .portal-brand {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
 .portal-brand img {
   display: block;
-  height: 64px;
-  width: auto;
+  height: 44px;
+  width: 44px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.portal-brand span {
+  font-family: var(--font-serif, "Times New Roman", serif);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .portal-document__brand img {
