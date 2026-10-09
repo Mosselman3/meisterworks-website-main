@@ -25,7 +25,7 @@ export function HomePage() {
         <HeroSlideshow />
         <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,oklch(0.14_0.006_60_/_0.15)_0%,oklch(0.12_0.006_60_/_0.35)_55%,oklch(0.1_0.006_60_/_0.82)_100%)]" />
         <div className="relative z-[2] max-w-[780px] px-7 pt-10 pb-[72px] lg:pt-0">
-          <div className="mb-[18px] text-[13px] font-medium tracking-[0.18em] text-[var(--accent)] uppercase">
+          <div className="mb-[18px] text-[13px] font-medium tracking-[0.18em] text-[oklch(0.86_0.05_75)] uppercase [text-shadow:0_1px_2px_oklch(0.1_0.006_60_/_0.55),0_0_18px_oklch(0.1_0.006_60_/_0.35)]">
             Vakmanschap in stalen deuren
           </div>
           <h1 className="font-serif-display m-0 mb-[22px] text-[clamp(38px,5.4vw,65px)] font-normal text-[oklch(0.98_0.004_75)]">
@@ -42,7 +42,7 @@ export function HomePage() {
               Ontwerp uw deur
             </Link>
             <Link href={ROUTES.offerte} className="btn-outline-light">
-              Bekijk projecten
+              Snelle Offerte
             </Link>
           </div>
         </div>
@@ -106,20 +106,33 @@ export function HomePage() {
 
       <WhyCustom />
 
-      <section id="projecten">
-        <div className="mx-auto max-w-[var(--max-width)] px-7 pt-[100px]">
-          <div className="max-w-[640px]">
-            <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
-              De modellen
-            </div>
-            <h2 className="font-serif-display m-0 mb-4 text-[clamp(28px,3.6vw,40px)] font-normal">
-              Stalen deur, met verschillende eigenschappen.
-            </h2>
-            <p className="m-0 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
-            Laat u verder inspireren met hoe de deuren bewegen en voor welke toepassingen ze geschikt zijn. Bekijk een deur, of stel hem direct samen in de configurator. 
-            </p>
+      <section className="px-7 py-[120px] text-center">
+        <div className="mx-auto max-w-[920px]">
+          <div className="mb-4 text-[14px] tracking-[0.18em] text-[oklch(0.5_0.01_60)] uppercase">
+            Kies uw type deur
+          </div>
+          <h2 className="font-serif-display m-0 mb-6 text-[clamp(38px,5vw,58px)] leading-[1.12] font-normal">
+            Welke stalen deur past bij uw ruimte?
+          </h2>
+          <p className="mx-auto m-0 max-w-[800px] text-[clamp(17px,1.8vw,19px)] leading-[1.75] text-[oklch(0.42_0.008_60)]">
+            Elk type deur beweegt anders en past bij een andere ruimte. Een
+            taatsdeur draait in beide richtingen, een scharnierdeur sluit in een
+            kozijn en een schuifdeur bespaart ruimte. Wilt u alleen licht en
+            openheid toevoegen, dan kiest u een vast paneel. Bekijk hieronder
+            de verschillen en ontdek welk type bij uw woning en gebruik past.
+          </p>
+          <div className="mt-9 flex justify-center">
+            <Link href={ROUTES.configurator} className="btn-dark gap-2 px-7 py-4">
+              Stel uw deur samen
+              <ArrowIcon />
+            </Link>
           </div>
         </div>
+      </section>
+
+      <ReviewMarquee rowA={MARQUEE_REVIEWS_A} rowB={MARQUEE_REVIEWS_B} />
+
+      <section id="projecten">
         {PRODUCT_STORIES.map((story) => {
           const product = storyProduct(story.slug);
           const dark = story.dark;
@@ -306,8 +319,6 @@ export function HomePage() {
         </div>
         </div>
       </section>
-
-      <ReviewMarquee rowA={MARQUEE_REVIEWS_A} rowB={MARQUEE_REVIEWS_B} />
 
       <ConfiguratorProcess />
 

@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type InputHTMLAttributes,
   type ReactNode,
 } from "react";
 import {
@@ -515,6 +516,78 @@ function glassThumb(src: string): CSSProperties {
 }
 
 
+function parseDraftNumber(raw: string, integer: boolean): number | null {
+  const trimmed = raw.trim().replace(",", ".");
+  if (!trimmed || trimmed === "-" || trimmed === "." || trimmed === "-.") return null;
+  if (integer ? !/^-?\d+$/.test(trimmed) : !/^-?\d+(\.\d+)?$/.test(trimmed)) return null;
+  const next = Number(trimmed);
+  return Number.isFinite(next) ? next : null;
+}
+
+function NumericField({
+  value,
+  min,
+  max,
+  integer = true,
+  className,
+  style,
+  placeholder,
+  ...props
+}: {
+  value: number;
+  min?: number;
+  max?: number;
+  integer?: boolean;
+  className?: string;
+  style?: CSSProperties;
+  placeholder?: string;
+} & Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "value" | "onChange" | "type" | "min" | "max" | "inputMode"
+> & {
+  onValueChange: (value: number) => void;
+}) {
+  const { onValueChange, ...inputProps } = props;
+  const [draft, setDraft] = useState<string | null>(null);
+  const resting = Number.isFinite(value) ? String(value) : "";
+  const shown = draft ?? resting;
+  return (
+    <input
+      {...inputProps}
+      className={className}
+      style={style}
+      type="text"
+      inputMode={integer ? "numeric" : "decimal"}
+      value={shown}
+      placeholder={draft === "" ? placeholder ?? resting : placeholder}
+      onFocus={(event) => {
+        setDraft(resting);
+        inputProps.onFocus?.(event);
+      }}
+      onChange={(event) => {
+        const raw = event.target.value;
+        if (raw !== "" && !(integer ? /^-?\d*$/ : /^-?\d*[.,]?\d*$/).test(raw)) return;
+        setDraft(raw);
+        const parsed = parseDraftNumber(raw, integer);
+        if (parsed == null) return;
+        if ((min != null && parsed < min) || (max != null && parsed > max)) return;
+        onValueChange(parsed);
+      }}
+      onBlur={(event) => {
+        const parsed = draft == null ? null : parseDraftNumber(draft, integer);
+        setDraft(null);
+        if (parsed != null) {
+          let next = parsed;
+          if (min != null) next = Math.max(min, next);
+          if (max != null) next = Math.min(max, next);
+          onValueChange(next);
+        }
+        inputProps.onBlur?.(event);
+      }}
+    />
+  );
+}
+
 function MmField({
   label,
   value,
@@ -531,13 +604,12 @@ function MmField({
   return (
     <label style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <span style={{ fontSize: 13, color: "oklch(0.35 0.008 60)" }}>{label}</span>
-      <input
-        type="number"
+      <NumericField
+        className="cfg-number"
         value={value}
         min={min}
         max={max}
-        step={10}
-        onChange={(ev) => onChange(Number(ev.target.value) || 0)}
+        onValueChange={onChange}
         style={{
           padding: "13px 14px",
           border: "1px solid oklch(0.85 0.006 75)",
@@ -3592,14 +3664,13 @@ function BarPositionControl({
               {liggersNow.map((value, index) => (
                 <label key={`ligger-${index}`} className="cfg-bar-pos-input">
                   {liggers > 1 ? <em>{index + 1}</em> : null}
-                  <input
-                    type="number"
-                    inputMode="numeric"
+                  <NumericField
+                    integer
                     min={8}
                     max={92}
                     aria-label={`${liggers === 1 ? "Ligger" : `Ligger ${index + 1}`} vanaf de vloer`}
                     value={value}
-                    onChange={(event) => onLigger(index, Number(event.target.value))}
+                    onValueChange={(next) => onLigger(index, next)}
                   />
                   <em>%</em>
                 </label>
@@ -3612,14 +3683,13 @@ function BarPositionControl({
               {staandersNow.map((value, index) => (
                 <label key={`staander-${index}`} className="cfg-bar-pos-input">
                   {staanders > 1 ? <em>{index + 1}</em> : null}
-                  <input
-                    type="number"
-                    inputMode="numeric"
+                  <NumericField
+                    integer
                     min={8}
                     max={92}
                     aria-label={`${staanders === 1 ? "Staander" : `Staander ${index + 1}`} vanaf links`}
                     value={value}
-                    onChange={(event) => onStaander(index, Number(event.target.value))}
+                    onValueChange={(next) => onStaander(index, next)}
                   />
                   <em>%</em>
                 </label>

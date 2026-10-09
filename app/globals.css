@@ -1951,6 +1951,11 @@ img {
   gap: 4px;
 }
 
+.cfg-bar-pos-input input::placeholder,
+.cfg-number::placeholder {
+  color: oklch(0.72 0.008 60);
+}
+
 .cfg-bar-pos-input input {
   width: 58px;
   padding: 6px 8px;
