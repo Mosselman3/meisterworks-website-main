@@ -66,6 +66,7 @@ function asState(value: unknown): ConfiguratorState | null {
     ralCode: typeof record.ralCode === "string" ? record.ralCode : INITIAL_STATE.ralCode,
     customDoorBars: record.customDoorBars === true,
     customPanelBars: record.customPanelBars === true,
+    mirrorPanelStaanders: record.mirrorPanelStaanders === true,
     liggerPositions: percentList(record.liggerPositions),
     staanderPositions: percentList(record.staanderPositions),
     panelLiggerPositions: percentList(record.panelLiggerPositions),

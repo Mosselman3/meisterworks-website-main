@@ -55,6 +55,8 @@ export type ConfiguratorState = {
   customPanelBars: boolean;
   panelLiggerPositions: number[];
   panelStaanderPositions: number[];
+  /** Right panel draws these staanders mirrored, so both side panels match. */
+  mirrorPanelStaanders: boolean;
   vlakPreset: string;
   vlakMode: "zelf" | "ontwerp";
   hoogte: number;
@@ -88,6 +90,7 @@ export const INITIAL_STATE: ConfiguratorState = {
   customPanelBars: false,
   panelLiggerPositions: [],
   panelStaanderPositions: [],
+  mirrorPanelStaanders: false,
   vlakPreset: "",
   vlakMode: "ontwerp",
   hoogte: 2100,
@@ -970,6 +973,8 @@ export type BarPositionSet = {
   staanders: number[] | null;
   panelLiggers: number[] | null;
   panelStaanders: number[] | null;
+  /** Right fixed panel uses the mirrored staander percentages. */
+  mirrorPanelStaanders?: boolean;
 };
 
 function clampBarPercent(value: number) {
@@ -990,6 +995,18 @@ export function resizeBarPositions(count: number, current: number[] | null | und
   if (clamped.length === count) return clamped;
   if (clamped.length > count) return clamped.slice(0, count);
   return [...clamped, ...even.slice(clamped.length)];
+}
+
+/** Flip staanders across one opening. 30% from the left becomes 70%. */
+export function mirrorBarPositions(positions: number[]): number[] {
+  return positions
+    .map((value) => clampBarPercent(100 - value))
+    .sort((left, right) => left - right);
+}
+
+/** Two side panels share one staander list, measured from the left. Mirroring the right panel makes both come out the same way. */
+export function panelStaanderDrawPercents(percents: number[], mirrorRightPanel: boolean): number[] {
+  return mirrorRightPanel ? mirrorBarPositions(percents) : percents;
 }
 
 export function placeBarPosition(positions: number[], index: number, raw: number): number[] {
@@ -1032,8 +1049,10 @@ function customPositionNote(state: ConfiguratorState) {
       );
     }
     if (state.panelStaanders > 0) {
+      const same =
+        state.panelLayout === "beide" && state.mirrorPanelStaanders ? ", gelijk op beide panelen" : "";
       parts.push(
-        `paneelstaanders ${percentList(floorPercents(state.panelStaanders, state.panelStaanderPositions))} vanaf links`,
+        `paneelstaanders ${percentList(floorPercents(state.panelStaanders, state.panelStaanderPositions))} vanaf links${same}`,
       );
     }
   }
@@ -1054,8 +1073,16 @@ export function quoteBarPositions(state: ConfiguratorState): BarPositionSet | nu
     panelOpen && state.panelStaanders > 0
       ? floorPercents(state.panelStaanders, state.panelStaanderPositions)
       : null;
-  if (!liggers && !staanders && !panelLiggers && !panelStaanders) return null;
-  return { liggers, staanders, panelLiggers, panelStaanders };
+  const mirrorPanelStaanders =
+    state.panelLayout === "beide" && state.mirrorPanelStaanders && state.panelStaanders > 0;
+  if (!liggers && !staanders && !panelLiggers && !panelStaanders && !mirrorPanelStaanders) return null;
+  return {
+    liggers,
+    staanders,
+    panelLiggers,
+    panelStaanders,
+    ...(mirrorPanelStaanders ? { mirrorPanelStaanders: true } : {}),
+  };
 }
 
 export function vlakLabel(state: ConfiguratorState): string {
@@ -1312,7 +1339,14 @@ export function buildPreviewSvg(
         }),
       );
     }
-    for (const pct of staanderPcts) {
+    const drawStaanders = panelStaanderDrawPercents(
+      staanderPcts,
+      bay.type === "panel" &&
+        bay.key === "rechts" &&
+        state.panelLayout === "beide" &&
+        state.mirrorPanelStaanders,
+    );
+    for (const pct of drawStaanders) {
       const sx = gx + gw * (pct / 100);
       e.push(
         React.createElement("line", {

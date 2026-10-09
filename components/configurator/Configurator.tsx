@@ -1276,6 +1276,7 @@ export function Configurator() {
     state.staanderPositions.join(","),
     state.panelLiggerPositions.join(","),
     state.panelStaanderPositions.join(","),
+    state.mirrorPanelStaanders ? "1" : "0",
     state.vlakPreset,
     state.vlakMode,
     state.kleur,
@@ -2027,6 +2028,11 @@ export function Configurator() {
                     ),
                   }))
                 }
+                mirrored={state.mirrorPanelStaanders}
+                showMirror={state.panelLayout === "beide"}
+                onMirror={(mirrorPanelStaanders) =>
+                  setState((current) => ({ ...current, mirrorPanelStaanders }))
+                }
               />
               <p
                 style={{
@@ -2171,6 +2177,11 @@ export function Configurator() {
                     value,
                   ),
                 }))
+              }
+              mirrored={state.mirrorPanelStaanders}
+              showMirror={state.panelLayout === "beide"}
+              onMirror={(mirrorPanelStaanders) =>
+                setState((current) => ({ ...current, mirrorPanelStaanders }))
               }
             />
           ) : null}
@@ -3626,9 +3637,12 @@ function BarPositionControl({
   custom,
   liggerPositions,
   staanderPositions,
+  mirrored = false,
+  showMirror = false,
   onCustom,
   onLigger,
   onStaander,
+  onMirror,
 }: {
   label: string;
   liggers: number;
@@ -3636,9 +3650,12 @@ function BarPositionControl({
   custom: boolean;
   liggerPositions: number[];
   staanderPositions: number[];
+  mirrored?: boolean;
+  showMirror?: boolean;
   onCustom: (custom: boolean) => void;
   onLigger: (index: number, value: number) => void;
   onStaander: (index: number, value: number) => void;
+  onMirror?: (mirrored: boolean) => void;
 }) {
   if (liggers + staanders === 0) return null;
   const liggersNow = resizeBarPositions(liggers, liggerPositions);
@@ -3694,6 +3711,17 @@ function BarPositionControl({
                   <em>%</em>
                 </label>
               ))}
+              {showMirror ? (
+                <label className="cfg-bar-pos-toggle cfg-bar-pos-mirror">
+                  <input
+                    type="checkbox"
+                    checked={mirrored}
+                    aria-label="Zelfde staanders op beide panelen"
+                    onChange={(event) => onMirror?.(event.target.checked)}
+                  />
+                  <span>Spiegelen</span>
+                </label>
+              ) : null}
             </div>
           ) : null}
         </div>

@@ -40,6 +40,7 @@ export type QuoteConfiguration = {
     staanders: number[] | null;
     panelLiggers: number[] | null;
     panelStaanders: number[] | null;
+    mirrorPanelStaanders?: boolean;
   } | null;
   vlakMode: "zelf" | "ontwerp";
   vlakPreset: string;

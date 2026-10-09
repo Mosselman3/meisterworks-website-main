@@ -1966,6 +1966,10 @@ body[data-nav-open="true"] [data-cfg-resume] {
   font-weight: 600;
 }
 
+.cfg-bar-pos-mirror {
+  margin-left: 4px;
+}
+
 .cfg-bar-pos-input {
   display: inline-flex;
   align-items: center;
