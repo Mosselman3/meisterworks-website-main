@@ -54,3 +54,19 @@ export function listInspirationMedia(): InspirationMedia[] {
       kind: isVideo(name) ? "video" : "image",
     }));
 }
+
+const PRODUCT_PHOTO_START: Record<string, number> = {
+  taatsdeur: 0,
+  "scharnierdeur-kozijn": 8,
+  schuifdeur: 16,
+  "vast-paneel": 24,
+};
+
+/** A stable slice of real project photos, different per product page. */
+export function productInspirationPhotos(slug: string, count = 5): InspirationMedia[] {
+  const images = listInspirationMedia().filter((item) => item.kind === "image");
+  if (images.length === 0) return [];
+  const start = (PRODUCT_PHOTO_START[slug] ?? 0) % images.length;
+  const take = Math.min(count, images.length);
+  return Array.from({ length: take }, (_, index) => images[(start + index) % images.length]!);
+}

@@ -30,6 +30,11 @@ function canUseStorage() {
   return typeof window !== "undefined";
 }
 
+function percentList(value: unknown): number[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is number => typeof item === "number" && Number.isFinite(item));
+}
+
 function notify() {
   window.dispatchEvent(new Event(CONFIGURATOR_DRAFT_EVENT));
 }
@@ -59,6 +64,12 @@ function asState(value: unknown): ConfiguratorState | null {
         ? record.beslag
         : INITIAL_STATE.beslag,
     ralCode: typeof record.ralCode === "string" ? record.ralCode : INITIAL_STATE.ralCode,
+    customDoorBars: record.customDoorBars === true,
+    customPanelBars: record.customPanelBars === true,
+    liggerPositions: percentList(record.liggerPositions),
+    staanderPositions: percentList(record.staanderPositions),
+    panelLiggerPositions: percentList(record.panelLiggerPositions),
+    panelStaanderPositions: percentList(record.panelStaanderPositions),
     answered:
       record.answered && typeof record.answered === "object"
         ? record.answered

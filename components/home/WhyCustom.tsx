@@ -2,80 +2,78 @@
 
 import { useEffect, useRef, useState } from "react";
 import { WHY_CUSTOM_TEXT } from "@/lib/content";
-import { CoverImage } from "@/components/ui";
 
 const WORDS = WHY_CUSTOM_TEXT.split(" ");
+const LIT = "oklch(0.97 0.004 75)";
+const DIM = "oklch(0.5 0.008 70)";
+
+function revealFor(rect: DOMRect, viewportHeight: number) {
+  const start = viewportHeight * 0.82;
+  const end = viewportHeight * 0.55;
+  const finish = end - rect.height;
+  const span = start - finish;
+  if (span <= 0) return 1;
+  return Math.max(0, Math.min(1, (start - rect.top) / span));
+}
 
 export function WhyCustom() {
   const textRef = useRef<HTMLParagraphElement>(null);
   const [activeCount, setActiveCount] = useState(0);
 
   useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (media.matches) {
+      setActiveCount(WORDS.length);
+      return;
+    }
+
     let frame = 0;
-    const loop = () => {
+    const update = () => {
+      frame = 0;
       const el = textRef.current;
-      if (el) {
-        const vh = window.innerHeight || 900;
-        const rect = el.getBoundingClientRect();
-        const center = rect.top + rect.height / 2;
-        const start = vh * 0.9;
-        const end = vh * 0.5;
-        const reveal = Math.max(0, Math.min(1, (start - center) / (start - end)));
-        const next = Math.round(reveal * WORDS.length);
-        setActiveCount((current) => (current === next ? current : next));
-      }
-      frame = requestAnimationFrame(loop);
+      if (!el) return;
+      const viewportHeight = window.innerHeight || 900;
+      const reveal = revealFor(el.getBoundingClientRect(), viewportHeight);
+      const next = Math.round(reveal * WORDS.length);
+      setActiveCount((current) => (current === next ? current : next));
     };
-    frame = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(frame);
+    const requestUpdate = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(update);
+    };
+
+    requestUpdate();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
   }, []);
 
   return (
-    <div className="bg-[oklch(0.14_0.006_60)] px-7 pt-[110px] pb-[90px]">
-      <div className="mx-auto max-w-[var(--max-width)]">
-        <div className="mb-7 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.008_75)] uppercase">
-          — Waarom maatwerk
-        </div>
+    <section className="bg-[oklch(0.14_0.006_60)] px-7 py-[120px] min-[900px]:py-[150px]">
+      <div className="mx-auto max-w-[860px]">
+        <h2 className="m-0 mb-8 flex items-center gap-4 text-[15px] font-medium tracking-[0.18em] text-[oklch(0.9_0.012_75)] uppercase">
+          <span className="h-px w-10 shrink-0 bg-[var(--accent)]" aria-hidden="true" />
+          Waarom maatwerk
+        </h2>
         <p
           ref={textRef}
-          className="font-serif-display m-0 max-w-[920px] text-[clamp(24px,3.4vw,38px)] leading-[1.55] tracking-[0.04em]"
+          className="font-serif-display m-0 text-[clamp(26px,3.6vw,42px)] leading-[1.45]"
         >
           {WORDS.map((word, index) => (
             <span
               key={`${word}-${index}`}
-              className="transition-colors duration-[250ms] ease-in-out"
-              style={{
-                color:
-                  index < activeCount
-                    ? "oklch(0.95 0.004 75)"
-                    : "oklch(0.4 0.008 60)",
-              }}
+              className="transition-colors duration-500 ease-out"
+              style={{ color: index < activeCount ? LIT : DIM }}
             >
               {word}{" "}
             </span>
           ))}
         </p>
-        <div className="mx-auto mt-14 grid max-w-[1040px] grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-5">
-          <CoverImage
-            src="/assets/double-doors-black.jpg"
-            alt="Stalen glaswand op maat"
-            className="aspect-[3/4] min-[900px]:aspect-[4/3]"
-            sizes="(min-width: 900px) 320px, 50vw"
-          />
-          <CoverImage
-            src="/assets/detail-green.jpg"
-            alt="Detail poedercoating"
-            className="aspect-[3/4] min-[900px]:aspect-[4/3]"
-            sizes="(min-width: 900px) 320px, 50vw"
-          />
-          <CoverImage
-            src="/assets/arched-bronze-door.jpg"
-            alt="Stalen draaideur op maat"
-            className="hidden aspect-[3/4] min-[900px]:block min-[900px]:aspect-[4/3]"
-            sizes="(min-width: 900px) 320px, 50vw"
-          />
-        </div>
       </div>
-    </div>
+    </section>
   );
 }

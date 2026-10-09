@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductView } from "@/components/product/ProductView";
+import { productInspirationPhotos } from "@/lib/inspiration";
 import { getProductPage } from "@/lib/products";
 import { PRODUCTS, getProduct } from "@/lib/site";
 
@@ -15,8 +16,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = getProduct(slug);
-  if (!product) return {};
-  return { title: `${product.title} — Meisterworks` };
+  const page = getProductPage(slug);
+  if (!product || !page) return {};
+  return {
+    title: product.title,
+    description: page.heroLead,
+    alternates: { canonical: `/deuren/${slug}` },
+  };
 }
 
 export default async function DeurPage({
@@ -28,5 +34,5 @@ export default async function DeurPage({
   const page = getProductPage(slug);
   if (!page) notFound();
 
-  return <ProductView page={page} />;
+  return <ProductView page={page} placedPhotos={productInspirationPhotos(slug)} />;
 }

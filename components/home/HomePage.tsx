@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ConfiguratorProcess } from "@/components/home/ConfiguratorProcess";
+import { HeroSlideshow } from "@/components/home/HeroSlideshow";
 import { TrustBar } from "@/components/home/TrustBar";
 import { WhyCustom } from "@/components/home/WhyCustom";
 import { ReviewMarquee } from "@/components/home/ReviewMarquee";
@@ -20,16 +21,8 @@ function storyProduct(slug: string) {
 export function HomePage() {
   return (
     <main>
-      <section className="relative flex min-h-[88vh] items-end">
-        <Image
-          src="/assets/hero-open-door.jpg"
-          alt="Stalen taatsdeur, geopend"
-          fill
-          priority
-          loading="eager"
-          className="object-cover"
-          sizes="100vw"
-        />
+      <section className="relative flex min-h-[88vh] items-end overflow-hidden">
+        <HeroSlideshow />
         <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,oklch(0.14_0.006_60_/_0.15)_0%,oklch(0.12_0.006_60_/_0.35)_55%,oklch(0.1_0.006_60_/_0.82)_100%)]" />
         <div className="relative z-[2] max-w-[780px] px-7 pt-10 pb-[72px] lg:pt-0">
           <div className="mb-[18px] text-[13px] font-medium tracking-[0.18em] text-[var(--accent)] uppercase">
@@ -45,10 +38,10 @@ export function HomePage() {
             vervaardigd — van eerste schets tot montage.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href={ROUTES.afspraak} className="btn-accent btn-accent-lg">
+            <Link href={ROUTES.configurator} className="btn-accent btn-accent-lg">
               Ontwerp uw deur
             </Link>
-            <Link href={ROUTES.projecten} className="btn-outline-light">
+            <Link href={ROUTES.offerte} className="btn-outline-light">
               Bekijk projecten
             </Link>
           </div>
@@ -112,60 +105,6 @@ export function HomePage() {
       </section>
 
       <WhyCustom />
-
-      <section className="bg-[oklch(0.93_0.006_75)] px-7 py-[100px]">
-        <div className="mx-auto max-w-[var(--max-width)]">
-        <div className="mb-12 max-w-[640px]">
-          <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
-            Reviews
-          </div>
-          <h2 className="font-serif-display m-0 mb-4 text-[clamp(28px,3.6vw,40px)] font-normal">
-            Uitgelicht verhaal
-          </h2>
-          <p className="m-0 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
-            Een Google-review van een geplaatste taatsdeur: hoe de afspraken,
-            de communicatie en het resultaat in de praktijk uitpakten.
-          </p>
-        </div>
-        <div
-          data-split-row="true"
-          className="grid items-center gap-12"
-          style={{ gridTemplateColumns: "minmax(0, 280px) minmax(0, 1fr)" }}
-        >
-          <CoverImage
-            src="/assets/hero-open-door.jpg"
-            alt="Stalen taatsdeur bij Anouk Hamelink"
-            className="mx-auto aspect-[4/5] w-full max-w-[280px] min-[860px]:mx-0"
-            sizes="280px"
-          />
-          <div>
-          <div className="mb-[18px] text-[13px] tracking-[0.1em] text-[var(--accent)]">
-            ★★★★★
-          </div>
-          <p className="m-0 mb-7 text-[clamp(22px,2.6vw,30px)] font-light leading-[1.55] text-[oklch(0.2_0.008_60)] italic">
-            “Na 2 jaar verbouwen de eerste vakman die zijn afspraken volledig
-            nakomt, goed communiceert, alles netjes op tijd levert, niets
-            beschadigt bij het plaatsen en bovendien een prachtige taatsdeur
-            heeft gemaakt volledig naar onze wensen. Top!”
-          </p>
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[16px] font-semibold text-[oklch(0.14_0.006_60)]">
-              L
-            </div>
-            <div>
-              <div className="text-[15px] font-semibold text-[oklch(0.18_0.006_60)]">
-                Lucinda Coumans
-              </div>
-              <div className="text-[13px] text-[oklch(0.5_0.008_60)]">
-                Taatsdeur &nbsp;·&nbsp; Google review &nbsp;·&nbsp; 9 maanden
-                geleden
-              </div>
-            </div>
-          </div>
-          </div>
-        </div>
-        </div>
-      </section>
 
       <section id="projecten">
         <div className="mx-auto max-w-[var(--max-width)] px-7 pt-[100px]">
@@ -311,6 +250,60 @@ export function HomePage() {
             Afspraak maken
             <ArrowIcon />
           </Link>
+        </div>
+      </section>
+
+      <section className="bg-[oklch(0.93_0.006_75)] px-7 py-[100px]">
+        <div className="mx-auto max-w-[var(--max-width)]">
+        <div className="mb-12 max-w-[640px]">
+          <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+            Reviews
+          </div>
+          <h2 className="font-serif-display m-0 mb-4 text-[clamp(28px,3.6vw,40px)] font-normal">
+            Uitgelicht verhaal
+          </h2>
+          <p className="m-0 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
+            Een Google-review van een geplaatste taatsdeur: hoe de afspraken,
+            de communicatie en het resultaat in de praktijk uitpakten.
+          </p>
+        </div>
+        <div
+          data-split-row="true"
+          className="grid items-center gap-14"
+          style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)" }}
+        >
+          <CoverImage
+            src="/assets/hero-open-door.jpg"
+            alt="Stalen taatsdeur bij Anouk Hamelink"
+            className="aspect-[4/5]"
+            sizes="(min-width: 860px) 40vw, 100vw"
+          />
+          <div>
+          <div className="mb-[18px] text-[13px] tracking-[0.1em] text-[var(--accent)]">
+            ★★★★★
+          </div>
+          <p className="m-0 mb-7 text-[clamp(22px,2.6vw,30px)] font-light leading-[1.55] text-[oklch(0.2_0.008_60)] italic">
+            “Na 2 jaar verbouwen de eerste vakman die zijn afspraken volledig
+            nakomt, goed communiceert, alles netjes op tijd levert, niets
+            beschadigt bij het plaatsen en bovendien een prachtige taatsdeur
+            heeft gemaakt volledig naar onze wensen. Top!”
+          </p>
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[16px] font-semibold text-[oklch(0.14_0.006_60)]">
+              L
+            </div>
+            <div>
+              <div className="text-[15px] font-semibold text-[oklch(0.18_0.006_60)]">
+                Lucinda Coumans
+              </div>
+              <div className="text-[13px] text-[oklch(0.5_0.008_60)]">
+                Taatsdeur &nbsp;·&nbsp; Google review &nbsp;·&nbsp; 9 maanden
+                geleden
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
         </div>
       </section>
 

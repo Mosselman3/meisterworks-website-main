@@ -1410,10 +1410,14 @@ img {
 
 .cfg-product-detail {
   display: grid;
-  grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+  gap: 20px;
   align-items: center;
   margin-top: 18px;
+  padding: 16px;
+  border: 1px solid oklch(0.86 0.006 75);
+  border-radius: 16px;
+  background: oklch(0.985 0.002 75);
 }
 
 .cfg-product-detail img {
@@ -1423,9 +1427,18 @@ img {
   border-radius: 12px;
 }
 
-.cfg-product-detail figcaption {
+.cfg-product-detail-copy {
   display: grid;
+  justify-items: start;
   gap: 6px;
+}
+
+.cfg-product-detail-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: oklch(0.5 0.01 60);
 }
 
 .cfg-product-detail strong {
@@ -1881,6 +1894,78 @@ img {
     letter-spacing: 0 !important;
     line-height: 1.2;
   }
+}
+
+.cfg-bar-pos {
+  margin-top: 14px;
+}
+
+.cfg-bar-pos-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: oklch(0.42 0.008 60);
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cfg-bar-pos-toggle input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.cfg-bar-pos-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.cfg-bar-pos-hint {
+  margin: 0;
+  color: oklch(0.55 0.008 60);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.cfg-bar-pos-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.cfg-bar-pos-row > span {
+  min-width: 72px;
+  color: oklch(0.4 0.008 60);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cfg-bar-pos-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cfg-bar-pos-input input {
+  width: 58px;
+  padding: 6px 8px;
+  border: 1px solid oklch(0.86 0.006 75);
+  border-radius: 8px;
+  background: oklch(1 0 0);
+  color: oklch(0.22 0.008 60);
+  font: inherit;
+  font-size: 13px;
+}
+
+.cfg-bar-pos-input em {
+  color: oklch(0.5 0.008 60);
+  font-size: 12px;
+  font-style: normal;
 }
 
 .vlak-panel-follow {

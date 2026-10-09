@@ -4,7 +4,10 @@ import { OfferteForm } from "@/components/offerte/OfferteForm";
 import { ROUTES } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Snelle offerte — Meisterworks",
+  title: "Snelle offerte",
+  description:
+    "Liever geen configurator doorlopen? Vul een kort formulier in en ontvang binnen één werkdag een vrijblijvende offerte.",
+  alternates: { canonical: "/offerte" },
 };
 
 export default function OffertePage() {

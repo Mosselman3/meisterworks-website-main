@@ -3,8 +3,9 @@ import { QuoteThankYou } from "@/components/offerte/QuoteThankYou";
 import { ROUTES } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Bedankt voor uw aanvraag — Meisterworks",
+  title: "Bedankt voor uw aanvraag",
   robots: { index: false, follow: false },
+  alternates: { canonical: "/configurator/bedankt" },
 };
 
 export default function ConfiguratorBedanktPage() {

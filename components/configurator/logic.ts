@@ -49,6 +49,12 @@ export type ConfiguratorState = {
   staanders: number;
   panelLiggers: number;
   panelStaanders: number;
+  customDoorBars: boolean;
+  liggerPositions: number[];
+  staanderPositions: number[];
+  customPanelBars: boolean;
+  panelLiggerPositions: number[];
+  panelStaanderPositions: number[];
   vlakPreset: string;
   vlakMode: "zelf" | "ontwerp";
   hoogte: number;
@@ -76,6 +82,12 @@ export const INITIAL_STATE: ConfiguratorState = {
   staanders: 0,
   panelLiggers: 0,
   panelStaanders: 0,
+  customDoorBars: false,
+  liggerPositions: [],
+  staanderPositions: [],
+  customPanelBars: false,
+  panelLiggerPositions: [],
+  panelStaanderPositions: [],
   vlakPreset: "",
   vlakMode: "ontwerp",
   hoogte: 2100,
@@ -284,13 +296,6 @@ export const SIDE_COUNT_FIXED: SideOption[] = [
     right: 1,
   },
 ];
-
-export const VLAK_PRESETS = [
-  { id: "geen", label: "Zonder onderverdeling", liggers: 0, staanders: 0 },
-  { id: "een-ligger", label: "Eén ligger", liggers: 1, staanders: 0 },
-  { id: "twee-liggers", label: "Twee liggers", liggers: 2, staanders: 0 },
-  { id: "raster", label: "Liggers en staanders", liggers: 1, staanders: 2 },
-] as const;
 
 export const VLAK_CUSTOM_ID = "anders";
 
@@ -517,29 +522,12 @@ const MECH_DIAGRAMS: Record<string, string> = {
   </svg>`,
 };
 
+const DRAAI_THUMBS: Record<string, string> = {
+  "draai-links": "/assets/richting/linksdraaiend.png",
+  "draai-rechts": "/assets/richting/rechtsdraaiend.png",
+};
+
 const DIR_DIAGRAMS: Record<string, string> = {
-  "draai-links": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
-    <rect width="200" height="110" fill="#f4f2ef"/>
-    <rect x="4" y="48" width="58" height="16" fill="#b9b4ad"/>
-    <rect x="148" y="48" width="48" height="16" fill="#b9b4ad"/>
-    <line x1="62" y1="56" x2="148" y2="56" stroke="#ddd8d0" stroke-width="7" stroke-linecap="round"/>
-    <line x1="62" y1="56" x2="136" y2="14" stroke="#2f4a63" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="62" cy="56" r="5" fill="#c9483a"/>
-    <circle cx="134" cy="16" r="4" fill="#2b2b2b"/>
-    <path d="M152 34 A 88 88 0 0 0 150 56" stroke="#c9483a" stroke-width="2" fill="none"/>
-    <path d="M148 38 l7 -6 l2 9 z" fill="#c9483a"/>
-  </svg>`,
-  "draai-rechts": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
-    <rect width="200" height="110" fill="#f4f2ef"/>
-    <rect x="4" y="48" width="48" height="16" fill="#b9b4ad"/>
-    <rect x="138" y="48" width="58" height="16" fill="#b9b4ad"/>
-    <line x1="52" y1="56" x2="138" y2="56" stroke="#ddd8d0" stroke-width="7" stroke-linecap="round"/>
-    <line x1="138" y1="56" x2="64" y2="14" stroke="#2f4a63" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="138" cy="56" r="5" fill="#c9483a"/>
-    <circle cx="66" cy="16" r="4" fill="#2b2b2b"/>
-    <path d="M48 34 A 88 88 0 0 1 50 56" stroke="#c9483a" stroke-width="2" fill="none"/>
-    <path d="M52 38 l-7 -6 l-2 9 z" fill="#c9483a"/>
-  </svg>`,
   "schuif-links": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110">
     <rect width="200" height="110" fill="#f4f2ef"/>
     <rect x="4" y="48" width="48" height="16" fill="#b9b4ad"/>
@@ -578,8 +566,23 @@ export function mechThumbStyle(id: string): React.CSSProperties {
   return svgToBg(MECH_DIAGRAMS[id] ?? MECH_DIAGRAMS.taats);
 }
 
+function photoThumb(src: string): React.CSSProperties {
+  return {
+    aspectRatio: "1024 / 371",
+    height: "auto",
+    borderRadius: 9,
+    backgroundColor: "#f7f6f4",
+    backgroundImage: `url("${src}")`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  };
+}
+
 export function dirThumbStyle(key: string): React.CSSProperties {
-  return svgToBg(DIR_DIAGRAMS[key] ?? DIR_DIAGRAMS["draai-links"]);
+  const photo = DRAAI_THUMBS[key];
+  if (photo) return photoThumb(photo);
+  return svgToBg(DIR_DIAGRAMS[key] ?? DIR_DIAGRAMS["schuif-links"]);
 }
 
 export function zijThumbStyle(
@@ -957,21 +960,122 @@ function barPhrase(liggers: number, staanders: number) {
   return `${liggers} ligger${liggers === 1 ? "" : "s"}, ${staanders} staander${staanders === 1 ? "" : "s"}`;
 }
 
+/** Percent of the opening. Liggers are measured from the floor, staanders from the left. */
+export const BAR_POSITION_MIN = 8;
+export const BAR_POSITION_MAX = 92;
+export const BAR_POSITION_GAP = 8;
+
+export type BarPositionSet = {
+  liggers: number[] | null;
+  staanders: number[] | null;
+  panelLiggers: number[] | null;
+  panelStaanders: number[] | null;
+};
+
+function clampBarPercent(value: number) {
+  return Math.min(BAR_POSITION_MAX, Math.max(BAR_POSITION_MIN, Math.round(value)));
+}
+
+export function evenBarPositions(count: number): number[] {
+  const total = Math.max(0, Math.trunc(count));
+  return Array.from({ length: total }, (_, index) =>
+    clampBarPercent(Math.round(((index + 1) / (total + 1)) * 100)),
+  );
+}
+
+export function resizeBarPositions(count: number, current: number[] | null | undefined): number[] {
+  const even = evenBarPositions(count);
+  if (!current?.length || count <= 0) return even;
+  const clamped = current.map((value) => clampBarPercent(value));
+  if (clamped.length === count) return clamped;
+  if (clamped.length > count) return clamped.slice(0, count);
+  return [...clamped, ...even.slice(clamped.length)];
+}
+
+export function placeBarPosition(positions: number[], index: number, raw: number): number[] {
+  if (!Number.isFinite(raw)) return positions;
+  const next = positions.map((value) => clampBarPercent(value));
+  const min = index > 0 ? next[index - 1] + BAR_POSITION_GAP : BAR_POSITION_MIN;
+  const max = index < next.length - 1 ? next[index + 1] - BAR_POSITION_GAP : BAR_POSITION_MAX;
+  if (min > max) return next;
+  next[index] = Math.min(max, Math.max(min, clampBarPercent(raw)));
+  return next;
+}
+
+export function floorPercents(count: number, positions: number[] | null | undefined): number[] {
+  return positions == null ? evenBarPositions(count) : resizeBarPositions(count, positions);
+}
+
+function percentList(values: number[]) {
+  if (values.length <= 1) return `${values[0]}%`;
+  return `${values.slice(0, -1).join("%, ")}% en ${values[values.length - 1]}%`;
+}
+
+function customPositionNote(state: ConfiguratorState) {
+  const parts: string[] = [];
+  if (state.vlakMode !== "ontwerp" && state.customDoorBars) {
+    if (state.liggers > 0) {
+      parts.push(
+        `liggers ${percentList(floorPercents(state.liggers, state.liggerPositions))} vanaf de vloer`,
+      );
+    }
+    if (state.staanders > 0) {
+      parts.push(
+        `staanders ${percentList(floorPercents(state.staanders, state.staanderPositions))} vanaf links`,
+      );
+    }
+  }
+  if (hasPanels(state) && state.customPanelBars) {
+    if (state.panelLiggers > 0) {
+      parts.push(
+        `paneelliggers ${percentList(floorPercents(state.panelLiggers, state.panelLiggerPositions))} vanaf de vloer`,
+      );
+    }
+    if (state.panelStaanders > 0) {
+      parts.push(
+        `paneelstaanders ${percentList(floorPercents(state.panelStaanders, state.panelStaanderPositions))} vanaf links`,
+      );
+    }
+  }
+  return parts.length > 0 ? ` Eigen positie: ${parts.join(", ")}.` : "";
+}
+
+export function quoteBarPositions(state: ConfiguratorState): BarPositionSet | null {
+  const doorOpen = state.vlakMode !== "ontwerp" && state.customDoorBars;
+  const panelOpen = hasPanels(state) && state.customPanelBars;
+  const liggers = doorOpen && state.liggers > 0 ? floorPercents(state.liggers, state.liggerPositions) : null;
+  const staanders =
+    doorOpen && state.staanders > 0 ? floorPercents(state.staanders, state.staanderPositions) : null;
+  const panelLiggers =
+    panelOpen && state.panelLiggers > 0
+      ? floorPercents(state.panelLiggers, state.panelLiggerPositions)
+      : null;
+  const panelStaanders =
+    panelOpen && state.panelStaanders > 0
+      ? floorPercents(state.panelStaanders, state.panelStaanderPositions)
+      : null;
+  if (!liggers && !staanders && !panelLiggers && !panelStaanders) return null;
+  return { liggers, staanders, panelLiggers, panelStaanders };
+}
+
 export function vlakLabel(state: ConfiguratorState): string {
   const design = state.vlakMode === "ontwerp" ? vlakDesign(state.vlakPreset) : null;
-  if (design && design.code === VLAK_CUSTOM_ID) return design.name;
+  if (design && design.code === VLAK_CUSTOM_ID) {
+    return hasPanels(state) ? `${design.name}${customPositionNote(state)}` : design.name;
+  }
   if (design) {
     if (!hasPanels(state)) return design.name;
     const panelWindows = windowCountFromBars(state.panelLiggers, state.panelStaanders);
     const panelWord = state.panelLayout === "beide" ? "Panelen" : "Paneel";
-    return `${design.name}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}`;
+    return `${design.name}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}${customPositionNote(state)}`;
   }
   const windows = windowCountFromBars(state.liggers, state.staanders);
   const door = `${barPhrase(state.liggers, state.staanders)} · ${windows} ${windows === 1 ? "raam" : "ramen"}`;
-  if (!hasPanels(state)) return door;
+  const note = customPositionNote(state);
+  if (!hasPanels(state)) return `${door}${note}`;
   const panelWindows = windowCountFromBars(state.panelLiggers, state.panelStaanders);
   const panelWord = state.panelLayout === "beide" ? "Panelen" : "Paneel";
-  return `Deur: ${door}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}`;
+  return `Deur: ${door}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}${note}`;
 }
 
 export type PreviewDesignMark =
@@ -1174,8 +1278,28 @@ export function buildPreviewSvg(
       : bay.type === "panel"
         ? state.panelStaanders
         : state.staanders;
-    for (let l = 1; l <= liggerCount; l++) {
-      const ly = gy + (gh * l) / (liggerCount + 1);
+    const liggerPcts = floorPercents(
+      liggerCount,
+      bay.type === "panel"
+        ? state.customPanelBars
+          ? state.panelLiggerPositions
+          : null
+        : state.customDoorBars
+          ? state.liggerPositions
+          : null,
+    );
+    const staanderPcts = floorPercents(
+      staanderCount,
+      bay.type === "panel"
+        ? state.customPanelBars
+          ? state.panelStaanderPositions
+          : null
+        : state.customDoorBars
+          ? state.staanderPositions
+          : null,
+    );
+    for (const pct of liggerPcts) {
+      const ly = gy + gh * (1 - pct / 100);
       e.push(
         React.createElement("line", {
           key: key(ki++),
@@ -1188,8 +1312,8 @@ export function buildPreviewSvg(
         }),
       );
     }
-    for (let s = 1; s <= staanderCount; s++) {
-      const sx = gx + (gw * s) / (staanderCount + 1);
+    for (const pct of staanderPcts) {
+      const sx = gx + gw * (pct / 100);
       e.push(
         React.createElement("line", {
           key: key(ki++),
@@ -1448,9 +1572,12 @@ export function buildPreviewSvg(
   if (!designOnDoor && state.liggers > 0) {
     const gh0 = H - frame - mullion;
     const gy0 = y0 + frame / 2 + mullion / 2;
-    for (let l = 1; l <= state.liggers; l++) {
-      const ly = gy0 + (gh0 * l) / (state.liggers + 1);
-      const posMm = Math.round(state.hoogte * (1 - l / (state.liggers + 1)));
+    for (const pct of floorPercents(
+      state.liggers,
+      state.customDoorBars ? state.liggerPositions : null,
+    )) {
+      const ly = gy0 + gh0 * (1 - pct / 100);
+      const posMm = Math.round(state.hoogte * (pct / 100));
       badge(x0 - 30, ly, `${posMm}`, 40);
       e.push(
         React.createElement("line", {
@@ -1469,9 +1596,12 @@ export function buildPreviewSvg(
   if (designOnDoor && hasPanels(state) && state.panelLiggers > 0) {
     const gh0 = H - frame - mullion;
     const gy0 = y0 + frame / 2 + mullion / 2;
-    for (let l = 1; l <= state.panelLiggers; l++) {
-      const ly = gy0 + (gh0 * l) / (state.panelLiggers + 1);
-      const posMm = Math.round(state.hoogte * (1 - l / (state.panelLiggers + 1)));
+    for (const pct of floorPercents(
+      state.panelLiggers,
+      state.customPanelBars ? state.panelLiggerPositions : null,
+    )) {
+      const ly = gy0 + gh0 * (1 - pct / 100);
+      const posMm = Math.round(state.hoogte * (pct / 100));
       badge(x0 - 30, ly, `${posMm}`, 40);
       e.push(
         React.createElement("line", {

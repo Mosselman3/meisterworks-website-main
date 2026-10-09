@@ -4,7 +4,10 @@ import { listInspirationMedia } from "@/lib/inspiration";
 import { CONTACT } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Inspiratie — Meisterworks",
+  title: "Inspiratie",
+  description:
+    "Een doorlopend overzicht van projecten, details en werk in uitvoering — rechtstreeks van onze Instagram.",
+  alternates: { canonical: "/inspiratie" },
 };
 
 export default function InspiratiePage() {

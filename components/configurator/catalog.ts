@@ -449,9 +449,30 @@ export const SLUITWERK = [
 ] as const;
 
 export const HARDWARE = [
-  { code: "loopslot", label: "Loopslot", desc: "Loopslot, zonder slot.", price: 95, indication: 1 },
-  { code: "wc_slot", label: "WC-slot", desc: "WC-slot.", price: 145, indication: 2 },
-  { code: "slot_met_cilinder", label: "Slot met cilinder", desc: "Slot met cilinder.", price: 240, indication: 3 },
+  {
+    code: "loopslot",
+    label: "Loopslot",
+    desc: "Loopslot, zonder slot.",
+    price: 95,
+    indication: 1,
+    image: "/assets/sluitwerk/loopslot.jpg",
+  },
+  {
+    code: "wc_slot",
+    label: "WC-slot",
+    desc: "WC-slot.",
+    price: 145,
+    indication: 2,
+    image: "/assets/sluitwerk/wc_slot.jpg",
+  },
+  {
+    code: "slot_met_cilinder",
+    label: "Slot met cilinder",
+    desc: "Slot met cilinder.",
+    price: 240,
+    indication: 3,
+    image: "/assets/sluitwerk/slot_met_cilinder.jpg",
+  },
 ] as const;
 
 const RATES = {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Lato } from "next/font/google";
+import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -18,9 +19,27 @@ const lato = Lato({
   display: "swap",
 });
 
+const defaultTitle = "Meisterworks — Maatwerk in staal & glas";
+const defaultDescription = "Maatwerk in staal en glas";
+
 export const metadata: Metadata = {
-  title: "Meisterworks",
-  description: "Maatwerk in staal en glas",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: defaultTitle,
+    template: "%s — Meisterworks",
+  },
+  description: defaultDescription,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "nl_NL",
+    siteName: "Meisterworks",
+    images: [{ url: DEFAULT_OG_IMAGE, alt: "Stalen taatsdeur van Meisterworks" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [DEFAULT_OG_IMAGE],
+  },
   icons: {
     icon: [
       {

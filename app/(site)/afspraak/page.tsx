@@ -4,7 +4,10 @@ import { REVIEW_COUNT, REVIEW_SCORE } from "@/lib/content";
 import { CONTACT, ROUTES } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Adviesgesprek plannen — Meisterworks",
+  title: "Adviesgesprek plannen",
+  description:
+    "Plan een adviesgesprek van 30 minuten, telefonisch of op het atelier. Geen verplichtingen.",
+  alternates: { canonical: "/afspraak" },
 };
 
 const REASONS = [

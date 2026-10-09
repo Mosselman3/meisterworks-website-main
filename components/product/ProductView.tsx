@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowIcon, CoverImage } from "@/components/ui";
 import { relatedProducts, type ProductPageCopy } from "@/lib/products";
 import { DesignMoreCarousel } from "@/components/product/DesignMoreCarousel";
+import { PlacedWork } from "@/components/product/PlacedWork";
+import type { InspirationMedia } from "@/lib/inspiration";
 import {
   COLORS,
   GLASS_LOOK_GROUPS,
@@ -130,7 +132,13 @@ function ComposeLink({ href, children }: { href: string; children: string }) {
   );
 }
 
-export function ProductView({ page }: { page: ProductPageCopy }) {
+export function ProductView({
+  page,
+  placedPhotos,
+}: {
+  page: ProductPageCopy;
+  placedPhotos: InspirationMedia[];
+}) {
   const related = relatedProducts(page.slug);
   const product = getProduct(page.slug);
   const configureHref = `${ROUTES.configurator}?product=${page.slug}`;
@@ -149,14 +157,16 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
   return (
     <main>
       <section className="relative mx-7 mt-[22px] flex min-h-[72vh] items-end overflow-hidden rounded-[18px]">
-        <CoverImage
-          src={page.heroImage}
-          alt={page.heroAlt}
-          className="absolute inset-0 h-full w-full"
-          radius={18}
-          priority
-          sizes="100vw"
-        />
+        <div className="absolute inset-0">
+          <CoverImage
+            src={page.heroImage}
+            alt={page.heroAlt}
+            className="h-full w-full"
+            radius={18}
+            priority
+            sizes="100vw"
+          />
+        </div>
         <div className="absolute inset-0 z-[1] rounded-[18px] bg-[linear-gradient(180deg,oklch(0.14_0.006_60_/_0.05)_0%,oklch(0.12_0.006_60_/_0.3)_55%,oklch(0.1_0.006_60_/_0.78)_100%)]" />
         <div className="relative z-[2] max-w-[720px] px-11 pb-14">
           <div className="mb-4 text-[13px] font-medium tracking-[0.18em] text-[var(--accent)] uppercase">
@@ -317,6 +327,8 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
         <ComposeLink href={configureHref}>Kies glas</ComposeLink>
       </section>
 
+      <PlacedWork photos={placedPhotos} />
+
       <section className="bg-[oklch(0.16_0.006_60)] px-7 py-20">
         <div className="mx-auto max-w-[var(--max-width)]">
           <StepIntro
@@ -386,7 +398,12 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
             <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
               {HARDWARE.map((option) => (
                 <div key={option.code}>
-                  <div className="mb-3.5 aspect-[4/5] rounded-[12px] bg-[oklch(0.22_0.006_60)]" />
+                  <CoverImage
+                    src={option.image}
+                    alt={option.label}
+                    className="mb-3.5 aspect-[4/5]"
+                    sizes={GRID_IMAGE_SIZES}
+                  />
                   <div className="font-serif-display mb-1.5 text-[16px] text-[oklch(0.94_0.004_75)] min-[560px]:text-[19px]">
                     {option.label}
                   </div>

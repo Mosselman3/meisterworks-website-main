@@ -33,6 +33,14 @@ export type QuoteConfiguration = {
   rightPanelWidthMm: number;
   panelLiggers: number;
   panelStaanders: number;
+  liggers: number;
+  staanders: number;
+  barPositions: {
+    liggers: number[] | null;
+    staanders: number[] | null;
+    panelLiggers: number[] | null;
+    panelStaanders: number[] | null;
+  } | null;
   vlakMode: "zelf" | "ontwerp";
   vlakPreset: string;
   openingDirection: "links" | "rechts" | null;

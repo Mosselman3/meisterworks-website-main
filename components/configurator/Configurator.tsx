@@ -54,8 +54,10 @@ import {
   INITIAL_STATE,
   MAX_DOORS,
   VLAK_CUSTOM_ID,
-  VLAK_PRESETS,
   catalogVlakDesigns,
+  placeBarPosition,
+  quoteBarPositions,
+  resizeBarPositions,
   buildPreviewSvg,
   configurationProgress,
   directionApplies,
@@ -597,6 +599,9 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
       rightPanelWidthMm: 0,
       panelLiggers: 0,
       panelStaanders: 0,
+      liggers: 0,
+      staanders: 0,
+      barPositions: null,
       vlakMode: "zelf",
       vlakPreset: "",
       openingDirection: null,
@@ -634,6 +639,9 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
     rightPanelWidthMm: rightPanelActive(state) ? state.rightPanelBreedte : 0,
     panelLiggers: hasPanels(state) ? state.panelLiggers : 0,
     panelStaanders: hasPanels(state) ? state.panelStaanders : 0,
+    liggers: state.liggers,
+    staanders: state.staanders,
+    barPositions: quoteBarPositions(state),
     vlakMode: state.vlakMode === "ontwerp" ? "ontwerp" : "zelf",
     vlakPreset: state.vlakMode === "ontwerp" ? state.vlakPreset : "",
     openingDirection:
@@ -768,6 +776,8 @@ function isUntouchedProductStart(state: ConfiguratorState, productParam: string)
     state.staanders === initial.staanders &&
     state.panelLiggers === initial.panelLiggers &&
     state.panelStaanders === initial.panelStaanders &&
+    state.customDoorBars === initial.customDoorBars &&
+    state.customPanelBars === initial.customPanelBars &&
     state.vlakPreset === initial.vlakPreset &&
     state.vlakMode === initial.vlakMode &&
     state.panelLayout === initial.panelLayout &&
@@ -825,9 +835,13 @@ export function Configurator() {
   const panelFollowRef = useRef<HTMLDivElement>(null);
   const glassFollowRef = useRef<HTMLDivElement>(null);
   const ralFollowRef = useRef<HTMLDivElement>(null);
+  const productFollowRef = useRef<HTMLDivElement>(null);
   const skipPanelScroll = useRef(true);
   const skipGlassScroll = useRef(true);
   const skipRalScroll = useRef(true);
+  const skipProductScroll = useRef(true);
+  const [productConfirmId, setProductConfirmId] = useState<string | null>(null);
+  const [productConfirmTick, setProductConfirmTick] = useState(0);
 
   useLayoutEffect(() => {
     if (!productParam) {
@@ -1184,6 +1198,12 @@ export function Configurator() {
     state.staanders,
     state.panelLiggers,
     state.panelStaanders,
+    state.customDoorBars,
+    state.customPanelBars,
+    state.liggerPositions.join(","),
+    state.staanderPositions.join(","),
+    state.panelLiggerPositions.join(","),
+    state.panelStaanderPositions.join(","),
     state.vlakPreset,
     state.vlakMode,
     state.kleur,
@@ -1320,6 +1340,7 @@ export function Configurator() {
       }));
       setQuoteOpen(false);
       setGlassLook(undefined);
+      setProductConfirmId(null);
       setMissingStep(null);
       quoteAutoShown.current = isDoorComplete(next);
       scrollToSection(next.openSection ?? "product");
@@ -1354,6 +1375,7 @@ export function Configurator() {
     setState(fresh);
     setQuoteOpen(false);
     setGlassLook(undefined);
+    setProductConfirmId(null);
     setMissingStep(null);
     quoteAutoShown.current = false;
     clearConfiguratorDraft();
@@ -1384,6 +1406,16 @@ export function Configurator() {
       setMissingStep("kleur");
       return;
     }
+    if (
+      currentStepId === "product" &&
+      product.detailImage &&
+      !state.answered.product &&
+      productConfirmId !== product.id
+    ) {
+      setProductConfirmId(product.id);
+      setProductConfirmTick((tick) => tick + 1);
+      return;
+    }
     const next = nextStepId(currentStepId, product, state.sluitwerk);
     setState((s) => ({
       ...s,
@@ -1397,6 +1429,8 @@ export function Configurator() {
     product,
     requestQuote,
     scrollToSection,
+    productConfirmId,
+    state.answered.product,
     state.kleur,
     state.ralCode,
     state.sluitwerk,
@@ -1430,6 +1464,15 @@ export function Configurator() {
   }, [state.kleur]);
 
   useEffect(() => {
+    if (skipProductScroll.current) {
+      skipProductScroll.current = false;
+      return;
+    }
+    if (!productConfirmId) return;
+    scrollFollowUpIntoView(productFollowRef.current);
+  }, [productConfirmTick, productConfirmId]);
+
+  useEffect(() => {
     if (missingStep && isStepConfirmed(missingStep, state, product)) {
       setMissingStep(null);
     }
@@ -1461,6 +1504,41 @@ export function Configurator() {
     };
   }, [quoteOpen]);
 
+  const stepBars = (
+    key: "liggers" | "staanders" | "panelLiggers" | "panelStaanders",
+    delta: 1 | -1,
+  ) => {
+    setState((current) => {
+      const next = Math.min(5, Math.max(0, current[key] + delta));
+      if (key === "liggers") {
+        return {
+          ...current,
+          liggers: next,
+          liggerPositions: resizeBarPositions(next, current.liggerPositions),
+        };
+      }
+      if (key === "staanders") {
+        return {
+          ...current,
+          staanders: next,
+          staanderPositions: resizeBarPositions(next, current.staanderPositions),
+        };
+      }
+      if (key === "panelLiggers") {
+        return {
+          ...current,
+          panelLiggers: next,
+          panelLiggerPositions: resizeBarPositions(next, current.panelLiggerPositions),
+        };
+      }
+      return {
+        ...current,
+        panelStaanders: next,
+        panelStaanderPositions: resizeBarPositions(next, current.panelStaanderPositions),
+      };
+    });
+  };
+
   const renderSectionBody = (id: StepId): ReactNode => {
     if (id === "product") {
       return (
@@ -1491,19 +1569,29 @@ export function Configurator() {
               }}
               previewSrc={o.img}
               onClick={() => {
+                const showClose = Boolean(o.detailImage);
                 setState((s) => ({
                   ...s,
                   productId: o.id,
+                  openSection: showClose ? "product" : s.openSection,
                   panelLayout: "geen",
                   richting: directionApplies(o) ? s.richting : "",
                   beslag: lockApplies(o, s.sluitwerk) ? s.beslag : "",
                   answered: {
                     ...s.answered,
-                    product: true,
+                    product: showClose
+                      ? s.productId === o.id && s.answered.product
+                      : true,
                     ...(directionApplies(o) ? {} : { richting: false }),
                     ...(lockApplies(o, s.sluitwerk) ? {} : { beslag: false }),
                   },
                 }));
+                if (showClose) {
+                  setProductConfirmId(o.id);
+                  setProductConfirmTick((tick) => tick + 1);
+                  return;
+                }
+                setProductConfirmId(null);
                 advanceFrom("product", o);
               }}
             />
@@ -1534,14 +1622,27 @@ export function Configurator() {
             }}
           />
         </div>
-        {product.detailImage ? (
-          <figure className="cfg-product-detail">
+        {product.detailImage &&
+        (productConfirmId === product.id || state.answered.product) ? (
+          <div ref={productFollowRef} className="cfg-product-detail">
             <img src={product.detailImage} alt={product.detailAlt ?? product.label} />
-            <figcaption>
+            <div className="cfg-product-detail-copy">
+              <div className="cfg-product-detail-kicker">Bevestiging</div>
               <strong>{product.detailTitle}</strong>
               <span>{product.detailLead}</span>
-            </figcaption>
-          </figure>
+              <button
+                type="button"
+                data-cfg-confirm
+                style={confirmBtnStyle()}
+                onClick={() => {
+                  mark("product", true);
+                  advanceFrom("product");
+                }}
+              >
+                Bevestigen
+              </button>
+            </div>
+          </div>
         ) : null}
       </>
       );
@@ -1798,18 +1899,8 @@ export function Configurator() {
                   }
                   subtitle="Horizontale onderverdeling"
                   value={state.panelLiggers}
-                  onMinus={() =>
-                    setState((s) => ({
-                      ...s,
-                      panelLiggers: Math.max(0, s.panelLiggers - 1),
-                    }))
-                  }
-                  onPlus={() =>
-                    setState((s) => ({
-                      ...s,
-                      panelLiggers: Math.min(5, s.panelLiggers + 1),
-                    }))
-                  }
+                  onMinus={() => stepBars("panelLiggers", -1)}
+                  onPlus={() => stepBars("panelLiggers", 1)}
                 />
                 <StepperField
                   title={
@@ -1819,20 +1910,52 @@ export function Configurator() {
                   }
                   subtitle="Verticale onderverdeling"
                   value={state.panelStaanders}
-                  onMinus={() =>
-                    setState((s) => ({
-                      ...s,
-                      panelStaanders: Math.max(0, s.panelStaanders - 1),
-                    }))
-                  }
-                  onPlus={() =>
-                    setState((s) => ({
-                      ...s,
-                      panelStaanders: Math.min(5, s.panelStaanders + 1),
-                    }))
-                  }
+                  onMinus={() => stepBars("panelStaanders", -1)}
+                  onPlus={() => stepBars("panelStaanders", 1)}
                 />
               </div>
+              <BarPositionControl
+                label="Positie zelf instellen"
+                liggers={state.panelLiggers}
+                staanders={state.panelStaanders}
+                custom={state.customPanelBars}
+                liggerPositions={state.panelLiggerPositions}
+                staanderPositions={state.panelStaanderPositions}
+                onCustom={(customPanelBars) =>
+                  setState((current) => ({
+                    ...current,
+                    customPanelBars,
+                    panelLiggerPositions: resizeBarPositions(
+                      current.panelLiggers,
+                      current.panelLiggerPositions,
+                    ),
+                    panelStaanderPositions: resizeBarPositions(
+                      current.panelStaanders,
+                      current.panelStaanderPositions,
+                    ),
+                  }))
+                }
+                onLigger={(index, value) =>
+                  setState((current) => ({
+                    ...current,
+                    panelLiggerPositions: placeBarPosition(
+                      resizeBarPositions(current.panelLiggers, current.panelLiggerPositions),
+                      index,
+                      value,
+                    ),
+                  }))
+                }
+                onStaander={(index, value) =>
+                  setState((current) => ({
+                    ...current,
+                    panelStaanderPositions: placeBarPosition(
+                      resizeBarPositions(current.panelStaanders, current.panelStaanderPositions),
+                      index,
+                      value,
+                    ),
+                  }))
+                }
+              />
               <p
                 style={{
                   fontSize: 12,
@@ -1853,52 +1976,6 @@ export function Configurator() {
           <>
           <div
             style={{
-              display: "flex",
-              gap: 10,
-              flexWrap: "wrap",
-              marginBottom: 22,
-            }}
-          >
-            {VLAK_PRESETS.map((o) => {
-              const sel =
-                state.liggers === o.liggers &&
-                state.staanders === o.staanders &&
-                (!hasPanels(state) ||
-                  (state.panelLiggers === o.liggers &&
-                    state.panelStaanders === o.staanders));
-              return (
-                <button
-                  key={o.id}
-                  type="button"
-                  onClick={() =>
-                    setState((s) => ({
-                      ...s,
-                      liggers: o.liggers,
-                      staanders: o.staanders,
-                      panelLiggers: hasPanels(s) ? o.liggers : s.panelLiggers,
-                      panelStaanders: hasPanels(s) ? o.staanders : s.panelStaanders,
-                    }))
-                  }
-                  style={{
-                    padding: "8px 16px",
-                    borderRadius: 999,
-                    fontFamily: "inherit",
-                    fontSize: 13,
-                    cursor: "pointer",
-                    border: `1px solid ${sel ? accent : "oklch(0.85 0.006 75)"}`,
-                    background: sel ? `${accent}1a` : "transparent",
-                    color: sel
-                      ? "oklch(0.25 0.008 60)"
-                      : "oklch(0.45 0.008 60)",
-                  }}
-                >
-                  {o.label}
-                </button>
-              );
-            })}
-          </div>
-          <div
-            style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
               gap: 18,
@@ -1908,35 +1985,15 @@ export function Configurator() {
               title={hasPanels(state) ? "Liggers deur" : "Liggers"}
               subtitle="Horizontale onderverdeling"
               value={state.liggers}
-              onMinus={() =>
-                setState((s) => ({
-                  ...s,
-                  liggers: Math.max(0, s.liggers - 1),
-                }))
-              }
-              onPlus={() =>
-                setState((s) => ({
-                  ...s,
-                  liggers: Math.min(5, s.liggers + 1),
-                }))
-              }
+              onMinus={() => stepBars("liggers", -1)}
+              onPlus={() => stepBars("liggers", 1)}
             />
             <StepperField
               title={hasPanels(state) ? "Staanders deur" : "Staanders"}
               subtitle="Verticale onderverdeling"
               value={state.staanders}
-              onMinus={() =>
-                setState((s) => ({
-                  ...s,
-                  staanders: Math.max(0, s.staanders - 1),
-                }))
-              }
-              onPlus={() =>
-                setState((s) => ({
-                  ...s,
-                  staanders: Math.min(5, s.staanders + 1),
-                }))
-              }
+              onMinus={() => stepBars("staanders", -1)}
+              onPlus={() => stepBars("staanders", 1)}
             />
             {hasPanels(state) ? (
               <>
@@ -1948,18 +2005,8 @@ export function Configurator() {
                   }
                   subtitle="Horizontale onderverdeling"
                   value={state.panelLiggers}
-                  onMinus={() =>
-                    setState((s) => ({
-                      ...s,
-                      panelLiggers: Math.max(0, s.panelLiggers - 1),
-                    }))
-                  }
-                  onPlus={() =>
-                    setState((s) => ({
-                      ...s,
-                      panelLiggers: Math.min(5, s.panelLiggers + 1),
-                    }))
-                  }
+                  onMinus={() => stepBars("panelLiggers", -1)}
+                  onPlus={() => stepBars("panelLiggers", 1)}
                 />
                 <StepperField
                   title={
@@ -1969,22 +2016,92 @@ export function Configurator() {
                   }
                   subtitle="Verticale onderverdeling"
                   value={state.panelStaanders}
-                  onMinus={() =>
-                    setState((s) => ({
-                      ...s,
-                      panelStaanders: Math.max(0, s.panelStaanders - 1),
-                    }))
-                  }
-                  onPlus={() =>
-                    setState((s) => ({
-                      ...s,
-                      panelStaanders: Math.min(5, s.panelStaanders + 1),
-                    }))
-                  }
+                  onMinus={() => stepBars("panelStaanders", -1)}
+                  onPlus={() => stepBars("panelStaanders", 1)}
                 />
               </>
             ) : null}
           </div>
+          <BarPositionControl
+            label="Positie zelf instellen"
+            liggers={state.liggers}
+            staanders={state.staanders}
+            custom={state.customDoorBars}
+            liggerPositions={state.liggerPositions}
+            staanderPositions={state.staanderPositions}
+            onCustom={(customDoorBars) =>
+              setState((current) => ({
+                ...current,
+                customDoorBars,
+                liggerPositions: resizeBarPositions(current.liggers, current.liggerPositions),
+                staanderPositions: resizeBarPositions(current.staanders, current.staanderPositions),
+              }))
+            }
+            onLigger={(index, value) =>
+              setState((current) => ({
+                ...current,
+                liggerPositions: placeBarPosition(
+                  resizeBarPositions(current.liggers, current.liggerPositions),
+                  index,
+                  value,
+                ),
+              }))
+            }
+            onStaander={(index, value) =>
+              setState((current) => ({
+                ...current,
+                staanderPositions: placeBarPosition(
+                  resizeBarPositions(current.staanders, current.staanderPositions),
+                  index,
+                  value,
+                ),
+              }))
+            }
+          />
+          {hasPanels(state) ? (
+            <BarPositionControl
+              label="Positie panelen zelf instellen"
+              liggers={state.panelLiggers}
+              staanders={state.panelStaanders}
+              custom={state.customPanelBars}
+              liggerPositions={state.panelLiggerPositions}
+              staanderPositions={state.panelStaanderPositions}
+              onCustom={(customPanelBars) =>
+                setState((current) => ({
+                  ...current,
+                  customPanelBars,
+                  panelLiggerPositions: resizeBarPositions(
+                    current.panelLiggers,
+                    current.panelLiggerPositions,
+                  ),
+                  panelStaanderPositions: resizeBarPositions(
+                    current.panelStaanders,
+                    current.panelStaanderPositions,
+                  ),
+                }))
+              }
+              onLigger={(index, value) =>
+                setState((current) => ({
+                  ...current,
+                  panelLiggerPositions: placeBarPosition(
+                    resizeBarPositions(current.panelLiggers, current.panelLiggerPositions),
+                    index,
+                    value,
+                  ),
+                }))
+              }
+              onStaander={(index, value) =>
+                setState((current) => ({
+                  ...current,
+                  panelStaanderPositions: placeBarPosition(
+                    resizeBarPositions(current.panelStaanders, current.panelStaanderPositions),
+                    index,
+                    value,
+                  ),
+                }))
+              }
+            />
+          ) : null}
           <p
             style={{
               fontSize: 12,
@@ -2402,8 +2519,12 @@ export function Configurator() {
               thumbStyle={{
                 height: 96,
                 borderRadius: 9,
+                backgroundImage: `url('${item.image}')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 backgroundColor: "oklch(0.93 0.006 75)",
               }}
+              previewSrc={item.image}
               onClick={() => {
                 setState((s) => ({
                   ...s,
@@ -3420,6 +3541,91 @@ export function Configurator() {
               </button>
             </div>
           </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function BarPositionControl({
+  label,
+  liggers,
+  staanders,
+  custom,
+  liggerPositions,
+  staanderPositions,
+  onCustom,
+  onLigger,
+  onStaander,
+}: {
+  label: string;
+  liggers: number;
+  staanders: number;
+  custom: boolean;
+  liggerPositions: number[];
+  staanderPositions: number[];
+  onCustom: (custom: boolean) => void;
+  onLigger: (index: number, value: number) => void;
+  onStaander: (index: number, value: number) => void;
+}) {
+  if (liggers + staanders === 0) return null;
+  const liggersNow = resizeBarPositions(liggers, liggerPositions);
+  const staandersNow = resizeBarPositions(staanders, staanderPositions);
+  return (
+    <div className="cfg-bar-pos">
+      <label className="cfg-bar-pos-toggle">
+        <input
+          type="checkbox"
+          checked={custom}
+          onChange={(event) => onCustom(event.target.checked)}
+        />
+        <span>{label}</span>
+      </label>
+      {custom ? (
+        <div className="cfg-bar-pos-fields">
+          <p className="cfg-bar-pos-hint">
+            Percentage van de opening. Liggers vanaf de vloer, staanders vanaf links.
+          </p>
+          {liggers > 0 ? (
+            <div className="cfg-bar-pos-row">
+              <span>{liggers === 1 ? "Ligger" : "Liggers"}</span>
+              {liggersNow.map((value, index) => (
+                <label key={`ligger-${index}`} className="cfg-bar-pos-input">
+                  {liggers > 1 ? <em>{index + 1}</em> : null}
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={8}
+                    max={92}
+                    aria-label={`${liggers === 1 ? "Ligger" : `Ligger ${index + 1}`} vanaf de vloer`}
+                    value={value}
+                    onChange={(event) => onLigger(index, Number(event.target.value))}
+                  />
+                  <em>%</em>
+                </label>
+              ))}
+            </div>
+          ) : null}
+          {staanders > 0 ? (
+            <div className="cfg-bar-pos-row">
+              <span>{staanders === 1 ? "Staander" : "Staanders"}</span>
+              {staandersNow.map((value, index) => (
+                <label key={`staander-${index}`} className="cfg-bar-pos-input">
+                  {staanders > 1 ? <em>{index + 1}</em> : null}
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={8}
+                    max={92}
+                    aria-label={`${staanders === 1 ? "Staander" : `Staander ${index + 1}`} vanaf links`}
+                    value={value}
+                    onChange={(event) => onStaander(index, Number(event.target.value))}
+                  />
+                  <em>%</em>
+                </label>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

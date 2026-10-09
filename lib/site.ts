@@ -1,5 +1,10 @@
 export const ACCENT = "#a67c52";
 
+/** Canonical origin. Change this if the public domain changes. */
+export const SITE_URL = "https://meisterworks.nl";
+
+export const DEFAULT_OG_IMAGE = "/assets/doors/taatsdeur-landscape.jpg";
+
 export const ROUTES = {
   home: "/",
   deuren: "/#deuren",
@@ -52,7 +57,7 @@ export const PRODUCTS: Product[] = [
     detailImage: "/assets/doors/scharnierdeur-detail.jpg",
     detailAlt: "Scharnier van een stalen deur in het kozijn",
     detailTitle: "Het scharnier",
-    detailLead: "De deur draait aan zichtbare scharnieren. Het kozijn is inbegrepen.",
+    detailLead: "De deur draait aan zichtbare scharnieren.",
     doorTypeCode: "scharnierdeur_kozijn",
   },
   {
@@ -63,7 +68,7 @@ export const PRODUCTS: Product[] = [
     detailImage: "/assets/doors/schuifdeur-detail.jpg",
     detailAlt: "Bovenrail van een stalen schuifdeur",
     detailTitle: "De rail",
-    detailLead: "De deur schuift langs de rail. Loopwerk is inbegrepen.",
+    detailLead: "De deur schuift langs de rail.",
     doorTypeCode: "schuifdeur",
   },
   {

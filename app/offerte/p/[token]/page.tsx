@@ -4,7 +4,7 @@ import { QuotePortal } from "@/components/portal/QuotePortal";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Uw offerte — Meisterworks",
+  title: "Uw offerte",
   robots: {
     index: false,
     follow: false,

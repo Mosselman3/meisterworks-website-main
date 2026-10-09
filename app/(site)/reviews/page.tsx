@@ -5,7 +5,9 @@ import { ArrowIcon } from "@/components/ui";
 import { ROUTES } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Reviews — Meisterworks",
+  title: "Reviews",
+  description: "Bekijk wat klanten zeggen over Meisterworks.",
+  alternates: { canonical: "/reviews" },
 };
 
 export default function ReviewsPage() {

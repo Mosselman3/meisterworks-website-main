@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Configurator — Meisterworks",
+  title: "Configurator",
+  description:
+    "Stel uw stalen deur samen: afmeting, vlakverdeling, glas, kleur en sluitwerk.",
+  alternates: { canonical: "/configurator" },
 };
 
 export default function ConfiguratorPage() {

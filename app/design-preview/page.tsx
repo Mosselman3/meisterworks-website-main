@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DESIGN_PAGES } from "@/lib/design-pages";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Design preview",
+  robots: { index: false, follow: false },
+  alternates: { canonical: "/design-preview" },
+};
 
 export default function DesignIndexPage() {
   if (process.env.NODE_ENV !== "development") {
