@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { InspirationGrid } from "@/components/inspiration/InspirationGrid";
+import { HeroLoad } from "@/components/motion/Reveal";
 import { listInspirationMedia } from "@/lib/inspiration";
 import { CONTACT } from "@/lib/site";
 
@@ -16,16 +17,23 @@ export default function InspiratiePage() {
   return (
     <main>
       <header className="mx-auto max-w-[var(--max-width)] px-7 pt-[72px] pb-12 text-center">
-        <div className="mb-4 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
-          Inspiratie
-        </div>
-        <h1 className="font-serif-display m-0 mb-[18px] text-[clamp(30px,4.4vw,46px)] font-normal">
-          Ons werk, dagelijks bijgehouden.
-        </h1>
-        <p className="mx-auto mb-7 max-w-[560px] text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
-          Een doorlopend overzicht van projecten, details en werk in uitvoering
-          — rechtstreeks van onze Instagram.
-        </p>
+        <HeroLoad>
+          <div className="mb-4 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+            Inspiratie
+          </div>
+        </HeroLoad>
+        <HeroLoad stagger={1}>
+          <h1 className="font-serif-display m-0 mb-[18px] text-[clamp(30px,4.4vw,46px)] font-normal">
+            Ons werk, dagelijks bijgehouden.
+          </h1>
+        </HeroLoad>
+        <HeroLoad stagger={2}>
+          <p className="mx-auto mb-7 max-w-[560px] text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
+            Een doorlopend overzicht van projecten, details en werk in uitvoering
+            — rechtstreeks van onze Instagram.
+          </p>
+        </HeroLoad>
+        <HeroLoad stagger={3}>
         <a
           href={CONTACT.instagram}
           target="_blank"
@@ -53,6 +61,7 @@ export default function InspiratiePage() {
           </svg>
           {CONTACT.instagramHandle} volgen
         </a>
+        </HeroLoad>
       </header>
 
       <section className="mx-auto max-w-[var(--max-width)] px-0 pb-[100px] min-[720px]:px-7">

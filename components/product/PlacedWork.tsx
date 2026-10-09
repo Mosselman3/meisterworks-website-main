@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Reveal } from "@/components/motion/Reveal";
 import { ArrowIcon, CoverImage } from "@/components/ui";
 import type { InspirationMedia } from "@/lib/inspiration";
 import { ROUTES } from "@/lib/site";
@@ -10,7 +11,7 @@ export function PlacedWork({ photos }: { photos: InspirationMedia[] }) {
   return (
     <section className="px-7 py-20">
       <div className="mx-auto max-w-[var(--max-width)]">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
+        <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-[640px]">
             <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
               Geplaatst werk
@@ -27,26 +28,29 @@ export function PlacedWork({ photos }: { photos: InspirationMedia[] }) {
             Alle inspiratie
             <ArrowIcon />
           </Link>
-        </div>
+        </Reveal>
         <div className="grid grid-cols-2 gap-3 min-[900px]:grid-cols-4">
           {lead ? (
-            <CoverImage
-              src={lead.src}
-              alt="Geplaatste stalen deur van Meisterworks"
-              className="col-span-2 aspect-[4/3] min-[900px]:row-span-2 min-[900px]:aspect-auto min-[900px]:h-full"
-              radius={14}
-              sizes="(min-width: 900px) 50vw, 100vw"
-            />
+            <Reveal variant="image" className="col-span-2 min-[900px]:row-span-2">
+              <CoverImage
+                src={lead.src}
+                alt="Geplaatste stalen deur van Meisterworks"
+                className="aspect-[4/3] min-[900px]:aspect-auto min-[900px]:h-full"
+                radius={14}
+                sizes="(min-width: 900px) 50vw, 100vw"
+              />
+            </Reveal>
           ) : null}
-          {rest.map((photo) => (
-            <CoverImage
-              key={photo.id}
-              src={photo.src}
-              alt="Geplaatste stalen deur van Meisterworks"
-              className="aspect-square"
-              radius={14}
-              sizes="(min-width: 900px) 25vw, 50vw"
-            />
+          {rest.map((photo, index) => (
+            <Reveal key={photo.id} variant="image" stagger={index + 1}>
+              <CoverImage
+                src={photo.src}
+                alt="Geplaatste stalen deur van Meisterworks"
+                className="aspect-square"
+                radius={14}
+                sizes="(min-width: 900px) 25vw, 50vw"
+              />
+            </Reveal>
           ))}
         </div>
       </div>

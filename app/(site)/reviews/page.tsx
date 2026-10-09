@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ReviewWallB, ReviewWalls } from "@/components/reviews/ReviewWalls";
+import { HeroLoad, Reveal } from "@/components/motion/Reveal";
 import { ArrowIcon } from "@/components/ui";
 import { ROUTES } from "@/lib/site";
 
@@ -14,12 +15,17 @@ export default function ReviewsPage() {
   return (
     <main>
       <header className="mx-auto max-w-[var(--max-width)] px-7 pt-[72px] pb-10 text-center">
-        <div className="mb-4 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
-          Reviews
-        </div>
-        <h1 className="font-serif-display m-0 mb-5 text-[clamp(30px,4.4vw,46px)] font-normal">
-          Bekijk wat klanten zeggen over Meisterworks.
-        </h1>
+        <HeroLoad>
+          <div className="mb-4 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+            Reviews
+          </div>
+        </HeroLoad>
+        <HeroLoad stagger={1}>
+          <h1 className="font-serif-display m-0 mb-5 text-[clamp(30px,4.4vw,46px)] font-normal">
+            Bekijk wat klanten zeggen over Meisterworks.
+          </h1>
+        </HeroLoad>
+        <HeroLoad stagger={2}>
         <div className="inline-flex items-center gap-3.5 rounded-[999px] bg-white px-[26px] py-3.5 shadow-[0_1px_3px_oklch(0_0_0_/_0.06)]">
           <span className="font-serif-display text-[26px]">4.9</span>
           <span className="text-[15px] tracking-[0.1em] text-[var(--accent)]">
@@ -29,12 +35,13 @@ export default function ReviewsPage() {
             52 reviews op Google
           </span>
         </div>
+        </HeroLoad>
       </header>
 
       <ReviewWalls />
 
       <section className="bg-[oklch(0.16_0.006_60)] px-7 py-20 text-center">
-        <div className="mx-auto max-w-[640px]">
+        <Reveal className="mx-auto max-w-[640px]">
           <h2 className="font-serif-display m-0 mb-[18px] text-[clamp(26px,3.4vw,36px)] font-normal text-[oklch(0.97_0.004_75)]">
             Laten we kijken wat bij uw huis past.
           </h2>
@@ -55,7 +62,7 @@ export default function ReviewsPage() {
               <ArrowIcon />
             </Link>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <div className="pt-[20px]">
@@ -63,6 +70,7 @@ export default function ReviewsPage() {
       </div>
 
       <section className="bg-[var(--accent)] px-7 py-[90px] text-center">
+        <Reveal>
         <h2 className="font-serif-display m-0 mb-5 text-[clamp(28px,4vw,44px)] font-normal text-[oklch(0.14_0.006_60)]">
           Klaar voor de volgende stap?
         </h2>
@@ -79,6 +87,7 @@ export default function ReviewsPage() {
             <ArrowIcon />
           </Link>
         </div>
+        </Reveal>
       </section>
     </main>
   );

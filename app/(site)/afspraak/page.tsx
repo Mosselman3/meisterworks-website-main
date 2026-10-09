@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { HeroLoad, Reveal } from "@/components/motion/Reveal";
 import { REVIEW_COUNT, REVIEW_SCORE } from "@/lib/content";
 import { CONTACT, ROUTES } from "@/lib/site";
 
@@ -36,17 +37,24 @@ export default function AfspraakPage() {
           </Link>
           &nbsp;/&nbsp; Adviesgesprek plannen
         </div>
-        <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
-          Adviesgesprek plannen
-        </div>
-        <h1 className="font-serif-display m-0 mb-3.5 text-[clamp(28px,4vw,40px)] font-normal">
-          Kies een moment dat u past.
-        </h1>
-        <p className="mb-3 max-w-[560px] text-[15px] leading-[1.6] text-[oklch(0.42_0.008_60)]">
-          Nog niet zeker wat u precies wilt bestellen? Een adviesgesprek is er
-          juist voor bedoeld — vrijblijvend, zonder verplichtingen, en met een
-          deskundig antwoord op al uw vragen.
-        </p>
+        <HeroLoad>
+          <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+            Adviesgesprek plannen
+          </div>
+        </HeroLoad>
+        <HeroLoad stagger={1}>
+          <h1 className="font-serif-display m-0 mb-3.5 text-[clamp(28px,4vw,40px)] font-normal">
+            Kies een moment dat u past.
+          </h1>
+        </HeroLoad>
+        <HeroLoad stagger={2}>
+          <p className="mb-3 max-w-[560px] text-[15px] leading-[1.6] text-[oklch(0.42_0.008_60)]">
+            Nog niet zeker wat u precies wilt bestellen? Een adviesgesprek is er
+            juist voor bedoeld — vrijblijvend, zonder verplichtingen, en met een
+            deskundig antwoord op al uw vragen.
+          </p>
+        </HeroLoad>
+        <HeroLoad stagger={3}>
         <div className="mb-9 flex items-center gap-2">
           <div className="flex gap-0.5">
             {Array.from({ length: 5 }).map((_, index) => (
@@ -65,6 +73,7 @@ export default function AfspraakPage() {
             {REVIEW_SCORE.toLocaleString("nl-NL")} uit {REVIEW_COUNT} beoordelingen
           </span>
         </div>
+        </HeroLoad>
       </header>
 
       <section
@@ -119,8 +128,8 @@ export default function AfspraakPage() {
               Waarom een adviesgesprek
             </div>
             <div className="flex flex-col gap-4">
-              {REASONS.map((reason) => (
-                <div key={reason} className="flex gap-3">
+              {REASONS.map((reason, index) => (
+                <Reveal key={reason} stagger={index} className="flex gap-3">
                   <svg
                     width="18"
                     height="18"
@@ -139,7 +148,7 @@ export default function AfspraakPage() {
                   <div className="text-[14px] leading-[1.5] text-[oklch(0.3_0.008_60)]">
                     {reason}
                   </div>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -150,14 +159,14 @@ export default function AfspraakPage() {
             </div>
             <div className="flex flex-col gap-3">
               {STEPS.map((step, index) => (
-                <div key={step} className="flex items-baseline gap-2.5">
+                <Reveal key={step} stagger={index} className="flex items-baseline gap-2.5">
                   <span className="font-serif-display shrink-0 text-[15px] text-[var(--accent)]">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <span className="text-[13px] leading-[1.5] text-[oklch(0.85_0.004_75)]">
                     {step}
                   </span>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>

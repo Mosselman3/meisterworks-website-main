@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { InspirationLightbox } from "@/components/inspiration/InspirationLightbox";
+import { Reveal } from "@/components/motion/Reveal";
 import type { InspirationMedia } from "@/lib/inspiration";
 import { ROUTES } from "@/lib/site";
 
@@ -132,16 +133,22 @@ export function InspirationGrid({ posts }: InspirationGridProps) {
   return (
     <>
     <div className="grid grid-cols-3 gap-px min-[720px]:gap-1">
-      {cells.map((cell) => {
+      {cells.map((cell, index) => {
+        const stagger = index < 6 ? index % 3 : 0;
+        const variant = index < 6 && cell.kind === "media" ? "image" : "fade";
         if (cell.kind === "cta") {
-          return <InspirationCta key={cell.id} variant={cell.variant} />;
+          return (
+            <Reveal key={cell.id} variant="fade" stagger={stagger}>
+              <InspirationCta variant={cell.variant} />
+            </Reveal>
+          );
         }
         const { post, mediaIndex } = cell;
         const eager = mediaIndex < EAGER_COUNT;
         const open = openId === post.id;
         return (
+          <Reveal key={post.id} variant={variant} stagger={stagger}>
           <div
-            key={post.id}
             className={`group relative aspect-square overflow-hidden bg-[oklch(0.9_0.006_75)] ${
               eager ? "" : "content-visibility-auto [contain-intrinsic-size:auto_33vw]"
             }`}
@@ -193,6 +200,7 @@ export function InspirationGrid({ posts }: InspirationGridProps) {
               </Link>
             </div>
           </div>
+          </Reveal>
         );
       })}
     </div>

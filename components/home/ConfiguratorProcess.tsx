@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { CONFIGURATOR_STEPS } from "@/lib/content";
+import { Reveal } from "@/components/motion/Reveal";
 import { ROUTES } from "@/lib/site";
 
 export function ConfiguratorProcess() {
   return (
     <section className="mx-auto max-w-[var(--max-width)] px-7 py-[100px]">
-      <div className="mx-auto mb-12 max-w-[640px] text-center">
+      <Reveal className="mx-auto mb-12 max-w-[640px] text-center">
         <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
           Configurator
         </div>
@@ -16,11 +17,11 @@ export function ConfiguratorProcess() {
           Vier stappen van eerste keuze tot aanvraag. Liever persoonlijk
           meedenken? Plan een vrijblijvend adviesgesprek.
         </p>
-      </div>
+      </Reveal>
 
       <ol className="home-config-process mb-16">
-        {CONFIGURATOR_STEPS.map((step) => (
-          <li key={step.num} className="home-config-step">
+        {CONFIGURATOR_STEPS.map((step, index) => (
+          <Reveal as="li" key={step.num} stagger={index} className="home-config-step">
             <div className="home-config-step-marker" aria-hidden="true">
               <span className="home-config-num font-serif-display">{step.num}</span>
             </div>
@@ -32,7 +33,7 @@ export function ConfiguratorProcess() {
                 {step.text}
               </p>
             </div>
-          </li>
+          </Reveal>
         ))}
       </ol>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Reveal } from "@/components/motion/Reveal";
 import { ALL_REVIEWS, reviewColumns } from "@/lib/content";
 
 const PARALLAX_DISTANCE = 120;
@@ -51,9 +52,13 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
             }}
             className="relative flex flex-col gap-3.5 will-change-transform"
           >
-            {column.map((review) => (
-              <div
+            {column.map((review, index) => (
+              <Reveal
                 key={`${review.name}-${review.time}`}
+                variant="fade"
+                stagger={Math.min(index, 3)}
+              >
+              <div
                 className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_oklch(0_0_0_/_0.05)]"
               >
                 <div className="mb-2 text-[12px] tracking-[0.1em] text-[var(--accent)]">
@@ -69,6 +74,7 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
                   Google review · {review.time}
                 </div>
               </div>
+              </Reveal>
             ))}
           </div>
         ))}

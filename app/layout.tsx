@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Cormorant_Garamond, Lato } from "next/font/google";
 import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -64,8 +65,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="nl"
       className={`${cormorantGaramond.variable} ${lato.variable} h-full antialiased`}
     >
-      <body className={`${lato.className} flex min-h-full flex-col`}>
-        {children}
+      <body className={lato.className}>
+        <Script id="site-motion" strategy="beforeInteractive">
+          {`try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("motion")}catch(e){}`}
+        </Script>
+        <div className="flex min-h-dvh flex-col">{children}</div>
       </body>
     </html>
   );

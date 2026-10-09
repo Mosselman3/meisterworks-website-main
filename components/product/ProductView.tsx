@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeroLoad, Reveal } from "@/components/motion/Reveal";
 import { ArrowIcon, CoverImage } from "@/components/ui";
 import { relatedProducts, type ProductPageCopy } from "@/lib/products";
 import { DesignMoreCarousel } from "@/components/product/DesignMoreCarousel";
@@ -61,7 +62,7 @@ function StepIntro({
   dark?: boolean;
 }) {
   return (
-    <div className="mb-10 max-w-[640px]">
+    <Reveal className="mb-10 max-w-[640px]">
       <div
         className={`mb-[14px] text-[13px] tracking-[0.16em] uppercase ${dark ? "text-[oklch(0.55_0.008_75)]" : "text-[oklch(0.5_0.01_60)]"}`}
       >
@@ -77,7 +78,7 @@ function StepIntro({
       >
         {body}
       </p>
-    </div>
+    </Reveal>
   );
 }
 
@@ -169,25 +170,33 @@ export function ProductView({
         </div>
         <div className="absolute inset-0 z-[1] rounded-[18px] bg-[linear-gradient(180deg,oklch(0.14_0.006_60_/_0.05)_0%,oklch(0.12_0.006_60_/_0.3)_55%,oklch(0.1_0.006_60_/_0.78)_100%)]" />
         <div className="relative z-[2] max-w-[720px] px-11 pb-14">
-          <div className="mb-4 text-[13px] font-medium tracking-[0.18em] text-[var(--accent)] uppercase">
-            {product?.title}
-          </div>
-          <h1 className="font-serif-display m-0 mb-5 text-[clamp(32px,5vw,56px)] font-normal text-[oklch(0.98_0.004_75)]">
-            {page.heroTitle}
-          </h1>
-          <p className="m-0 max-w-[500px] text-[clamp(15px,1.8vw,17px)] leading-[1.6] text-[oklch(0.88_0.004_75)]">
-            {page.heroLead}
-          </p>
+          <HeroLoad>
+            <div className="mb-4 text-[13px] font-medium tracking-[0.18em] text-[var(--accent)] uppercase">
+              {product?.title}
+            </div>
+          </HeroLoad>
+          <HeroLoad stagger={1}>
+            <h1 className="font-serif-display m-0 mb-5 text-[clamp(32px,5vw,56px)] font-normal text-[oklch(0.98_0.004_75)]">
+              {page.heroTitle}
+            </h1>
+          </HeroLoad>
+          <HeroLoad stagger={2}>
+            <p className="m-0 max-w-[500px] text-[clamp(15px,1.8vw,17px)] leading-[1.6] text-[oklch(0.88_0.004_75)]">
+              {page.heroLead}
+            </p>
+          </HeroLoad>
         </div>
       </section>
 
       <section className="mx-auto max-w-[760px] px-7 pt-20 pb-10 text-left">
-        <p className="m-0 mb-5 text-[clamp(19px,2.2vw,23px)] font-light leading-[1.7] text-[oklch(0.25_0.008_60)]">
-          {page.introLead}
-        </p>
-        <p className="m-0 text-[16px] leading-[1.75] text-[oklch(0.42_0.008_60)]">
-          {page.introBody}
-        </p>
+        <Reveal>
+          <p className="m-0 mb-5 text-[clamp(19px,2.2vw,23px)] font-light leading-[1.7] text-[oklch(0.25_0.008_60)]">
+            {page.introLead}
+          </p>
+          <p className="m-0 text-[16px] leading-[1.75] text-[oklch(0.42_0.008_60)]">
+            {page.introBody}
+          </p>
+        </Reveal>
       </section>
 
       {product?.detailImage ? (
@@ -197,13 +206,17 @@ export function ProductView({
             className="grid items-center gap-12"
             style={{ gridTemplateColumns: "minmax(0, 1.15fr) minmax(0, 0.85fr)" }}
           >
-            <CoverImage
-              src={product.detailImage}
-              alt={product.detailAlt ?? product.title}
-              className="aspect-[4/3]"
-              sizes="(min-width: 860px) 55vw, 100vw"
-            />
-            <div>
+            <Reveal variant="from-start">
+              <Reveal variant="image">
+                <CoverImage
+                  src={product.detailImage}
+                  alt={product.detailAlt ?? product.title}
+                  className="aspect-[4/3]"
+                  sizes="(min-width: 860px) 55vw, 100vw"
+                />
+              </Reveal>
+            </Reveal>
+            <Reveal variant="from-end">
               <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
                 Mechaniek
               </div>
@@ -213,7 +226,7 @@ export function ProductView({
               <p className="m-0 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
                 {page.introLead}
               </p>
-            </div>
+            </Reveal>
           </div>
         </section>
       ) : null}
@@ -234,14 +247,14 @@ export function ProductView({
             }
           />
           <div className="grid max-w-[640px] grid-cols-2 gap-4">
-            {directionOptions(page.slug === "schuifdeur" ? "schuif" : "draai").map((option) => (
-              <div key={option.id}>
+            {directionOptions(page.slug === "schuifdeur" ? "schuif" : "draai").map((option, index) => (
+              <Reveal key={option.id} stagger={index}>
                 <div className="mb-3 overflow-hidden rounded-[12px]" style={dirThumbStyle(option.dia)} />
                 <div className="text-[15px] text-[oklch(0.25_0.008_60)]">{option.label}</div>
                 <p className="m-0 mt-1 text-[14px] leading-[1.5] text-[oklch(0.45_0.008_60)]">
                   {option.desc}
                 </p>
-              </div>
+              </Reveal>
             ))}
           </div>
           <ComposeLink href={configureHref}>Kies richting</ComposeLink>
@@ -256,8 +269,8 @@ export function ProductView({
             body="Kies geen paneel, één paneel links of rechts, of twee panelen aan beide zijden. Zelfde staal, zelfde glas, zonder mechaniek."
           />
           <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-4 min-[900px]:gap-5">
-            {PANEL_CHOICES.map((option) => (
-              <div key={option.label}>
+            {PANEL_CHOICES.map((option, index) => (
+              <Reveal key={option.label} stagger={index}>
                 <div
                   className="mb-3 overflow-hidden rounded-[12px]"
                   style={panelLayoutThumb(option.kind, option.side)}
@@ -266,7 +279,7 @@ export function ProductView({
                 <p className="m-0 mt-1 text-[14px] leading-[1.5] text-[oklch(0.45_0.008_60)]">
                   {option.desc}
                 </p>
-              </div>
+              </Reveal>
             ))}
           </div>
           <ComposeLink href={configureHref}>Paneel toevoegen</ComposeLink>
@@ -283,7 +296,9 @@ export function ProductView({
               : "U vult breedte en hoogte in millimeters in. Wij meten de opening zelf in voordat we in productie gaan."
           }
         />
-        <MaatDiagram withPanel={page.hasFixedPanel} />
+        <Reveal>
+          <MaatDiagram withPanel={page.hasFixedPanel} />
+        </Reveal>
         <ComposeLink href={configureHref}>{page.composeCta}</ComposeLink>
       </section>
 
@@ -294,7 +309,9 @@ export function ProductView({
             title="Kies een ontwerp, of stel het zelf samen."
             body="Zo kan het glas verdeeld worden. In de configurator bepaalt u ook zelf het aantal liggers en staanders."
           />
-          <DesignMoreCarousel />
+          <Reveal>
+            <DesignMoreCarousel />
+          </Reveal>
           <ComposeLink href={configureHref}>Kies indeling</ComposeLink>
         </div>
       </section>
@@ -306,8 +323,8 @@ export function ProductView({
           body="Kies de uitstraling. In de configurator kiest u daarna nog gelaagd of gehard, of het patroon bij figuren."
         />
         <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-6">
-          {GLASS_LOOK_GROUPS.map((option) => (
-            <div key={option.id}>
+          {GLASS_LOOK_GROUPS.map((option, index) => (
+            <Reveal key={option.id} stagger={index}>
               <CoverImage
                 src={option.image}
                 alt={option.title}
@@ -321,7 +338,7 @@ export function ProductView({
               <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
                 {option.text}
               </p>
-            </div>
+            </Reveal>
           ))}
         </div>
         <ComposeLink href={configureHref}>Kies glas</ComposeLink>
@@ -338,8 +355,8 @@ export function ProductView({
             dark
           />
           <div className="grid max-w-[640px] grid-cols-2 gap-4">
-            {COLORS.map((color) => (
-              <div key={color.code}>
+            {COLORS.map((color, index) => (
+              <Reveal key={color.code} stagger={index}>
                 <div
                   className="mb-3 aspect-[4/3] rounded-[12px]"
                   style={{ background: colorThumbBackground(color.code, color.hex) }}
@@ -348,7 +365,7 @@ export function ProductView({
                 <p className="m-0 text-[14px] leading-[1.5] text-[oklch(0.65_0.008_75)]">
                   {color.desc}
                 </p>
-              </div>
+              </Reveal>
             ))}
           </div>
           <ComposeLink href={configureHref}>Kies kleur</ComposeLink>
@@ -364,8 +381,8 @@ export function ProductView({
               body="Kies de handgreep die het beste bij jouw deur past. De lengte en uitvoering kunnen worden afgestemd op de deur en de gewenste uitstraling."
             />
             <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
-              {SLUITWERK.map((option) => (
-                <div key={option.code}>
+              {SLUITWERK.map((option, index) => (
+                <Reveal key={option.code} stagger={index}>
                   <CoverImage
                     src={option.image}
                     alt={option.label}
@@ -378,7 +395,7 @@ export function ProductView({
                   <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
                     {option.desc}
                   </p>
-                </div>
+                </Reveal>
               ))}
             </div>
             <ComposeLink href={configureHref}>Kies handgreep</ComposeLink>
@@ -396,8 +413,8 @@ export function ProductView({
               dark
             />
             <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-7">
-              {HARDWARE.map((option) => (
-                <div key={option.code}>
+              {HARDWARE.map((option, index) => (
+                <Reveal key={option.code} stagger={index}>
                   <CoverImage
                     src={option.image}
                     alt={option.label}
@@ -413,7 +430,7 @@ export function ProductView({
                   <p className="m-0 mt-2 text-[14px] text-[oklch(0.72_0.008_75)]">
                     {designPriceMark(option.indication)}
                   </p>
-                </div>
+                </Reveal>
               ))}
             </div>
             <ComposeLink href={configureHref}>Kies sluitwerk</ComposeLink>
@@ -423,56 +440,63 @@ export function ProductView({
 
       <section className="bg-[oklch(0.93_0.006_75)] px-7 py-20">
         <div className="mx-auto max-w-[var(--max-width)]">
-          <div className="mb-2.5 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
-            Andere producten
-          </div>
-          <h2 className="font-serif-display m-0 mb-8 text-[clamp(24px,3vw,32px)] font-normal">
-            Bekijk ook onze andere modellen.
-          </h2>
+          <Reveal>
+            <div className="mb-2.5 text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+              Andere producten
+            </div>
+            <h2 className="font-serif-display m-0 mb-8 text-[clamp(24px,3vw,32px)] font-normal">
+              Bekijk ook onze andere modellen.
+            </h2>
+          </Reveal>
           <div className="grid grid-cols-2 gap-4 min-[900px]:grid-cols-3 min-[900px]:gap-5">
-            {related.map((item) => (
-              <Link
-                key={item.slug}
-                href={item.href}
-                className="flex flex-col overflow-hidden rounded-[14px] bg-white"
-              >
-                <CoverImage
-                  src={item.imageLandscape}
-                  alt={item.title}
-                  className="aspect-[4/3]"
-                  radius={0}
-                  sizes={RELATED_IMAGE_SIZES}
-                />
-                <div className="flex items-center justify-between gap-2.5 px-[18px] py-4">
-                  <div className="font-serif-display text-[14px] min-[560px]:text-[16px] text-[oklch(0.2_0.008_60)]">
-                    {item.title}
+            {related.map((item, index) => (
+              <Reveal key={item.slug} stagger={index}>
+                <Link
+                  href={item.href}
+                  className="flex h-full flex-col overflow-hidden rounded-[14px] bg-white"
+                >
+                  <Reveal variant="image" stagger={index}>
+                    <CoverImage
+                      src={item.imageLandscape}
+                      alt={item.title}
+                      className="aspect-[4/3]"
+                      radius={0}
+                      sizes={RELATED_IMAGE_SIZES}
+                    />
+                  </Reveal>
+                  <div className="flex items-center justify-between gap-2.5 px-[18px] py-4">
+                    <div className="font-serif-display text-[14px] min-[560px]:text-[16px] text-[oklch(0.2_0.008_60)]">
+                      {item.title}
+                    </div>
+                    <ArrowIcon />
                   </div>
-                  <ArrowIcon />
-                </div>
-              </Link>
+                </Link>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-[700px] px-7 py-[90px] text-center">
-        <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
-          Volgende stap
-        </div>
-        <h2 className="font-serif-display m-0 mb-[18px] text-[clamp(26px,3.6vw,38px)] font-normal">
-          Stel deze samenstelling samen in de configurator.
-        </h2>
-        <p className="m-0 mb-9 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
-          Liever eerst persoonlijk meedenken? Plan een vrijblijvend adviesgesprek.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <Link href={configureHref} className="btn-accent btn-accent-lg">
-            {page.composeCta}
-          </Link>
-          <Link href={ROUTES.afspraak} className="btn-outline">
-            Adviesgesprek plannen
-          </Link>
-        </div>
+        <Reveal>
+          <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+            Volgende stap
+          </div>
+          <h2 className="font-serif-display m-0 mb-[18px] text-[clamp(26px,3.6vw,38px)] font-normal">
+            Stel deze samenstelling samen in de configurator.
+          </h2>
+          <p className="m-0 mb-9 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
+            Liever eerst persoonlijk meedenken? Plan een vrijblijvend adviesgesprek.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href={configureHref} className="btn-accent btn-accent-lg">
+              {page.composeCta}
+            </Link>
+            <Link href={ROUTES.afspraak} className="btn-outline">
+              Adviesgesprek plannen
+            </Link>
+          </div>
+        </Reveal>
       </section>
     </main>
   );

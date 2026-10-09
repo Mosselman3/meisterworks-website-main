@@ -5,6 +5,7 @@ import { HeroSlideshow } from "@/components/home/HeroSlideshow";
 import { TrustBar } from "@/components/home/TrustBar";
 import { WhyCustom } from "@/components/home/WhyCustom";
 import { ReviewMarquee } from "@/components/home/ReviewMarquee";
+import { HeroLoad, Reveal } from "@/components/motion/Reveal";
 import { ArrowIcon, CoverImage } from "@/components/ui";
 import {
   HOME_PRODUCTS,
@@ -25,26 +26,34 @@ export function HomePage() {
         <HeroSlideshow />
         <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,oklch(0.14_0.006_60_/_0.15)_0%,oklch(0.12_0.006_60_/_0.35)_55%,oklch(0.1_0.006_60_/_0.82)_100%)]" />
         <div className="relative z-[2] max-w-[780px] px-7 pt-10 pb-[72px] lg:pt-0">
-          <div className="mb-[18px] text-[13px] font-medium tracking-[0.18em] text-[oklch(0.86_0.05_75)] uppercase [text-shadow:0_1px_2px_oklch(0.1_0.006_60_/_0.55),0_0_18px_oklch(0.1_0.006_60_/_0.35)]">
-            Vakmanschap in stalen deuren
-          </div>
-          <h1 className="font-serif-display m-0 mb-[22px] text-[clamp(38px,5.4vw,65px)] font-normal text-[oklch(0.98_0.004_75)]">
-            Deuren op maat,
-            <br />
-            gemaakt om te blijven.
-          </h1>
-          <p className="mb-[34px] max-w-[520px] text-[clamp(15px,2vw,18px)] leading-[1.6] text-[oklch(0.88_0.004_75)]">
-            Elke deur wordt volledig naar uw wensen ontworpen en met de hand
-            vervaardigd — van eerste schets tot montage.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href={ROUTES.configurator} className="btn-accent btn-accent-lg">
-              Ontwerp uw deur
-            </Link>
-            <Link href={ROUTES.offerte} className="btn-outline-light">
-              Snelle Offerte
-            </Link>
-          </div>
+          <HeroLoad>
+            <div className="mb-[18px] text-[13px] font-medium tracking-[0.18em] text-[oklch(0.86_0.05_75)] uppercase [text-shadow:0_1px_2px_oklch(0.1_0.006_60_/_0.55),0_0_18px_oklch(0.1_0.006_60_/_0.35)]">
+              Vakmanschap in stalen deuren
+            </div>
+          </HeroLoad>
+          <HeroLoad stagger={1}>
+            <h1 className="font-serif-display m-0 mb-[22px] text-[clamp(38px,5.4vw,65px)] font-normal text-[oklch(0.98_0.004_75)]">
+              Deuren op maat,
+              <br />
+              gemaakt om te blijven.
+            </h1>
+          </HeroLoad>
+          <HeroLoad stagger={2}>
+            <p className="mb-[34px] max-w-[520px] text-[clamp(15px,2vw,18px)] leading-[1.6] text-[oklch(0.88_0.004_75)]">
+              Elke deur wordt volledig naar uw wensen ontworpen en met de hand
+              vervaardigd — van eerste schets tot montage.
+            </p>
+          </HeroLoad>
+          <HeroLoad stagger={3}>
+            <div className="flex flex-wrap gap-4">
+              <Link href={ROUTES.configurator} className="btn-accent btn-accent-lg">
+                Ontwerp uw deur
+              </Link>
+              <Link href={ROUTES.offerte} className="btn-outline-light">
+                Snelle Offerte
+              </Link>
+            </div>
+          </HeroLoad>
         </div>
       </section>
 
@@ -54,7 +63,7 @@ export function HomePage() {
         id="deuren"
         className="mx-auto max-w-[var(--max-width)] px-7 pt-[100px] pb-[60px]"
       >
-        <div className="mx-auto mb-14 max-w-[620px] text-center">
+        <Reveal className="mx-auto mb-14 max-w-[620px] text-center">
           <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
             Ons aanbod
           </div>
@@ -64,20 +73,22 @@ export function HomePage() {
           <p className="m-0 text-[16px] leading-[1.6] text-[oklch(0.42_0.008_60)]">
             Elk model met de hand vervaardigd op basis van uw wensen.
           </p>
-        </div>
+        </Reveal>
         <div className="home-product-grid">
-          {HOME_PRODUCTS.map((product) => (
+          {HOME_PRODUCTS.map((product, index) => (
+            <Reveal key={product.slug} stagger={index} className="h-full">
             <Link
-              key={product.slug}
               href={product.href}
-              className="home-product-card"
+              className="home-product-card h-full"
             >
-              <CoverImage
-                src={product.image}
-                alt={product.alt}
-                className="home-product-image aspect-[4/5]"
-                sizes="(min-width: 1100px) 25vw, 50vw"
-              />
+              <Reveal variant="image" stagger={index} className="home-product-image">
+                <CoverImage
+                  src={product.image}
+                  alt={product.alt}
+                  className="aspect-[4/5]"
+                  sizes="(min-width: 1100px) 25vw, 50vw"
+                />
+              </Reveal>
               <div className="home-product-card-body px-6 py-[26px]">
                 <div className="mb-2 flex items-center justify-between gap-2.5">
                   <div className="home-product-card-title font-serif-display text-[22px]">
@@ -90,6 +101,7 @@ export function HomePage() {
                 </div>
               </div>
             </Link>
+            </Reveal>
           ))}
         </div>
         <p className="m-0 mt-10 text-center text-[13px] leading-[1.6] text-[oklch(0.52_0.008_60)]">
@@ -106,28 +118,27 @@ export function HomePage() {
 
       <WhyCustom />
 
-      <section className="px-7 py-[120px] text-center">
-        <div className="mx-auto max-w-[920px]">
-          <div className="mb-4 text-[14px] tracking-[0.18em] text-[oklch(0.5_0.01_60)] uppercase">
+      <section className="px-7 py-[100px] text-center">
+        <Reveal className="mx-auto max-w-[720px]">
+          <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
             Kies uw type deur
           </div>
-          <h2 className="font-serif-display m-0 mb-6 text-[clamp(38px,5vw,58px)] leading-[1.12] font-normal">
+          <h2 className="font-serif-display m-0 mb-4 text-[clamp(30px,4vw,44px)] font-normal">
             Welke stalen deur past bij uw ruimte?
           </h2>
-          <p className="mx-auto m-0 max-w-[800px] text-[clamp(17px,1.8vw,19px)] leading-[1.75] text-[oklch(0.42_0.008_60)]">
+          <p className="m-0 text-[16px] leading-[1.6] text-[oklch(0.42_0.008_60)]">
             Elk type deur beweegt anders en past bij een andere ruimte. Een
             taatsdeur draait in beide richtingen, een scharnierdeur sluit in een
             kozijn en een schuifdeur bespaart ruimte. Wilt u alleen licht en
-            openheid toevoegen, dan kiest u een vast paneel. Bekijk hieronder
-            de verschillen en ontdek welk type bij uw woning en gebruik past.
+            openheid toevoegen, dan kiest u een vast paneel.
           </p>
-          <div className="mt-9 flex justify-center">
-            <Link href={ROUTES.configurator} className="btn-dark gap-2 px-7 py-4">
+          <div className="mt-8 flex justify-center">
+            <Link href={ROUTES.configurator} className="btn-dark gap-2">
               Stel uw deur samen
               <ArrowIcon />
             </Link>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <ReviewMarquee rowA={MARQUEE_REVIEWS_A} rowB={MARQUEE_REVIEWS_B} />
@@ -152,7 +163,10 @@ export function HomePage() {
                   gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)",
                 }}
               >
-                <div style={{ order: story.imageFirst ? 2 : 0 }}>
+                <Reveal
+                  variant={story.imageFirst ? "from-end" : "from-start"}
+                  style={{ order: story.imageFirst ? 2 : 0 }}
+                >
                   <Image
                     src={
                       story.mark === "white"
@@ -186,19 +200,23 @@ export function HomePage() {
                     {story.cta}
                     <ArrowIcon />
                   </Link>
-                </div>
-                <CoverImage
-                  src={product.imageLandscape}
-                  alt={product.title}
-                  className="aspect-[4/3]"
-                  sizes="(min-width: 860px) 50vw, 100vw"
-                />
+                </Reveal>
+                <Reveal variant={story.imageFirst ? "from-start" : "from-end"}>
+                  <Reveal variant="image">
+                    <CoverImage
+                      src={product.imageLandscape}
+                      alt={product.title}
+                      className="aspect-[4/3]"
+                      sizes="(min-width: 860px) 50vw, 100vw"
+                    />
+                  </Reveal>
+                </Reveal>
               </div>
             </div>
           );
         })}
         <div className="bg-[oklch(0.93_0.006_75)] px-7 py-[90px]">
-          <div className="mx-auto max-w-[640px] text-center">
+          <Reveal className="mx-auto max-w-[640px] text-center">
             <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
               Configurator
             </div>
@@ -213,7 +231,7 @@ export function HomePage() {
               Open de configurator
               <ArrowIcon />
             </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -226,19 +244,25 @@ export function HomePage() {
           className="mx-auto grid max-w-[var(--max-width)] items-center gap-16"
           style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)" }}
         >
-          <div className="grid grid-cols-2 gap-4">
-            <CoverImage
-              src="/assets/welding-detail.jpg"
-              alt="Lassen aan een stalen kader"
-              className="aspect-square"
-            />
-            <CoverImage
-              src="/assets/detail-maroon.jpg"
-              alt="Detail lasnaad, bordeaux"
-              className="aspect-square self-end"
-            />
-          </div>
-          <div>
+          <Reveal variant="from-start">
+            <div className="grid grid-cols-2 gap-4">
+              <Reveal variant="image">
+                <CoverImage
+                  src="/assets/welding-detail.jpg"
+                  alt="Lassen aan een stalen kader"
+                  className="aspect-square"
+                />
+              </Reveal>
+              <Reveal variant="image" stagger={1} className="self-end">
+                <CoverImage
+                  src="/assets/detail-maroon.jpg"
+                  alt="Detail lasnaad, bordeaux"
+                  className="aspect-square"
+                />
+              </Reveal>
+            </div>
+          </Reveal>
+          <Reveal variant="from-end">
             <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
               Vakmanschap
             </div>
@@ -256,7 +280,7 @@ export function HomePage() {
               is een deur die decennia meegaat, in een afwerking die nergens
               anders te vinden is.
             </p>
-          </div>
+          </Reveal>
         </div>
         <div className="mt-12 flex justify-center">
           <Link href={ROUTES.afspraak} className="btn-dark gap-2">
@@ -268,7 +292,7 @@ export function HomePage() {
 
       <section className="bg-[oklch(0.93_0.006_75)] px-7 py-[100px]">
         <div className="mx-auto max-w-[var(--max-width)]">
-        <div className="mb-12 max-w-[640px]">
+        <Reveal className="mb-12 max-w-[640px]">
           <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
             Reviews
           </div>
@@ -279,19 +303,23 @@ export function HomePage() {
             Een Google-review van een geplaatste taatsdeur: hoe de afspraken,
             de communicatie en het resultaat in de praktijk uitpakten.
           </p>
-        </div>
+        </Reveal>
         <div
           data-split-row="true"
           className="grid items-center gap-14"
           style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)" }}
         >
-          <CoverImage
-            src="/assets/hero-open-door.jpg"
-            alt="Stalen taatsdeur bij Anouk Hamelink"
-            className="aspect-[4/5]"
-            sizes="(min-width: 860px) 40vw, 100vw"
-          />
-          <div>
+          <Reveal variant="from-start">
+            <Reveal variant="image">
+              <CoverImage
+                src="/assets/hero-open-door.jpg"
+                alt="Stalen taatsdeur bij Anouk Hamelink"
+                className="aspect-[4/5]"
+                sizes="(min-width: 860px) 40vw, 100vw"
+              />
+            </Reveal>
+          </Reveal>
+          <Reveal variant="from-end">
           <div className="mb-[18px] text-[13px] tracking-[0.1em] text-[var(--accent)]">
             ★★★★★
           </div>
@@ -315,7 +343,7 @@ export function HomePage() {
               </div>
             </div>
           </div>
-          </div>
+          </Reveal>
         </div>
         </div>
       </section>
@@ -326,6 +354,7 @@ export function HomePage() {
         id="offerte"
         className="bg-[var(--accent)] px-7 py-[90px] text-center"
       >
+        <Reveal>
         <h2 className="font-serif-display m-0 mb-5 text-[clamp(30px,4.2vw,48px)] font-normal text-[oklch(0.14_0.006_60)]">
           Creëer de stalen deur van uw dromen
         </h2>
@@ -341,6 +370,7 @@ export function HomePage() {
             Adviesgesprek plannen
           </Link>
         </div>
+        </Reveal>
       </section>
     </main>
   );
