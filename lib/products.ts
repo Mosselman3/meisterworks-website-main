@@ -1,4 +1,4 @@
-import { PRODUCTS, productPath } from "./site";
+import { PRODUCTS, getProduct, productPath } from "./site";
 
 export type ProductPageCopy = {
   slug: string;
@@ -19,7 +19,7 @@ export const PRODUCT_PAGES: ProductPageCopy[] = [
     heroTitle: "Een deur die om haar as draait.",
     heroLead:
       "Taatsmechaniek in vloer en bovenkant. De deur hangt los van het kozijn en draait als een zwevend vlak.",
-    heroImage: "/assets/doors/taatsdeur.jpeg",
+    heroImage: getProduct("taatsdeur")!.imageLandscape,
     heroAlt: "Stalen taatsdeur",
     introLead:
       "De taatsdeur is geschikt voor grotere, zwaardere vlakken. De as zit verzonken in de vloer en in de bovenkant, zodat er geen zichtbaar scharnier aan het kozijn zit.",
@@ -34,7 +34,7 @@ export const PRODUCT_PAGES: ProductPageCopy[] = [
     heroTitle: "Scharnierdeur, kozijn inbegrepen.",
     heroLead:
       "Klassieke bediening op scharnieren, geleverd met het stalen kozijn. Eén geheel, op maat van uw opening.",
-    heroImage: "/assets/doors/scharnierdeur-kozijn.jpeg",
+    heroImage: getProduct("scharnierdeur-kozijn")!.imageLandscape,
     heroAlt: "Scharnierdeur met stalen kozijn",
     introLead:
       "Bij de scharnierdeur zijn kozijn en scharnieren inbegrepen. De deur draait aan het kozijn, strak uitgevoerd in staal.",
@@ -49,7 +49,7 @@ export const PRODUCT_PAGES: ProductPageCopy[] = [
     heroTitle: "Een deur die langs de opening loopt.",
     heroLead:
       "Inclusief rail en loopwerk. De deur schuift weg in plaats van open te zwaaien.",
-    heroImage: "/assets/doors/schuifdeur.jpeg",
+    heroImage: getProduct("schuifdeur")!.imageLandscape,
     heroAlt: "Stalen schuifdeur",
     introLead:
       "De schuifdeur is bedoeld waar naast de opening weinig ruimte is om een deur open te draaien. Rail en loopwerk zijn inbegrepen.",
@@ -64,7 +64,7 @@ export const PRODUCT_PAGES: ProductPageCopy[] = [
     heroTitle: "Een vlak dat blijft staan.",
     heroLead:
       "Alleen een bevestigingsframe, geen mechaniek. Hetzelfde staal en glas als onze deuren, zonder bewegend deel.",
-    heroImage: "/assets/doors/vast-paneel.jpeg",
+    heroImage: getProduct("vast-paneel")!.imageLandscape,
     heroAlt: "Vast paneel in stalen frame",
     introLead:
       "Het vaste paneel is een los product. Het vult een opening met staal en glas wanneer er geen deur hoeft te bewegen.",

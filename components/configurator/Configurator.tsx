@@ -1464,6 +1464,7 @@ export function Configurator() {
   const renderSectionBody = (id: StepId): ReactNode => {
     if (id === "product") {
       return (
+        <>
         <div
           style={{
             display: "grid",
@@ -1533,6 +1534,16 @@ export function Configurator() {
             }}
           />
         </div>
+        {product.detailImage ? (
+          <figure className="cfg-product-detail">
+            <img src={product.detailImage} alt={product.detailAlt ?? product.label} />
+            <figcaption>
+              <strong>{product.detailTitle}</strong>
+              <span>{product.detailLead}</span>
+            </figcaption>
+          </figure>
+        ) : null}
+      </>
       );
     }
 

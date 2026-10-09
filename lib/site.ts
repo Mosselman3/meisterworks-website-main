@@ -24,6 +24,11 @@ export type Product = {
   slug: string;
   title: string;
   image: string;
+  imageLandscape: string;
+  detailImage?: string;
+  detailAlt?: string;
+  detailTitle?: string;
+  detailLead?: string;
   doorTypeCode: string;
 };
 
@@ -31,25 +36,41 @@ export const PRODUCTS: Product[] = [
   {
     slug: "taatsdeur",
     title: "Taatsdeur",
-    image: "/assets/doors/taatsdeur.jpeg",
+    image: "/assets/doors/taatsdeur-portrait.jpg",
+    imageLandscape: "/assets/doors/taatsdeur-landscape.jpg",
+    detailImage: "/assets/doors/taatsdeur-detail.jpg",
+    detailAlt: "Taatsmechaniek in de vloer van een stalen deur",
+    detailTitle: "De as in de vloer",
+    detailLead: "De as zit verzonken in de vloer, zonder scharnier aan het kozijn.",
     doorTypeCode: "taatsdeur",
   },
   {
     slug: "scharnierdeur-kozijn",
     title: "Scharnierdeur incl. kozijn",
-    image: "/assets/doors/scharnierdeur-kozijn.jpeg",
+    image: "/assets/doors/scharnierdeur-portrait.jpg",
+    imageLandscape: "/assets/doors/scharnierdeur-landscape.jpg",
+    detailImage: "/assets/doors/scharnierdeur-detail.jpg",
+    detailAlt: "Scharnier van een stalen deur in het kozijn",
+    detailTitle: "Het scharnier",
+    detailLead: "De deur draait aan zichtbare scharnieren. Het kozijn is inbegrepen.",
     doorTypeCode: "scharnierdeur_kozijn",
   },
   {
     slug: "schuifdeur",
     title: "Schuifdeur",
-    image: "/assets/doors/schuifdeur.jpeg",
+    image: "/assets/doors/schuifdeur-portrait.jpg",
+    imageLandscape: "/assets/doors/schuifdeur-landscape.jpg",
+    detailImage: "/assets/doors/schuifdeur-detail.jpg",
+    detailAlt: "Bovenrail van een stalen schuifdeur",
+    detailTitle: "De rail",
+    detailLead: "De deur schuift langs de rail. Loopwerk is inbegrepen.",
     doorTypeCode: "schuifdeur",
   },
   {
     slug: "vast-paneel",
     title: "Vast paneel (los)",
-    image: "/assets/doors/vast-paneel.jpeg",
+    image: "/assets/doors/vast-paneel-portrait.jpg",
+    imageLandscape: "/assets/doors/vast-paneel-landscape.jpg",
     doorTypeCode: "vast_paneel",
   },
 ];

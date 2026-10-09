@@ -1,5 +1,5 @@
 import React from "react";
-import { ACCENT } from "@/lib/site";
+import { ACCENT, getProduct as getCatalogProduct } from "@/lib/site";
 import { DESIGN_SURCHARGES, HARDWARE, SLUITWERK, colorLabel, designPriceMark, findColor, findGlass, normalizeRalCode, ralPreviewHex, windowCountFromBars } from "./catalog";
 
 export { ACCENT as CONFIGURATOR_ACCENT };
@@ -11,6 +11,10 @@ export type ConfigProduct = {
   label: string;
   desc: string;
   img: string;
+  detailImage?: string;
+  detailAlt?: string;
+  detailTitle?: string;
+  detailLead?: string;
   doorTypeCode: string;
   basePrice: number;
   hasHardware: boolean;
@@ -91,12 +95,23 @@ export const INITIAL_STATE: ConfiguratorState = {
   liveSummaryOpen: false,
 };
 
+function catalogPhoto(slug: string) {
+  const product = getCatalogProduct(slug);
+  return {
+    img: product?.imageLandscape ?? "",
+    detailImage: product?.detailImage,
+    detailAlt: product?.detailAlt,
+    detailTitle: product?.detailTitle,
+    detailLead: product?.detailLead,
+  };
+}
+
 export const CFG_PRODUCTS: ConfigProduct[] = [
   {
     id: "taatsdeur",
     label: "Taatsdeur",
     desc: "Taatsmechaniek vloer en boven.",
-    img: "/assets/doors/taatsdeur.jpeg",
+    ...catalogPhoto("taatsdeur"),
     doorTypeCode: "taatsdeur",
     basePrice: 380,
     hasHardware: true,
@@ -106,7 +121,7 @@ export const CFG_PRODUCTS: ConfigProduct[] = [
     id: "scharnierdeur-kozijn",
     label: "Scharnierdeur incl. kozijn",
     desc: "Kozijn en scharnieren inbegrepen.",
-    img: "/assets/doors/scharnierdeur-kozijn.jpeg",
+    ...catalogPhoto("scharnierdeur-kozijn"),
     doorTypeCode: "scharnierdeur_kozijn",
     basePrice: 450,
     hasHardware: true,
@@ -116,7 +131,7 @@ export const CFG_PRODUCTS: ConfigProduct[] = [
     id: "schuifdeur",
     label: "Schuifdeur",
     desc: "Inclusief rail en loopwerk.",
-    img: "/assets/doors/schuifdeur.jpeg",
+    ...catalogPhoto("schuifdeur"),
     doorTypeCode: "schuifdeur",
     basePrice: 520,
     hasHardware: true,
@@ -126,7 +141,7 @@ export const CFG_PRODUCTS: ConfigProduct[] = [
     id: "vast-paneel",
     label: "Vast paneel (los)",
     desc: "Alleen een bevestigingsframe, geen mechaniek.",
-    img: "/assets/doors/vast-paneel.jpeg",
+    ...catalogPhoto("vast-paneel"),
     doorTypeCode: "vast_paneel",
     basePrice: 150,
     hasHardware: false,

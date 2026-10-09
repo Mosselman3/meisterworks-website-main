@@ -180,6 +180,34 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
         </p>
       </section>
 
+      {product?.detailImage ? (
+        <section className="mx-auto max-w-[var(--max-width)] px-7 py-10">
+          <div
+            data-split-row="true"
+            className="grid items-center gap-12"
+            style={{ gridTemplateColumns: "minmax(0, 1.15fr) minmax(0, 0.85fr)" }}
+          >
+            <CoverImage
+              src={product.detailImage}
+              alt={product.detailAlt ?? product.title}
+              className="aspect-[4/3]"
+              sizes="(min-width: 860px) 55vw, 100vw"
+            />
+            <div>
+              <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+                Mechaniek
+              </div>
+              <h2 className="font-serif-display m-0 mb-4 text-[clamp(26px,3.2vw,36px)] font-normal">
+                {product.detailTitle}
+              </h2>
+              <p className="m-0 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
+                {page.introLead}
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       {directionStep ? (
         <section className="mx-auto max-w-[var(--max-width)] px-7 py-20">
           <StepIntro
@@ -392,7 +420,7 @@ export function ProductView({ page }: { page: ProductPageCopy }) {
                 className="flex flex-col overflow-hidden rounded-[14px] bg-white"
               >
                 <CoverImage
-                  src={item.image}
+                  src={item.imageLandscape}
                   alt={item.title}
                   className="aspect-[4/3]"
                   radius={0}

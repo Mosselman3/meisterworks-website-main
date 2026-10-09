@@ -236,7 +236,7 @@ export function HomePage() {
                   </Link>
                 </div>
                 <CoverImage
-                  src={product.image}
+                  src={product.imageLandscape}
                   alt={product.title}
                   className="aspect-[4/3]"
                   sizes="(min-width: 860px) 50vw, 100vw"
