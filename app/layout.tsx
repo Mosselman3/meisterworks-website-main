@@ -64,6 +64,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="nl"
       className={`${cormorantGaramond.variable} ${lato.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className={lato.className}>
         <Script id="site-motion" strategy="beforeInteractive">

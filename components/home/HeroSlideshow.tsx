@@ -6,22 +6,17 @@ import { useEffect, useState } from "react";
 const SLIDES = [
   {
     src: "/assets/hero/slide-1.jpg",
-    alt: "Stalen deur met boog in een lichte hal",
-    position: "center 34%",
-  },
-  {
-    src: "/assets/hero/slide-2.jpg",
-    alt: "Bronzen stalen deuren met uitzicht op het terras",
-    position: "center 46%",
-  },
-  {
-    src: "/assets/hero/slide-3.jpg",
-    alt: "Zwarte stalen deur, open naar de woonkamer",
+    alt: "Bruine stalen deuren in een lichte hal, open naar de eetkamer",
     position: "center 42%",
   },
   {
-    src: "/assets/hero/slide-4.jpg",
-    alt: "Detail van een stalen deurprofiel met glas",
+    src: "/assets/hero/slide-2.jpg",
+    alt: "Hand op het bruine stalen deurprofiel",
+    position: "center 50%",
+  },
+  {
+    src: "/assets/hero/slide-3.jpg",
+    alt: "Stalen deur met boog in een hal naast de trap",
     position: "center 40%",
   },
 ] as const;
