@@ -96,9 +96,15 @@ export function SiteHeader() {
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
-    if (open) mobileScrollRef.current?.scrollTo({ top: 0 });
+    if (open) {
+      document.body.dataset.navOpen = "true";
+      mobileScrollRef.current?.scrollTo({ top: 0 });
+    } else {
+      delete document.body.dataset.navOpen;
+    }
     return () => {
       document.body.style.overflow = "";
+      delete document.body.dataset.navOpen;
     };
   }, [open]);
 

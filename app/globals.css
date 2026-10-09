@@ -1658,6 +1658,11 @@ img {
   display: none;
 }
 
+body[data-nav-open="true"] [data-cfg-resume] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 [data-cfg-resume] {
   position: fixed;
   z-index: 70;

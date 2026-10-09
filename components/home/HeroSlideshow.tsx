@@ -1,29 +1,68 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { getImageProps } from "next/image";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 const SLIDES = [
   {
-    src: "/assets/hero/slide-1.jpg",
-    alt: "Bruine stalen deuren in een lichte hal, open naar de eetkamer",
-    position: "center 42%",
+    portrait: {
+      src: "/assets/hero/portrait-1.jpg",
+      alt: "Stalen deur met boog, naast een palm in een lichte kamer",
+      width: 768,
+      height: 1024,
+    },
+    landscape: {
+      src: "/assets/hero/landscape-1.jpg",
+      alt: "Bruine stalen deuren in een lichte hal, open naar de eetkamer",
+      width: 1024,
+      height: 683,
+    },
   },
   {
-    src: "/assets/hero/slide-2.jpg",
-    alt: "Hand op het bruine stalen deurprofiel",
-    position: "center 50%",
+    portrait: {
+      src: "/assets/hero/portrait-2.jpg",
+      alt: "Bronzen stalen deuren met uitzicht op het terras",
+      width: 768,
+      height: 1024,
+    },
+    landscape: {
+      src: "/assets/hero/landscape-2.jpg",
+      alt: "Hand op het bruine stalen deurprofiel",
+      width: 1024,
+      height: 683,
+    },
   },
   {
-    src: "/assets/hero/slide-3.jpg",
-    alt: "Stalen deur met boog in een hal naast de trap",
-    position: "center 40%",
+    portrait: {
+      src: "/assets/hero/portrait-3.jpg",
+      alt: "Zwarte stalen deur, open naar de woonkamer",
+      width: 768,
+      height: 1024,
+    },
+    landscape: {
+      src: "/assets/hero/landscape-3.jpg",
+      alt: "Stalen deur met boog in een hal naast de trap",
+      width: 1024,
+      height: 680,
+    },
   },
 ] as const;
 
 const INTERVAL_MS = 3000;
+const LANDSCAPE_MEDIA = "(orientation: landscape)";
+
+function subscribeToOrientation(onChange: () => void) {
+  const media = window.matchMedia(LANDSCAPE_MEDIA);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
 
 export function HeroSlideshow() {
+  const landscapeScreen = useSyncExternalStore(
+    subscribeToOrientation,
+    () => window.matchMedia(LANDSCAPE_MEDIA).matches,
+    () => false,
+  );
   const [index, setIndex] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
@@ -61,20 +100,38 @@ export function HeroSlideshow() {
     <div className="absolute inset-0">
       {SLIDES.map((slide, i) => {
         const active = i === index;
+        const portrait = getImageProps({
+          src: slide.portrait.src,
+          alt: slide.portrait.alt,
+          width: slide.portrait.width,
+          height: slide.portrait.height,
+          priority: i === 0,
+          sizes: "100vw",
+        });
+        const landscape = getImageProps({
+          src: slide.landscape.src,
+          alt: slide.landscape.alt,
+          width: slide.landscape.width,
+          height: slide.landscape.height,
+          priority: i === 0,
+          sizes: "100vw",
+        });
+
         return (
-          <Image
-            key={slide.src}
-            src={slide.src}
-            alt={slide.alt}
-            fill
-            priority={i === 0}
-            sizes="100vw"
+          <picture
+            key={slide.portrait.src}
             aria-hidden={!active}
-            style={{ objectPosition: slide.position }}
-            className={`object-cover transition-opacity duration-[1400ms] ease-in-out motion-reduce:transition-none ${
+            className={`absolute inset-0 transition-opacity duration-[1400ms] ease-in-out motion-reduce:transition-none ${
               active ? "opacity-100" : "opacity-0"
             }`}
-          />
+          >
+            <source media={LANDSCAPE_MEDIA} srcSet={landscape.props.srcSet} />
+            <img
+              {...portrait.props}
+              alt={landscapeScreen ? slide.landscape.alt : slide.portrait.alt}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          </picture>
         );
       })}
       {reducedMotion ? null : (
