@@ -1658,9 +1658,11 @@ img {
   display: none;
 }
 
-body[data-nav-open="true"] [data-cfg-resume] {
-  visibility: hidden;
-  pointer-events: none;
+body[data-nav-open="true"] [data-cfg-resume],
+body[data-nav-open="true"] [data-cfg-summary-float],
+body[data-nav-open="true"] [data-cfg-nav-mobile] {
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 [data-cfg-resume] {
