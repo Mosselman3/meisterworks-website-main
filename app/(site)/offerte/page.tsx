@@ -31,7 +31,7 @@ export default function OffertePage() {
         </HeroLoad>
         <HeroLoad stagger={1}>
           <h1 className="font-serif-display m-0 mb-3.5 text-[clamp(28px,4vw,40px)] font-normal">
-            Vertel ons wat u nodig heeft.
+            Vertel ons uw wensen en ontvang een vrijblijvende offerte.
           </h1>
         </HeroLoad>
         <HeroLoad stagger={2}>

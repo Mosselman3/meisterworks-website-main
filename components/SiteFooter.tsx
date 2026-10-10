@@ -45,6 +45,9 @@ export function SiteFooter() {
             <Link href={ROUTES.reviews} className="footer-link">
               Reviews
             </Link>
+            <Link href={ROUTES.faq} className="footer-link">
+              Veelgestelde vragen
+            </Link>
             <Link href={ROUTES.offerte} className="footer-link">
               Snelle offerte
             </Link>

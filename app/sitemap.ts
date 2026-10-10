@@ -5,6 +5,7 @@ const PUBLIC_PATHS = [
   ROUTES.home,
   ROUTES.inspiratie,
   ROUTES.reviews,
+  ROUTES.faq,
   ROUTES.afspraak,
   ROUTES.offerte,
   ROUTES.configurator,

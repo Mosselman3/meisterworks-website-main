@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { FaqSection } from "@/components/faq/FaqSection";
 import { HeroLoad, Reveal } from "@/components/motion/Reveal";
 import { ArrowIcon, CoverImage } from "@/components/ui";
+import { productPageFaqs, PRODUCT_FAQ_COPY, isDoorTypeCode } from "@/lib/faq";
 import { relatedProducts, type ProductPageCopy } from "@/lib/products";
 import { DesignMoreCarousel } from "@/components/product/DesignMoreCarousel";
 import { PlacedWork } from "@/components/product/PlacedWork";
@@ -476,6 +478,15 @@ export function ProductView({
           </div>
         </div>
       </section>
+
+      {product && isDoorTypeCode(product.doorTypeCode) ? (
+        <FaqSection
+          items={productPageFaqs(product.doorTypeCode)}
+          title={PRODUCT_FAQ_COPY[product.doorTypeCode].title}
+          body={PRODUCT_FAQ_COPY[product.doorTypeCode].body}
+          showAllLink
+        />
+      ) : null}
 
       <section className="mx-auto max-w-[700px] px-7 py-[90px] text-center">
         <Reveal>

@@ -12,6 +12,7 @@ export const ROUTES = {
   vakmanschap: "/#vakmanschap",
   inspiratie: "/inspiratie",
   reviews: "/reviews",
+  faq: "/veelgestelde-vragen",
   offerte: "/offerte",
   offerteBedankt: "/offerte/bedankt",
   afspraak: "/afspraak",

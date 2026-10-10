@@ -17,7 +17,7 @@ export function PlacedWork({ photos }: { photos: InspirationMedia[] }) {
               Geplaatst werk
             </div>
             <h2 className="font-serif-display m-0 mb-4 text-[clamp(26px,3.2vw,36px)] font-normal">
-              Zo staat het in huis.
+              Laat u inspireren door ons werk. 
             </h2>
             <p className="m-0 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
               De opties hierboven zijn illustraties om een keuze te maken. Dit is

@@ -35,6 +35,7 @@ const NAV_LINKS: NavLink[] = [
   { href: ROUTES.inspiratie, label: "Inspiratie", match: ROUTES.inspiratie, foldWhenTight: true },
   { href: ROUTES.vakmanschap, label: "Vakmanschap", hideInCompact: true, foldWhenTight: true },
   { href: ROUTES.reviews, label: "Reviews", match: ROUTES.reviews, foldWhenTight: true },
+  { href: ROUTES.faq, label: "FAQ", match: ROUTES.faq, foldWhenTight: true },
   { href: ROUTES.offerte, label: "Snelle offerte", match: ROUTES.offerte },
 ];
 
