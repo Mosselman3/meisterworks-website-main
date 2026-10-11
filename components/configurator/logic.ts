@@ -36,10 +36,32 @@ export type Bay = {
   key: string;
   label: string;
   defaultWidth: number;
+  liggers?: number;
+  staanders?: number;
+  liggerPositions?: number[] | null;
+  staanderPositions?: number[] | null;
 };
 
 export type PanelLayout = "geen" | "een" | "beide";
 export type PanelSide = "links" | "rechts";
+
+/** Extra panels joined onto a standalone vast paneel. The first panel stays on the door fields. */
+export type JoinedPanelDraft = {
+  widthMm: number;
+  liggers: number;
+  staanders: number;
+  customBars: boolean;
+  liggerPositions: number[];
+  staanderPositions: number[];
+};
+
+export type JoinedPanel = {
+  widthMm: number;
+  liggers: number;
+  staanders: number;
+  liggerPositions: number[] | null;
+  staanderPositions: number[] | null;
+};
 
 export type ConfiguratorState = {
   openSection: string | null;
@@ -70,6 +92,8 @@ export type ConfiguratorState = {
   richting: "links" | "rechts" | "";
   leftPanelBreedte: number;
   rightPanelBreedte: number;
+  /** Extra panels of a standalone vast paneel, up to four. Empty means one panel. */
+  joinedPanels: JoinedPanelDraft[];
   groupOpen: Record<string, number>;
   answered: Record<string, boolean>;
   summaryOpen: boolean;
@@ -104,6 +128,7 @@ export const INITIAL_STATE: ConfiguratorState = {
   richting: "",
   leftPanelBreedte: 700,
   rightPanelBreedte: 700,
+  joinedPanels: [],
   groupOpen: {},
   answered: {},
   summaryOpen: false,
@@ -249,32 +274,16 @@ export const SIDE_REQUIRED: SideOption[] = [
   },
 ];
 
-export const SIDE_COUNT: SideOption[] = [
-  {
-    id: "een",
-    label: "Enkel paneel",
-    desc: "Eén vast paneel.",
-    left: 0,
-    right: 0,
-    panels: 1,
-  },
-  {
-    id: "twee",
-    label: "Twee panelen",
-    desc: "Twee panelen aaneengesloten.",
-    left: 0,
-    right: 0,
-    panels: 2,
-  },
-  {
-    id: "drie",
-    label: "Drie of meer panelen",
-    desc: "Drie panelen aaneengesloten.",
-    left: 0,
-    right: 0,
-    panels: 3,
-  },
-];
+export const JOINED_PANEL_CHOICES = [
+  { count: 1, label: "Eén paneel", desc: "Eén vast paneel." },
+  { count: 2, label: "Twee panelen", desc: "Twee panelen aaneengesloten." },
+  { count: 3, label: "Drie panelen", desc: "Drie panelen aaneengesloten." },
+  { count: 4, label: "Vier panelen", desc: "Vier panelen aaneengesloten." },
+  { count: 5, label: "Vijf panelen", desc: "Vijf panelen aaneengesloten." },
+] as const;
+
+/** Extra panels stored beside panel 1. Five panels in total. */
+export const MAX_JOINED_PANELS = JOINED_PANEL_CHOICES.length - 1;
 
 export const SIDE_COUNT_FIXED: SideOption[] = [
   {
@@ -419,7 +428,7 @@ export function stepApplies(
   if (id === "richting") return directionApplies(product);
   if (id === "beslag") return lockApplies(product, sluitwerkCode);
   if (id === "handgreep") return product.hasHardware;
-  if (id === "paneel") return product.hasFixedPanel;
+  if (id === "paneel") return product.hasFixedPanel || product.doorTypeCode === "vast_paneel";
   return true;
 }
 
@@ -718,6 +727,13 @@ export function paneelLabel(state: ConfiguratorState) {
 
 export function maatLabel(state: ConfiguratorState) {
   const hoogte = state.hoogte;
+  if (getProduct(state.productId).doorTypeCode === "vast_paneel" && state.joinedPanels.length > 0) {
+    const parts = [`Paneel 1 ${state.breedte} × ${hoogte} mm`];
+    state.joinedPanels.forEach((panel, index) => {
+      parts.push(`Paneel ${index + 2} ${panel.widthMm} × ${hoogte} mm`);
+    });
+    return parts.join(" · ");
+  }
   const parts = [`Deur ${state.breedte} × ${hoogte} mm`];
   if (leftPanelActive(state)) {
     parts.push(`paneel links ${state.leftPanelBreedte} × ${hoogte} mm`);
@@ -736,13 +752,30 @@ export function formatM2(area: number) {
 }
 
 export function totalOpeningM2(state: ConfiguratorState) {
-  return panelAreaM2(state.breedte, state.hoogte) + totalPanelM2(state);
+  const extra =
+    getProduct(state.productId).doorTypeCode === "vast_paneel"
+      ? state.joinedPanels.reduce((sum, panel) => sum + panelAreaM2(panel.widthMm, state.hoogte), 0)
+      : 0;
+  return panelAreaM2(state.breedte, state.hoogte) + totalPanelM2(state) + extra;
 }
 
 export type SizeLine = { label: string; widthMm: number; heightMm: number };
 
 export function sizeLines(state: ConfiguratorState): SizeLine[] {
   const hoogte = state.hoogte;
+  if (getProduct(state.productId).doorTypeCode === "vast_paneel" && state.joinedPanels.length > 0) {
+    const lines: SizeLine[] = [
+      { label: "Paneel 1", widthMm: state.breedte, heightMm: hoogte },
+    ];
+    state.joinedPanels.forEach((panel, index) => {
+      lines.push({
+        label: `Paneel ${index + 2}`,
+        widthMm: panel.widthMm,
+        heightMm: hoogte,
+      });
+    });
+    return lines;
+  }
   const lines: SizeLine[] = [];
   if (leftPanelActive(state)) {
     lines.push({
@@ -781,6 +814,34 @@ export function panelLayoutThumb(
           : `${door}${right}`
         : `${left}${door}${right}`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f4f2ef"/>${parts}</svg>`;
+  return {
+    height: 96,
+    borderRadius: 9,
+    backgroundColor: "#f4f2ef",
+    backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(svg.replace(/\s+/g, " "))}")`,
+    backgroundSize: "contain",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  };
+}
+
+export function joinedPanelCountThumb(count: number): React.CSSProperties {
+  const panels = Math.min(JOINED_PANEL_CHOICES.length, Math.max(1, Math.round(count)));
+  const width = 200;
+  const height = 200;
+  const padX = 12;
+  const padY = 16;
+  const gap = 4;
+  const panelWidth = (width - padX * 2 - gap * (panels - 1)) / panels;
+  const panelHeight = height - padY * 2;
+  let parts = "";
+  for (let index = 0; index < panels; index += 1) {
+    const x = padX + index * (panelWidth + gap);
+    const font = panelWidth < 34 ? 7 : 9;
+    parts += `<rect x="${x.toFixed(1)}" y="${padY}" width="${panelWidth.toFixed(1)}" height="${panelHeight}" fill="#e3e9e8" stroke="#2f4a63" stroke-width="3"/>`;
+    parts += `<text x="${(x + panelWidth / 2).toFixed(1)}" y="${padY + panelHeight - 8}" text-anchor="middle" font-size="${font}" fill="#2f4a63" fill-opacity="0.55" font-family="monospace">VAST</text>`;
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><rect width="${width}" height="${height}" fill="#f4f2ef"/>${parts}</svg>`;
   return {
     height: 96,
     borderRadius: 9,
@@ -845,8 +906,11 @@ export function isDoorComplete(state: ConfiguratorState): boolean {
 }
 
 export function snapshotDoor(state: ConfiguratorState): ConfiguratorState {
+  const vastPaneel = getProduct(state.productId).doorTypeCode === "vast_paneel";
   return {
     ...state,
+    ...(vastPaneel ? { vlakMode: "zelf" as const, vlakPreset: "" } : {}),
+    joinedPanels: vastPaneel ? normalizeJoinedPanels(state.joinedPanels) : [],
     answered: { ...state.answered },
     groupOpen: { ...state.groupOpen },
     summaryOpen: false,
@@ -975,6 +1039,8 @@ export type BarPositionSet = {
   panelStaanders: number[] | null;
   /** Right fixed panel uses the mirrored staander percentages. */
   mirrorPanelStaanders?: boolean;
+  /** Extra panels when the product is a standalone vast paneel. At most four. */
+  joinedPanels?: JoinedPanel[] | null;
 };
 
 function clampBarPercent(value: number) {
@@ -1017,6 +1083,64 @@ export function placeBarPosition(positions: number[], index: number, raw: number
   if (min > max) return next;
   next[index] = Math.min(max, Math.max(min, clampBarPercent(raw)));
   return next;
+}
+
+export function emptyJoinedPanel(widthMm = 800): JoinedPanelDraft {
+  return {
+    widthMm,
+    liggers: 0,
+    staanders: 0,
+    customBars: false,
+    liggerPositions: [],
+    staanderPositions: [],
+  };
+}
+
+export function normalizeJoinedPanels(value: unknown): JoinedPanelDraft[] {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, MAX_JOINED_PANELS).flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const record = item as Partial<JoinedPanelDraft>;
+    const liggers = Math.min(20, Math.max(0, Math.round(Number(record.liggers) || 0)));
+    const staanders = Math.min(20, Math.max(0, Math.round(Number(record.staanders) || 0)));
+    const customBars = record.customBars === true;
+    return [
+      {
+        widthMm: Math.min(3000, Math.max(300, Math.round(Number(record.widthMm) || 800))),
+        liggers,
+        staanders,
+        customBars,
+        liggerPositions: customBars ? resizeBarPositions(liggers, record.liggerPositions) : [],
+        staanderPositions: customBars ? resizeBarPositions(staanders, record.staanderPositions) : [],
+      },
+    ];
+  });
+}
+
+export function joinedPanelCount(panels: JoinedPanelDraft[]) {
+  return 1 + panels.length;
+}
+
+export function joinedCountLabel(panels: JoinedPanelDraft[]) {
+  const count = joinedPanelCount(panels);
+  return JOINED_PANEL_CHOICES.find((choice) => choice.count === count)?.label ?? `${count} panelen`;
+}
+
+function storedJoinedPanels(panels: JoinedPanelDraft[]): JoinedPanel[] | null {
+  if (panels.length === 0) return null;
+  return panels.map((panel) => ({
+    widthMm: panel.widthMm,
+    liggers: panel.liggers,
+    staanders: panel.staanders,
+    liggerPositions:
+      panel.customBars && panel.liggers > 0
+        ? floorPercents(panel.liggers, panel.liggerPositions)
+        : null,
+    staanderPositions:
+      panel.customBars && panel.staanders > 0
+        ? floorPercents(panel.staanders, panel.staanderPositions)
+        : null,
+  }));
 }
 
 export function floorPercents(count: number, positions: number[] | null | undefined): number[] {
@@ -1075,14 +1199,33 @@ export function quoteBarPositions(state: ConfiguratorState): BarPositionSet | nu
       : null;
   const mirrorPanelStaanders =
     state.panelLayout === "beide" && state.mirrorPanelStaanders && state.panelStaanders > 0;
-  if (!liggers && !staanders && !panelLiggers && !panelStaanders && !mirrorPanelStaanders) return null;
+  const joinedPanels =
+    getProduct(state.productId).doorTypeCode === "vast_paneel"
+      ? storedJoinedPanels(state.joinedPanels)
+      : null;
+  if (!liggers && !staanders && !panelLiggers && !panelStaanders && !mirrorPanelStaanders && !joinedPanels) {
+    return null;
+  }
   return {
     liggers,
     staanders,
     panelLiggers,
     panelStaanders,
     ...(mirrorPanelStaanders ? { mirrorPanelStaanders: true } : {}),
+    ...(joinedPanels ? { joinedPanels } : {}),
   };
+}
+
+function joinedDivisionNote(state: ConfiguratorState) {
+  if (getProduct(state.productId).doorTypeCode !== "vast_paneel" || state.joinedPanels.length === 0) {
+    return "";
+  }
+  return state.joinedPanels
+    .map((panel, index) => {
+      const windows = windowCountFromBars(panel.liggers, panel.staanders);
+      return ` Paneel ${index + 2}: ${barPhrase(panel.liggers, panel.staanders)} · ${windows} ${windows === 1 ? "raam" : "ramen"}.`;
+    })
+    .join("");
 }
 
 export function vlakLabel(state: ConfiguratorState): string {
@@ -1099,10 +1242,11 @@ export function vlakLabel(state: ConfiguratorState): string {
   const windows = windowCountFromBars(state.liggers, state.staanders);
   const door = `${barPhrase(state.liggers, state.staanders)} · ${windows} ${windows === 1 ? "raam" : "ramen"}`;
   const note = customPositionNote(state);
-  if (!hasPanels(state)) return `${door}${note}`;
+  const joined = joinedDivisionNote(state);
+  if (!hasPanels(state)) return `${door}${note}${joined}`;
   const panelWindows = windowCountFromBars(state.panelLiggers, state.panelStaanders);
   const panelWord = state.panelLayout === "beide" ? "Panelen" : "Paneel";
-  return `Deur: ${door}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}${note}`;
+  return `Deur: ${door}. ${panelWord}: ${barPhrase(state.panelLiggers, state.panelStaanders)} · ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}${note}${joined}`;
 }
 
 export type PreviewDesignMark =
@@ -1183,25 +1327,55 @@ export function doorPaneCount(state: Pick<ConfiguratorState, "vlakMode" | "vlakP
 export function laborWindowCount(
   state: Pick<
     ConfiguratorState,
-    "vlakMode" | "vlakPreset" | "liggers" | "staanders" | "panelLayout" | "panelLiggers" | "panelStaanders"
+    | "vlakMode"
+    | "vlakPreset"
+    | "liggers"
+    | "staanders"
+    | "panelLayout"
+    | "panelLiggers"
+    | "panelStaanders"
+    | "joinedPanels"
+    | "productId"
   >,
 ) {
   const panels = fixedPanelCount(state.panelLayout);
   const panelPanes =
     panels > 0 ? windowCountFromBars(state.panelLiggers, state.panelStaanders) : 0;
-  return doorPaneCount(state) + panels * panelPanes;
+  const joined =
+    getProduct(state.productId).doorTypeCode === "vast_paneel"
+      ? state.joinedPanels.reduce(
+          (sum, panel) => sum + windowCountFromBars(panel.liggers, panel.staanders),
+          0,
+        )
+      : 0;
+  return doorPaneCount(state) + panels * panelPanes + joined;
 }
 
 /** Panes beyond the one included pane on the door and on each fixed panel. */
 export function extraLaborPanes(
   state: Pick<
     ConfiguratorState,
-    "vlakMode" | "vlakPreset" | "liggers" | "staanders" | "panelLayout" | "panelLiggers" | "panelStaanders"
+    | "vlakMode"
+    | "vlakPreset"
+    | "liggers"
+    | "staanders"
+    | "panelLayout"
+    | "panelLiggers"
+    | "panelStaanders"
+    | "joinedPanels"
+    | "productId"
   >,
 ) {
   const panels = fixedPanelCount(state.panelLayout);
   const panelPanes = windowCountFromBars(state.panelLiggers, state.panelStaanders);
-  return Math.max(0, doorPaneCount(state) - 1) + panels * Math.max(0, panelPanes - 1);
+  const joined =
+    getProduct(state.productId).doorTypeCode === "vast_paneel"
+      ? state.joinedPanels.reduce((sum, panel) => {
+          const panes = windowCountFromBars(panel.liggers, panel.staanders);
+          return sum + Math.max(0, panes - 1);
+        }, 0)
+      : 0;
+  return Math.max(0, doorPaneCount(state) - 1) + panels * Math.max(0, panelPanes - 1) + joined;
 }
 
 export function buildPreviewSvg(
@@ -1217,16 +1391,42 @@ export function buildPreviewSvg(
   const doorWidth = Math.max(300, state.breedte || 900);
   const leftWidth = leftPanelActive(state) ? state.leftPanelBreedte : 0;
   const rightWidth = rightPanelActive(state) ? state.rightPanelBreedte : 0;
-  const bays: Bay[] = [
-    ...(leftWidth
-      ? [{ type: "panel" as const, key: "links", label: "Paneel links", defaultWidth: leftWidth }]
-      : []),
-    { type: "door", key: "deur", label: "Deur", defaultWidth: doorWidth },
-    ...(rightWidth
-      ? [{ type: "panel" as const, key: "rechts", label: "Paneel rechts", defaultWidth: rightWidth }]
-      : []),
-  ];
-  const totalMm = doorWidth + leftWidth + rightWidth;
+  const joined = product.doorTypeCode === "vast_paneel" ? state.joinedPanels : [];
+  const bays: Bay[] = joined.length
+    ? [
+        {
+          type: "panel",
+          key: "paneel-1",
+          label: "Paneel 1",
+          defaultWidth: doorWidth,
+          liggers: state.vlakMode === "ontwerp" ? 0 : state.liggers,
+          staanders: state.vlakMode === "ontwerp" ? 0 : state.staanders,
+          liggerPositions:
+            state.vlakMode !== "ontwerp" && state.customDoorBars ? state.liggerPositions : null,
+          staanderPositions:
+            state.vlakMode !== "ontwerp" && state.customDoorBars ? state.staanderPositions : null,
+        },
+        ...joined.map((panel, index) => ({
+          type: "panel" as const,
+          key: `paneel-${index + 2}`,
+          label: `Paneel ${index + 2}`,
+          defaultWidth: panel.widthMm,
+          liggers: panel.liggers,
+          staanders: panel.staanders,
+          liggerPositions: panel.customBars ? panel.liggerPositions : null,
+          staanderPositions: panel.customBars ? panel.staanderPositions : null,
+        })),
+      ]
+    : [
+        ...(leftWidth
+          ? [{ type: "panel" as const, key: "links", label: "Paneel links", defaultWidth: leftWidth }]
+          : []),
+        { type: "door", key: "deur", label: "Deur", defaultWidth: doorWidth },
+        ...(rightWidth
+          ? [{ type: "panel" as const, key: "rechts", label: "Paneel rechts", defaultWidth: rightWidth }]
+          : []),
+      ];
+  const totalMm = bays.reduce((sum, bay) => sum + bay.defaultWidth, 0);
   const ratio = Math.max(0.28, Math.min(1.6, totalMm / state.hoogte));
   const H = 300;
   const minW = Math.min(400, 54 * bays.length + 14);
@@ -1293,37 +1493,46 @@ export function buildPreviewSvg(
       }
     }
 
+    const override = bay.liggers != null && bay.staanders != null;
     const designOnDoor =
-      bay.type === "door" && state.vlakMode === "ontwerp" && state.vlakPreset !== "";
+      !override && bay.type === "door" && state.vlakMode === "ontwerp" && state.vlakPreset !== "";
     const liggerCount = designOnDoor
       ? 0
-      : bay.type === "panel"
-        ? state.panelLiggers
-        : state.liggers;
+      : override
+        ? bay.liggers!
+        : bay.type === "panel"
+          ? state.panelLiggers
+          : state.liggers;
     const staanderCount = designOnDoor
       ? 0
-      : bay.type === "panel"
-        ? state.panelStaanders
-        : state.staanders;
+      : override
+        ? bay.staanders!
+        : bay.type === "panel"
+          ? state.panelStaanders
+          : state.staanders;
     const liggerPcts = floorPercents(
       liggerCount,
-      bay.type === "panel"
-        ? state.customPanelBars
-          ? state.panelLiggerPositions
-          : null
-        : state.customDoorBars
-          ? state.liggerPositions
-          : null,
+      override
+        ? bay.liggerPositions
+        : bay.type === "panel"
+          ? state.customPanelBars
+            ? state.panelLiggerPositions
+            : null
+          : state.customDoorBars
+            ? state.liggerPositions
+            : null,
     );
     const staanderPcts = floorPercents(
       staanderCount,
-      bay.type === "panel"
-        ? state.customPanelBars
-          ? state.panelStaanderPositions
-          : null
-        : state.customDoorBars
-          ? state.staanderPositions
-          : null,
+      override
+        ? bay.staanderPositions
+        : bay.type === "panel"
+          ? state.customPanelBars
+            ? state.panelStaanderPositions
+            : null
+          : state.customDoorBars
+            ? state.staanderPositions
+            : null,
     );
     for (const pct of liggerPcts) {
       const ly = gy + gh * (1 - pct / 100);

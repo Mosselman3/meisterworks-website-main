@@ -67,6 +67,7 @@ import {
   lockApplies,
   dirThumbStyle,
   doorSummaryRows,
+  emptyJoinedPanel,
   firstUnconfirmedStep,
   freshDoorState,
   getProduct,
@@ -74,6 +75,10 @@ import {
   hasPanels,
   isDoorComplete,
   isStepConfirmed,
+  joinedCountLabel,
+  joinedPanelCount,
+  joinedPanelCountThumb,
+  JOINED_PANEL_CHOICES,
   leftPanelActive,
   maatLabel,
   nextStepId,
@@ -633,6 +638,9 @@ function stateForProduct(slug: string | null): ConfiguratorState {
   return {
     ...INITIAL_STATE,
     productId: chosen.id,
+    ...(chosen.doorTypeCode === "vast_paneel"
+      ? { vlakMode: "zelf" as const, vlakPreset: "" }
+      : {}),
     answered: { product: true },
     openSection: nextStepId("product", chosen),
   };
@@ -714,8 +722,14 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
     liggers: state.liggers,
     staanders: state.staanders,
     barPositions: quoteBarPositions(state),
-    vlakMode: state.vlakMode === "ontwerp" ? "ontwerp" : "zelf",
-    vlakPreset: state.vlakMode === "ontwerp" ? state.vlakPreset : "",
+    vlakMode:
+      product.doorTypeCode !== "vast_paneel" && state.vlakMode === "ontwerp"
+        ? "ontwerp"
+        : "zelf",
+    vlakPreset:
+      product.doorTypeCode !== "vast_paneel" && state.vlakMode === "ontwerp"
+        ? state.vlakPreset
+        : "",
     openingDirection:
       (product.doorTypeCode === "scharnierdeur_kozijn" ||
         product.doorTypeCode === "schuifdeur") &&
@@ -852,6 +866,7 @@ function isUntouchedProductStart(state: ConfiguratorState, productParam: string)
     state.customPanelBars === initial.customPanelBars &&
     state.vlakPreset === initial.vlakPreset &&
     state.vlakMode === initial.vlakMode &&
+    JSON.stringify(state.joinedPanels) === JSON.stringify(initial.joinedPanels) &&
     state.panelLayout === initial.panelLayout &&
     state.kleur === initial.kleur &&
     state.ralCode === initial.ralCode &&
@@ -937,6 +952,7 @@ export function Configurator() {
     if (!draftReady || state.openSection !== "vlak" || state.answered.vlak) return;
     setState((current) => {
       if (current.openSection !== "vlak" || current.answered.vlak) return current;
+      if (getProduct(current.productId).doorTypeCode === "vast_paneel") return current;
       if (current.vlakMode === "ontwerp" || current.vlakPreset) return current;
       if (
         current.liggers !== 0 ||
@@ -1034,19 +1050,26 @@ export function Configurator() {
             summary: directionChoiceLabel(state.richting, product.doorTypeCode),
           }
         : null,
-      product.hasFixedPanel
+      product.hasFixedPanel || product.doorTypeCode === "vast_paneel"
         ? {
             id: "paneel" as StepId,
-            title: "Vast paneel",
+            title: product.doorTypeCode === "vast_paneel" ? "Panelen" : "Vast paneel",
             intro:
-              "Kies of u een vast paneel links, rechts of aan beide zijden wilt.",
-            summary: paneelLabel(state),
+              product.doorTypeCode === "vast_paneel"
+                ? "Een vast paneel kan alleen staan, of aaneengesloten worden met extra panelen tot de gewenste breedte."
+                : "Kies of u een vast paneel links, rechts of aan beide zijden wilt.",
+            summary:
+              product.doorTypeCode === "vast_paneel"
+                ? joinedCountLabel(state.joinedPanels)
+                : paneelLabel(state),
           }
         : null,
       {
         id: "maat" as StepId,
         title: "Afmeting",
-        intro: hasPanels(state)
+        intro: state.joinedPanels.length
+          ? "Vul per paneel de breedte in, en de hoogte van de opening."
+          : hasPanels(state)
           ? "Vul de breedte van de deur en de panelen, en de hoogte van de opening in millimeters in."
           : "Vul de breedte en de hoogte van de opening in millimeters in.",
         summary: maatLabel(state),
@@ -1055,7 +1078,9 @@ export function Configurator() {
         id: "vlak" as StepId,
         title: "Vlakverdeling",
         intro:
-          "Stel de verdeling zelf in, of kies een ontwerp. Bij een ontwerp dat er niet tussen staat kunt u een tekening toevoegen.",
+          product.doorTypeCode === "vast_paneel" && state.joinedPanels.length > 0
+            ? "Stel per paneel de liggers en staanders in. De positie kunt u per paneel apart kiezen."
+            : "Stel de verdeling zelf in, of kies een ontwerp. Bij een ontwerp dat er niet tussen staat kunt u een tekening toevoegen.",
         summary: vlak,
       },
       {
@@ -1287,6 +1312,7 @@ export function Configurator() {
     state.panelLayout,
     state.panelSide,
     state.richting,
+    JSON.stringify(state.joinedPanels),
     state.leftPanelBreedte,
     state.rightPanelBreedte,
     activeIndex,
@@ -1648,6 +1674,13 @@ export function Configurator() {
                   productId: o.id,
                   openSection: showClose ? "product" : s.openSection,
                   panelLayout: "geen",
+                  joinedPanels:
+                    o.doorTypeCode === "vast_paneel" && s.productId === o.id
+                      ? s.joinedPanels
+                      : [],
+                  ...(o.doorTypeCode === "vast_paneel"
+                    ? { vlakMode: "zelf" as const, vlakPreset: "" }
+                    : {}),
                   richting: directionApplies(o) ? s.richting : "",
                   beslag: lockApplies(o, s.sluitwerk) ? s.beslag : "",
                   answered: {
@@ -1656,6 +1689,7 @@ export function Configurator() {
                       ? s.productId === o.id && s.answered.product
                       : true,
                     ...(directionApplies(o) ? {} : { richting: false }),
+                    ...(s.productId === o.id ? {} : { paneel: false }),
                     ...(lockApplies(o, s.sluitwerk) ? {} : { beslag: false }),
                   },
                 }));
@@ -1688,6 +1722,7 @@ export function Configurator() {
                 ...s,
                 productId: CUSTOM_PRODUCT.id,
                 panelLayout: "geen",
+                joinedPanels: [],
                 answered: { ...s.answered, product: true },
               }));
               advanceFrom("product", CUSTOM_PRODUCT);
@@ -1753,8 +1788,15 @@ export function Configurator() {
     }
 
     if (id === "vlak") {
-      const chooseDesign = state.vlakMode === "ontwerp";
+      const designChoice = product.doorTypeCode !== "vast_paneel";
+      const chooseDesign = designChoice && state.vlakMode === "ontwerp";
       const andersChosen = chooseDesign && state.vlakPreset === VLAK_CUSTOM_ID;
+      const vlakModes = (
+        [
+          ["zelf", "Zelf ontwerpen"],
+          ["ontwerp", "Ontwerp kiezen"],
+        ] as const
+      ).filter(([mode]) => designChoice || mode === "zelf");
       return (
         <>
           <div
@@ -1772,13 +1814,8 @@ export function Configurator() {
               flexWrap: "wrap",
             }}
           >
-            {(
-              [
-                ["zelf", "Zelf ontwerpen"],
-                ["ontwerp", "Ontwerp kiezen"],
-              ] as const
-            ).map(([mode, label]) => {
-              const selected = state.vlakMode === mode;
+            {vlakModes.map(([mode, label]) => {
+              const selected = designChoice ? state.vlakMode === mode : mode === "zelf";
               return (
                 <button
                   key={mode}
@@ -2060,14 +2097,26 @@ export function Configurator() {
             }}
           >
             <StepperField
-              title={hasPanels(state) ? "Liggers deur" : "Liggers"}
+              title={
+                product.doorTypeCode === "vast_paneel" && state.joinedPanels.length > 0
+                  ? "Liggers paneel 1"
+                  : hasPanels(state)
+                    ? "Liggers deur"
+                    : "Liggers"
+              }
               subtitle="Horizontale onderverdeling"
               value={state.liggers}
               onMinus={() => stepBars("liggers", -1)}
               onPlus={() => stepBars("liggers", 1)}
             />
             <StepperField
-              title={hasPanels(state) ? "Staanders deur" : "Staanders"}
+              title={
+                product.doorTypeCode === "vast_paneel" && state.joinedPanels.length > 0
+                  ? "Staanders paneel 1"
+                  : hasPanels(state)
+                    ? "Staanders deur"
+                    : "Staanders"
+              }
               subtitle="Verticale onderverdeling"
               value={state.staanders}
               onMinus={() => stepBars("staanders", -1)}
@@ -2136,6 +2185,169 @@ export function Configurator() {
               }))
             }
           />
+          {product.doorTypeCode === "vast_paneel"
+            ? state.joinedPanels.map((panel, index) => (
+                <div key={`joined-bars-${index}`} style={{ marginTop: 18 }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                      gap: 18,
+                    }}
+                  >
+                    <StepperField
+                      title={`Liggers paneel ${index + 2}`}
+                      subtitle="Horizontale onderverdeling"
+                      value={panel.liggers}
+                      onMinus={() =>
+                        setState((current) => ({
+                          ...current,
+                          joinedPanels: current.joinedPanels.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? {
+                                  ...item,
+                                  liggers: Math.max(0, item.liggers - 1),
+                                  liggerPositions: resizeBarPositions(
+                                    Math.max(0, item.liggers - 1),
+                                    item.liggerPositions,
+                                  ),
+                                }
+                              : item,
+                          ),
+                        }))
+                      }
+                      onPlus={() =>
+                        setState((current) => ({
+                          ...current,
+                          joinedPanels: current.joinedPanels.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? {
+                                  ...item,
+                                  liggers: Math.min(5, item.liggers + 1),
+                                  liggerPositions: resizeBarPositions(
+                                    Math.min(5, item.liggers + 1),
+                                    item.liggerPositions,
+                                  ),
+                                }
+                              : item,
+                          ),
+                        }))
+                      }
+                    />
+                    <StepperField
+                      title={`Staanders paneel ${index + 2}`}
+                      subtitle="Verticale onderverdeling"
+                      value={panel.staanders}
+                      onMinus={() =>
+                        setState((current) => ({
+                          ...current,
+                          joinedPanels: current.joinedPanels.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? {
+                                  ...item,
+                                  staanders: Math.max(0, item.staanders - 1),
+                                  staanderPositions: resizeBarPositions(
+                                    Math.max(0, item.staanders - 1),
+                                    item.staanderPositions,
+                                  ),
+                                }
+                              : item,
+                          ),
+                        }))
+                      }
+                      onPlus={() =>
+                        setState((current) => ({
+                          ...current,
+                          joinedPanels: current.joinedPanels.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? {
+                                  ...item,
+                                  staanders: Math.min(5, item.staanders + 1),
+                                  staanderPositions: resizeBarPositions(
+                                    Math.min(5, item.staanders + 1),
+                                    item.staanderPositions,
+                                  ),
+                                }
+                              : item,
+                          ),
+                        }))
+                      }
+                    />
+                  </div>
+                  <BarPositionControl
+                    label={`Positie paneel ${index + 2} zelf instellen`}
+                    liggers={panel.liggers}
+                    staanders={panel.staanders}
+                    custom={panel.customBars}
+                    liggerPositions={panel.liggerPositions}
+                    staanderPositions={panel.staanderPositions}
+                    onCustom={(customBars) =>
+                      setState((current) => ({
+                        ...current,
+                        joinedPanels: current.joinedPanels.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? {
+                                ...item,
+                                customBars,
+                                liggerPositions: resizeBarPositions(item.liggers, item.liggerPositions),
+                                staanderPositions: resizeBarPositions(
+                                  item.staanders,
+                                  item.staanderPositions,
+                                ),
+                              }
+                            : item,
+                        ),
+                      }))
+                    }
+                    onLigger={(barIndex, value) =>
+                      setState((current) => ({
+                        ...current,
+                        joinedPanels: current.joinedPanels.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? {
+                                ...item,
+                                liggerPositions: placeBarPosition(
+                                  resizeBarPositions(item.liggers, item.liggerPositions),
+                                  barIndex,
+                                  value,
+                                ),
+                              }
+                            : item,
+                        ),
+                      }))
+                    }
+                    onStaander={(barIndex, value) =>
+                      setState((current) => ({
+                        ...current,
+                        joinedPanels: current.joinedPanels.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? {
+                                ...item,
+                                staanderPositions: placeBarPosition(
+                                  resizeBarPositions(item.staanders, item.staanderPositions),
+                                  barIndex,
+                                  value,
+                                ),
+                              }
+                            : item,
+                        ),
+                      }))
+                    }
+                  />
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "oklch(0.55 0.008 60)",
+                      lineHeight: 1.5,
+                      margin: "12px 0 0",
+                    }}
+                  >
+                    Paneel {index + 2} heeft {windowCountFromBars(panel.liggers, panel.staanders)}{" "}
+                    {windowCountFromBars(panel.liggers, panel.staanders) === 1 ? "raam" : "ramen"}.
+                  </p>
+                </div>
+              ))
+            : null}
           {hasPanels(state) ? (
             <BarPositionControl
               label="Positie panelen zelf instellen"
@@ -2193,7 +2405,11 @@ export function Configurator() {
               margin: "16px 0 0",
             }}
           >
-            De deur heeft {windows} {windows === 1 ? "raam" : "ramen"}.
+            {product.doorTypeCode === "vast_paneel"
+              ? state.joinedPanels.length > 0
+                ? `Paneel 1 heeft ${windows} ${windows === 1 ? "raam" : "ramen"}.`
+                : `Het paneel heeft ${windows} ${windows === 1 ? "raam" : "ramen"}.`
+              : `De deur heeft ${windows} ${windows === 1 ? "raam" : "ramen"}.`}
             {hasPanels(state)
               ? ` ${state.panelLayout === "beide" ? "De vaste panelen hebben" : "Het vaste paneel heeft"} ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}.`
               : ""}
@@ -2226,12 +2442,37 @@ export function Configurator() {
             }}
           >
             <MmField
-              label={hasPanels(state) ? "Breedte deur (mm)" : "Breedte (mm)"}
+              label={
+                product.doorTypeCode === "vast_paneel" && state.joinedPanels.length > 0
+                  ? "Breedte paneel 1 (mm)"
+                  : hasPanels(state)
+                    ? "Breedte deur (mm)"
+                    : "Breedte (mm)"
+              }
               value={state.breedte}
               min={300}
               max={3000}
               onChange={(breedte) => setState((s) => ({ ...s, breedte }))}
             />
+            {product.doorTypeCode === "vast_paneel"
+              ? state.joinedPanels.map((panel, index) => (
+                  <MmField
+                    key={`joined-width-${index}`}
+                    label={`Breedte paneel ${index + 2} (mm)`}
+                    value={panel.widthMm}
+                    min={300}
+                    max={3000}
+                    onChange={(widthMm) =>
+                      setState((current) => ({
+                        ...current,
+                        joinedPanels: current.joinedPanels.map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, widthMm } : item,
+                        ),
+                      }))
+                    }
+                  />
+                ))
+              : null}
             {leftPanelActive(state) ? (
               <MmField
                 label="Breedte paneel links (mm)"
@@ -2623,6 +2864,49 @@ export function Configurator() {
     }
 
     if (id === "paneel") {
+      if (product.doorTypeCode === "vast_paneel") {
+        return (
+          <>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+                gap: 14,
+              }}
+            >
+              {JOINED_PANEL_CHOICES.map((option) => (
+                <OptionCard
+                  key={option.count}
+                  label={option.label}
+                  desc={option.desc}
+                  selected={joinedPanelCount(state.joinedPanels) === option.count}
+                  thumbStyle={joinedPanelCountThumb(option.count)}
+                  onClick={() =>
+                    setState((current) => ({
+                      ...current,
+                      joinedPanels: Array.from(
+                        { length: option.count - 1 },
+                        (_, index) => current.joinedPanels[index] ?? emptyJoinedPanel(),
+                      ),
+                    }))
+                  }
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              data-cfg-confirm
+              style={confirmBtnStyle()}
+              onClick={() => {
+                mark("paneel", true);
+                advanceFrom("paneel");
+              }}
+            >
+              Bevestigen en doorgaan →
+            </button>
+          </>
+        );
+      }
       const layouts: {
         id: PanelLayout;
         label: string;

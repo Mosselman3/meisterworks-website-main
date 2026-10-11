@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { ALL_REVIEWS, reviewColumns } from "@/lib/content";
 
-const PARALLAX_DISTANCE = 120;
+const PARALLAX_DISTANCE = 64;
 const SPEEDS = [1.8, -1.8, 2.4, -2.4];
 
 function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
@@ -14,35 +14,36 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
 
   useEffect(() => {
     let frame = 0;
-    const loop = () => {
-      const el = wallRef.current;
-      if (el) {
-        const rect = el.getBoundingClientRect();
-        const vh = window.innerHeight || 900;
+
+    const update = () => {
+      const wall = wallRef.current;
+      if (wall) {
+        const rect = wall.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || 900;
         const progress = Math.max(
           -1,
-          Math.min(1, ((vh - rect.top) / (vh + rect.height)) * 2 - 1),
+          Math.min(1, ((viewportHeight - rect.top) / (viewportHeight + rect.height)) * 2 - 1),
         );
-        colRefs.current.forEach((col, index) => {
-          if (col) {
-            col.style.transform = `translateY(${progress * -PARALLAX_DISTANCE * SPEEDS[index % SPEEDS.length]}px)`;
+
+        colRefs.current.forEach((column, index) => {
+          if (column) {
+            column.style.transform = `translateY(${progress * -PARALLAX_DISTANCE * SPEEDS[index % SPEEDS.length]}px)`;
           }
         });
       }
-      frame = requestAnimationFrame(loop);
+
+      frame = requestAnimationFrame(update);
     };
-    frame = requestAnimationFrame(loop);
+
+    frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
   }, []);
 
   return (
-    <div
-      ref={wallRef}
-      className="relative mx-auto h-[820px] max-w-[var(--max-width)] overflow-hidden px-7 py-8"
-    >
+    <div ref={wallRef} className="mx-auto max-w-[var(--max-width)] px-7 py-40">
       <div
         data-wall-cols="true"
-        className="grid h-full grid-cols-4 gap-3.5"
+        className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4"
       >
         {columns.map((column, colIndex) => (
           <div
@@ -50,7 +51,7 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
             ref={(node) => {
               colRefs.current[colIndex] = node;
             }}
-            className="relative flex flex-col gap-3.5 will-change-transform"
+            className="flex flex-col gap-3.5 will-change-transform"
           >
             {column.map((review, index) => (
               <Reveal
@@ -64,7 +65,7 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
                 <div className="mb-2 text-[12px] tracking-[0.1em] text-[var(--accent)]">
                   {review.stars}
                 </div>
-                <p className="line-clamp-4 m-0 mb-3 text-[14px] font-light leading-[1.55] text-[oklch(0.25_0.008_60)]">
+                <p className="m-0 mb-3 text-[14px] font-light leading-[1.55] text-[oklch(0.25_0.008_60)]">
                   “{review.quote}”
                 </p>
                 <div className="text-[13px] font-semibold text-[oklch(0.2_0.008_60)]">
@@ -79,18 +80,12 @@ function Wall({ reviews }: { reviews: typeof ALL_REVIEWS }) {
           </div>
         ))}
       </div>
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[60px] bg-[linear-gradient(180deg,var(--background),transparent)]" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[60px] bg-[linear-gradient(0deg,var(--background),transparent)]" />
     </div>
   );
 }
 
 export function ReviewWalls() {
-  return (
-    <>
-      <Wall reviews={ALL_REVIEWS.slice(0, 20)} />
-    </>
-  );
+  return <Wall reviews={ALL_REVIEWS.slice(0, 20)} />;
 }
 
 export function ReviewWallB() {

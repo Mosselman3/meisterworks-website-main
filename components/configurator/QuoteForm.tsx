@@ -41,6 +41,13 @@ export type QuoteConfiguration = {
     panelLiggers: number[] | null;
     panelStaanders: number[] | null;
     mirrorPanelStaanders?: boolean;
+    joinedPanels?: {
+      widthMm: number;
+      liggers: number;
+      staanders: number;
+      liggerPositions: number[] | null;
+      staanderPositions: number[] | null;
+    }[] | null;
   } | null;
   vlakMode: "zelf" | "ontwerp";
   vlakPreset: string;

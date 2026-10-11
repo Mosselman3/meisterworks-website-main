@@ -320,7 +320,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     products: ["vast_paneel"],
     question: "Wat stel ik samen bij een vast paneel?",
     answer: [
-      "Afmeting, vlakverdeling, glas en kleur. Er is geen sluitwerk, geen handgreep en geen mechanisme. Een paneel dat naast een bewegende deur staat, kiest u bij de taatsdeur, de scharnierdeur of de schuifdeur.",
+      "Afmeting, aantal panelen, vlakverdeling, glas en kleur. Elk paneel kan een eigen verdeling van liggers en staanders krijgen. Er is geen sluitwerk, geen handgreep en geen mechanisme. Een paneel dat naast een bewegende deur staat, kiest u bij de taatsdeur, de scharnierdeur of de schuifdeur.",
     ],
   },
 ];

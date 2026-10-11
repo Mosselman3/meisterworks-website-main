@@ -69,7 +69,7 @@ export const PRODUCT_PAGES: ProductPageCopy[] = [
     introLead:
       "Het vaste paneel is een los product. Het vult een opening met staal en glas wanneer er geen deur hoeft te bewegen.",
     introBody:
-      "Afmeting, vlakverdeling, glas en kleur kiest u in de configurator. Er is geen sluitwerk, geen handgreep en geen mechanisme.",
+      "Afmeting, aantal panelen, vlakverdeling, glas en kleur kiest u in de configurator. Panelen kunnen aaneengesloten staan, elk met een eigen verdeling van liggers en staanders. Er is geen sluitwerk, geen handgreep en geen mechanisme.",
     composeCta: "Paneel samenstellen",
     hasHardware: false,
     hasFixedPanel: false,
