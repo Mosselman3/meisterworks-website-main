@@ -282,25 +282,80 @@ export const GLASS_TYPES: CatalogGlass[] = [
 
 export const BASELINE_GLASS = "33.1";
 
-export const COLORS = [
-  { code: "standaard_mat_zwart", label: "Standaard RAL zwart", desc: "De standaard afwerking.", surcharge: 0, hex: "#1c1c1c", priceMark: "€" },
-  { code: "afwijkende_ral", label: "Afwijkende RAL-kleur", desc: "Een RAL-kleur speciaal voor uw project.", surcharge: 85, hex: "#2f3d33", priceMark: "€€" },
-] as const;
+export type DesignColor = {
+  code: string;
+  name: string;
+  hex: string;
+};
+
+/** Representative screen swatches for the Iconica design-color collection. */
+export const DESIGN_COLORS: readonly DesignColor[] = [
+  { code: "noble_bronze", name: "Noble bronze", hex: "#80624f" },
+  { code: "crescent_glow", name: "Crescent glow", hex: "#b39162" },
+  { code: "sandlook", name: "Sandlook", hex: "#b7a58e" },
+  { code: "dark_bronze", name: "Dark bronze", hex: "#4d382d" },
+  { code: "anodic_brown", name: "Anodic Brown", hex: "#5e4b41" },
+  { code: "earth_clay", name: "Earth clay", hex: "#986d58" },
+  { code: "cast_iron", name: "Cast iron", hex: "#3d3d39" },
+  { code: "smoked_steel", name: "Smoked Steel", hex: "#6d706f" },
+];
+
+export type ColorOption = {
+  code: string;
+  label: string;
+  desc: string;
+  surcharge: number;
+  hex: string;
+  priceMark: string | null;
+  designColors?: readonly DesignColor[];
+};
+
+export const COLORS: readonly ColorOption[] = [
+  {
+    code: "standaard_mat_zwart",
+    label: "Standaard RAL-zwart",
+    desc: "De standaard afwerking.",
+    surcharge: 0,
+    hex: "#1c1c1c",
+    priceMark: "€",
+  },
+  {
+    code: "afwijkende_ral",
+    label: "Afwijkende RAL-kleur",
+    desc: "Een RAL-kleur speciaal voor uw project.",
+    surcharge: 85,
+    hex: "#2f3d33",
+    priceMark: "€€",
+  },
+  {
+    code: "design_kleur",
+    label: "Designkleuren",
+    desc: "De Iconica-collectie met karaktervolle metallic afwerkingen.",
+    surcharge: 0,
+    hex: DESIGN_COLORS[0].hex,
+    priceMark: null,
+    designColors: DESIGN_COLORS,
+  },
+];
 
 export const RAL_RAINBOW =
   "linear-gradient(90deg, #c0392b 0%, #e67e22 16%, #f1c40f 32%, #27ae60 48%, #2980b9 64%, #8e44ad 80%, #1c1c1c 100%)";
 
 export function colorThumbBackground(code: string, hex: string) {
   if (code === "afwijkende_ral") return RAL_RAINBOW;
+  if (code === "design_kleur") {
+    const stops = DESIGN_COLORS.flatMap((color, index) => {
+      const start = (index / DESIGN_COLORS.length) * 100;
+      const end = ((index + 1) / DESIGN_COLORS.length) * 100;
+      return [`${color.hex} ${start}%`, `${color.hex} ${end}%`];
+    });
+    return `linear-gradient(90deg, ${stops.join(", ")})`;
+  }
   return hex;
 }
 
-const LEGACY_COLORS = [
-  { code: "design_kleur", label: "Designkleur", desc: "Brons en andere designkleuren.", surcharge: 0, hex: "#6b5340", priceMark: null },
-] as const;
-
 export function findColor(code: string) {
-  return COLORS.find((item) => item.code === code) ?? LEGACY_COLORS.find((item) => item.code === code) ?? COLORS[0];
+  return COLORS.find((item) => item.code === code) ?? COLORS[0];
 }
 
 export type RalSwatch = { code: string; name: string; hex: string };
@@ -378,8 +433,16 @@ export function ralPreviewHex(value: string, fallback = "#2f3d33") {
   return findRalSwatch(normalized)?.hex ?? fallback;
 }
 
-export function colorLabel(code: string, ralCode: string) {
+export function colorLabel(
+  code: string,
+  ralCode: string,
+  designColorCode = "",
+) {
   const color = findColor(code);
+  if (code === "design_kleur") {
+    const designColor = DESIGN_COLORS.find((item) => item.code === designColorCode);
+    return designColor ? `${color.label} · ${designColor.name}` : color.label;
+  }
   if (code !== "afwijkende_ral") return color.label;
   const normalized = normalizeRalCode(ralCode);
   return normalized ? `${color.label} · ${normalized}` : color.label;

@@ -1,6 +1,18 @@
 import React from "react";
 import { ACCENT, getProduct as getCatalogProduct } from "@/lib/site";
-import { DESIGN_SURCHARGES, HARDWARE, SLUITWERK, colorLabel, designPriceMark, findColor, findGlass, normalizeRalCode, ralPreviewHex, windowCountFromBars } from "./catalog";
+import {
+  DESIGN_COLORS,
+  DESIGN_SURCHARGES,
+  HARDWARE,
+  SLUITWERK,
+  colorLabel,
+  designPriceMark,
+  findColor,
+  findGlass,
+  normalizeRalCode,
+  ralPreviewHex,
+  windowCountFromBars,
+} from "./catalog";
 
 export { ACCENT as CONFIGURATOR_ACCENT };
 
@@ -84,6 +96,7 @@ export type ConfiguratorState = {
   hoogte: number;
   kleur: string;
   ralCode: string;
+  designColorCode: string;
   glas: string;
   beslag: string;
   sluitwerk: string;
@@ -120,6 +133,7 @@ export const INITIAL_STATE: ConfiguratorState = {
   hoogte: 2100,
   kleur: "standaard_mat_zwart",
   ralCode: "",
+  designColorCode: "",
   glas: "33.1",
   beslag: "",
   sluitwerk: "recht_hoekgreep",
@@ -866,8 +880,16 @@ export function isStepConfirmed(
   if (stepId === "vlak") return !!a.vlak;
   if (stepId === "glas") return !!a.glas;
   if (stepId === "kleur") {
-    if (state.kleur !== "afwijkende_ral") return !!a.kleur;
-    return !!a.kleur && Boolean(normalizeRalCode(state.ralCode));
+    if (state.kleur === "afwijkende_ral") {
+      return !!a.kleur && Boolean(normalizeRalCode(state.ralCode));
+    }
+    if (state.kleur === "design_kleur") {
+      return (
+        !!a.kleur &&
+        DESIGN_COLORS.some((item) => item.code === state.designColorCode)
+      );
+    }
+    return !!a.kleur;
   }
   if (stepId === "handgreep") return !!a.handgreep;
   if (stepId === "beslag") return !!a.beslag;
@@ -948,7 +970,12 @@ export function doorSummaryRows(
     a.maat ? { label: "Afmeting", value: maatLabel(state) } : null,
     a.vlak ? { label: "Vlakverdeling", value: vlakLabel(state) } : null,
     a.glas ? { label: "Glas", value: glas.customerName } : null,
-    a.kleur ? { label: "Kleur", value: colorLabel(state.kleur, state.ralCode) } : null,
+    a.kleur
+      ? {
+          label: "Kleur",
+          value: colorLabel(state.kleur, state.ralCode, state.designColorCode),
+        }
+      : null,
     product.hasHardware && a.handgreep
       ? { label: "Handgreep", value: sluitwerk.label }
       : null,
@@ -1386,7 +1413,9 @@ export function buildPreviewSvg(
   const frameHex =
     state.kleur === "afwijkende_ral"
       ? ralPreviewHex(state.ralCode, kleur.hex)
-      : kleur.hex;
+      : state.kleur === "design_kleur"
+        ? DESIGN_COLORS.find((item) => item.code === state.designColorCode)?.hex ?? kleur.hex
+        : kleur.hex;
   const glas = findGlass(state.glas);
   const doorWidth = Math.max(300, state.breedte || 900);
   const leftWidth = leftPanelActive(state) ? state.leftPanelBreedte : 0;

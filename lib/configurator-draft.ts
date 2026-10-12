@@ -1,4 +1,9 @@
-import { DESIGN_SURCHARGES, HARDWARE, SLUITWERK } from "@/components/configurator/catalog";
+import {
+  DESIGN_COLORS,
+  DESIGN_SURCHARGES,
+  HARDWARE,
+  SLUITWERK,
+} from "@/components/configurator/catalog";
 import {
   configurationProgress,
   getProduct,
@@ -11,6 +16,9 @@ import {
 const HANDGREEP_CODES = new Set<string>(SLUITWERK.map((item) => item.code));
 const HARDWARE_CODES = new Set<string>(HARDWARE.map((item) => item.code));
 const DESIGN_CODES = new Set<string>(DESIGN_SURCHARGES.map((item) => item.code));
+const DESIGN_COLOR_CODES = new Set<string>(
+  DESIGN_COLORS.map((item) => item.code),
+);
 
 const STORAGE_KEY = "meisterworks.configurator.draft";
 const DISMISS_KEY = "meisterworks.configurator.resume.dismissedAt";
@@ -64,6 +72,11 @@ function asState(value: unknown): ConfiguratorState | null {
         ? record.beslag
         : INITIAL_STATE.beslag,
     ralCode: typeof record.ralCode === "string" ? record.ralCode : INITIAL_STATE.ralCode,
+    designColorCode:
+      typeof record.designColorCode === "string" &&
+      DESIGN_COLOR_CODES.has(record.designColorCode)
+        ? record.designColorCode
+        : INITIAL_STATE.designColorCode,
     customDoorBars: record.customDoorBars === true,
     customPanelBars: record.customPanelBars === true,
     mirrorPanelStaanders: record.mirrorPanelStaanders === true,

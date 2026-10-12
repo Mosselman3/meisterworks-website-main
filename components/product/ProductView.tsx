@@ -353,7 +353,7 @@ export function ProductView({
           <StepIntro
             kicker={`Stap ${colorStep} — Kleur`}
             title="De afwerking van het staal."
-            body="Standaard is mat zwart. Bij een afwijkende RAL-kleur kiest u in de configurator een kleur; de kleurcode vult zichzelf in en kunt u nog aanpassen."
+            body="Kies standaard RAL-zwart, een afwijkende RAL-kleur of een designkleur uit de Iconica-collectie. Bij een afwijkende RAL-kleur vult de configurator de kleurcode in; die kunt u nog aanpassen."
             dark
           />
           <div className="grid max-w-[640px] grid-cols-2 gap-4">

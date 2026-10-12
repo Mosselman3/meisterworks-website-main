@@ -27,6 +27,7 @@ import { FoldIcon } from "@/components/ui";
 import { ACCENT, ROUTES } from "@/lib/site";
 import {
   COLORS,
+  DESIGN_COLORS,
   GLASS_LOOK_GROUPS,
   GLASS_PRESENTATION,
   GLASS_TYPE_COPY,
@@ -870,6 +871,7 @@ function isUntouchedProductStart(state: ConfiguratorState, productParam: string)
     state.panelLayout === initial.panelLayout &&
     state.kleur === initial.kleur &&
     state.ralCode === initial.ralCode &&
+    state.designColorCode === initial.designColorCode &&
     state.glas === initial.glas &&
     state.beslag === initial.beslag &&
     state.sluitwerk === initial.sluitwerk &&
@@ -922,6 +924,7 @@ export function Configurator() {
   const panelFollowRef = useRef<HTMLDivElement>(null);
   const glassFollowRef = useRef<HTMLDivElement>(null);
   const ralFollowRef = useRef<HTMLDivElement>(null);
+  const designColorFollowRef = useRef<HTMLDivElement>(null);
   const productFollowRef = useRef<HTMLDivElement>(null);
   const skipPanelScroll = useRef(true);
   const skipGlassScroll = useRef(true);
@@ -972,11 +975,17 @@ export function Configurator() {
   );
 
   const kleur = findColor(state.kleur);
-  const kleurLabel = colorLabel(state.kleur, state.ralCode);
+  const kleurLabel = colorLabel(
+    state.kleur,
+    state.ralCode,
+    state.designColorCode,
+  );
   const kleurHex =
     state.kleur === "afwijkende_ral"
       ? ralPreviewHex(state.ralCode, kleur.hex)
-      : kleur.hex;
+      : state.kleur === "design_kleur"
+        ? DESIGN_COLORS.find((item) => item.code === state.designColorCode)?.hex ?? kleur.hex
+        : kleur.hex;
   const glas = findGlass(state.glas);
   const beslag = HARDWARE.find((item) => item.code === state.beslag);
   const sluitwerk = SLUITWERK.find((item) => item.code === state.sluitwerk) ?? SLUITWERK[0];
@@ -1306,6 +1315,7 @@ export function Configurator() {
     state.vlakMode,
     state.kleur,
     state.ralCode,
+    state.designColorCode,
     state.glas,
     state.beslag,
     state.sluitwerk,
@@ -1499,8 +1509,9 @@ export function Configurator() {
     }
     if (
       currentStepId === "kleur" &&
-      state.kleur === "afwijkende_ral" &&
-      !normalizeRalCode(state.ralCode)
+      ((state.kleur === "afwijkende_ral" && !normalizeRalCode(state.ralCode)) ||
+        (state.kleur === "design_kleur" &&
+          !DESIGN_COLORS.some((item) => item.code === state.designColorCode)))
     ) {
       setMissingStep("kleur");
       return;
@@ -1560,6 +1571,11 @@ export function Configurator() {
     }
     if (state.kleur !== "afwijkende_ral") return;
     scrollFollowUpIntoView(ralFollowRef.current);
+  }, [state.kleur]);
+
+  useEffect(() => {
+    if (state.kleur !== "design_kleur") return;
+    scrollFollowUpIntoView(designColorFollowRef.current);
   }, [state.kleur]);
 
   useEffect(() => {
@@ -2690,6 +2706,17 @@ export function Configurator() {
                     setState((s) => ({
                       ...s,
                       kleur: item.code,
+                      designColorCode: "",
+                      answered: { ...s.answered, kleur: false },
+                    }));
+                    return;
+                  }
+                  if (item.code === "design_kleur") {
+                    setState((s) => ({
+                      ...s,
+                      kleur: item.code,
+                      ralCode: "",
+                      designColorCode: "",
                       answered: { ...s.answered, kleur: false },
                     }));
                     return;
@@ -2698,6 +2725,7 @@ export function Configurator() {
                     ...s,
                     kleur: item.code,
                     ralCode: "",
+                    designColorCode: "",
                     answered: { ...s.answered, kleur: true },
                   }));
                   advanceFrom("kleur");
@@ -2705,6 +2733,44 @@ export function Configurator() {
               />
             ))}
           </div>
+          {state.kleur === "design_kleur" ? (
+            <div ref={designColorFollowRef} className="ral-picker">
+              <p className="ral-picker__intro">
+                Kies één van de beschikbare designkleuren.
+              </p>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                  gap: 12,
+                }}
+                role="listbox"
+                aria-label="Designkleuren"
+              >
+                {DESIGN_COLORS.map((designColor) => (
+                  <OptionCard
+                    key={designColor.code}
+                    label={designColor.name}
+                    desc="Iconica designafwerking."
+                    selected={state.designColorCode === designColor.code}
+                    thumbStyle={{
+                      height: 72,
+                      borderRadius: 9,
+                      background: designColor.hex,
+                    }}
+                    onClick={() => {
+                      setState((s) => ({
+                        ...s,
+                        designColorCode: designColor.code,
+                        answered: { ...s.answered, kleur: true },
+                      }));
+                      advanceFrom("kleur");
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
           {state.kleur === "afwijkende_ral" ? (
             <div ref={ralFollowRef} className="ral-picker">
               <p className="ral-picker__intro">

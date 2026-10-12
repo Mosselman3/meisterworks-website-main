@@ -127,7 +127,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     products: [],
     question: "In welke kleur wordt het staal afgewerkt?",
     answer: [
-      "Standaard is mat zwart. Voor een andere kleur kiest u in de configurator een afwijkende RAL-kleur. De kleurcode vult zichzelf in, en u kunt die nog aanpassen.",
+      "U kiest standaard RAL-zwart, een afwijkende RAL-kleur of een designkleur uit de Iconica-collectie. Bij een afwijkende RAL-kleur vult de configurator de kleurcode in, en u kunt die nog aanpassen.",
     ],
   },
   {
