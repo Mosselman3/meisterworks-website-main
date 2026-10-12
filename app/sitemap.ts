@@ -8,6 +8,7 @@ const PUBLIC_PATHS = [
   ROUTES.faq,
   ROUTES.afspraak,
   ROUTES.offerte,
+  ROUTES.algemeneVoorwaarden,
   ROUTES.configurator,
   ...PRODUCTS.map((product) => `/deuren/${product.slug}`),
 ];

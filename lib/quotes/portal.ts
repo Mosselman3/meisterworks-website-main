@@ -1,6 +1,7 @@
 import "server-only";
 import { createHmac } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import { GENERAL_TERMS_VERSION } from "@/lib/legal/terms";
 import type { QuotePortal } from "@/lib/quotes/portal-types";
 
 export type { PortalDecision, QuotePortal } from "@/lib/quotes/portal-types";
@@ -65,6 +66,7 @@ export async function decideQuotePortal(
     decision: "approved" | "rejected";
     signerName?: string;
     termsAccepted?: boolean;
+    termsVersion?: string;
     rejectionReason?: string;
   },
 ) {
@@ -74,6 +76,7 @@ export async function decideQuotePortal(
     p_decision: input.decision,
     p_signer_name: input.signerName?.trim() || null,
     p_terms_accepted: Boolean(input.termsAccepted),
+    p_terms_version: input.termsVersion || GENERAL_TERMS_VERSION,
     p_rejection_reason: input.rejectionReason?.trim() || null,
   });
   if (error || !data) {

@@ -238,6 +238,12 @@ export function glassConstructionLabel(
 
 const GLASS_IMAGE_OVERRIDE: Record<string, string> = {
   "33.1_matte_folie": "/assets/glas/mat.jpg",
+  "4mm_cathedraal_grof": "/assets/glas/cathedraal-grof.jpg",
+  "4mm_cathedraal_fijn": "/assets/glas/cathedraal-fijn.jpg",
+  "4mm_byzanthijn_grof": "/assets/glas/byzanthijn-grof.jpg",
+  "4mm_byzanthijn_fijn": "/assets/glas/byzanthijn-fijn.jpg",
+  "4mm_canale_blank": "/assets/glas/canale-blank.jpg",
+  "4mm_raywall_90t": "/assets/glas/raywall-90t.webp",
 };
 
 export function glassCardImage(code: string, category: string) {

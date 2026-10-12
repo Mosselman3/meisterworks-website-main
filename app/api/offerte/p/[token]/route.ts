@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { GENERAL_TERMS_VERSION } from "@/lib/legal/terms";
 import {
   decideQuotePortal,
   getQuotePortal,
@@ -64,6 +65,10 @@ export async function POST(
         decision: payload.decision,
         signerName: typeof payload.signerName === "string" ? payload.signerName : undefined,
         termsAccepted: payload.termsAccepted === true,
+        termsVersion:
+          typeof payload.termsVersion === "string"
+            ? payload.termsVersion
+            : GENERAL_TERMS_VERSION,
         rejectionReason:
           typeof payload.rejectionReason === "string" ? payload.rejectionReason : undefined,
       });

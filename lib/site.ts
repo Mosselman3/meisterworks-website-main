@@ -15,6 +15,7 @@ export const ROUTES = {
   faq: "/veelgestelde-vragen",
   offerte: "/offerte",
   offerteBedankt: "/offerte/bedankt",
+  algemeneVoorwaarden: "/algemene-voorwaarden",
   afspraak: "/afspraak",
   configurator: "/configurator",
   configuratorBedankt: "/configurator/bedankt",

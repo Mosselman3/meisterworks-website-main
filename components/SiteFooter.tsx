@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { GoogleReviewsRating } from "@/components/reviews/GoogleReviewsRating";
+import { GENERAL_TERMS_PDF } from "@/lib/legal/terms";
 import { REVIEW_COUNT, REVIEW_SCORE } from "@/lib/content";
 import { CONTACT, ROUTES } from "@/lib/site";
 
@@ -51,6 +52,14 @@ export function SiteFooter() {
             <Link href={ROUTES.offerte} className="footer-link">
               Snelle offerte
             </Link>
+            <a
+              href={GENERAL_TERMS_PDF}
+              target="_blank"
+              rel="noreferrer"
+              className="footer-link"
+            >
+              Algemene voorwaarden
+            </a>
           </div>
         </div>
         <div>

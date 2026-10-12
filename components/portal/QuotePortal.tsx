@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  GENERAL_TERMS_LABEL,
+  GENERAL_TERMS_PDF,
+  GENERAL_TERMS_VERSION,
+  QUOTE_VAT_COPY,
+} from "@/lib/legal/terms";
 import type { QuotePortal as QuotePortalData } from "@/lib/quotes/portal-types";
 
 function formatEuro(cents: number) {
@@ -77,6 +83,7 @@ export function QuotePortal({ token }: { token: string }) {
           decision,
           signerName,
           termsAccepted,
+          termsVersion: GENERAL_TERMS_VERSION,
           rejectionReason,
         }),
       });
@@ -177,6 +184,7 @@ export function QuotePortal({ token }: { token: string }) {
               <div><dt>Btw ({portal.vatPercentage}%)</dt><dd>{formatEuro(portal.vatCents)}</dd></div>
               <div className="portal-document__total"><dt>Totaal incl. btw</dt><dd>{formatEuro(portal.totalInclVatCents)}</dd></div>
             </dl>
+            <p className="portal-document__vat-note">{QUOTE_VAT_COPY}</p>
           </section>
         </article>
 
@@ -200,6 +208,7 @@ export function QuotePortal({ token }: { token: string }) {
               <div className="portal-result portal-result--approved">
                 <strong>Offerte goedgekeurd</strong>
                 <p>Goedgekeurd door {decision.signerName} op {formatDate(decision.actionAt)}. Wij nemen contact met u op voor de vervolgstappen.</p>
+                {decision.termsVersion ? <p>Algemene voorwaarden: versie {decision.termsVersion} opgeslagen bij deze goedkeuring.</p> : null}
               </div>
             ) : (
               <div className="portal-result">
@@ -226,7 +235,14 @@ export function QuotePortal({ token }: { token: string }) {
                 <h2 id="portal-dialog-title">Offerte goedkeuren</h2>
                 <p>Uw naam wordt als digitale handtekening bij deze offerte geplaatst.</p>
                 <label>Volledige naam<input value={signerName} onChange={(event) => setSignerName(event.target.value)} autoComplete="name" /></label>
-                <label className="portal-check"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />Ik ga akkoord met de offerte en de algemene voorwaarden.</label>
+                <label className="portal-check">
+                  <input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
+                  Ik ga akkoord met de offerte en de{" "}
+                  <a href={GENERAL_TERMS_PDF} target="_blank" rel="noreferrer">
+                    algemene voorwaarden (PDF, versie {GENERAL_TERMS_LABEL})
+                  </a>
+                  .
+                </label>
                 <div className="portal-dialog__actions">
                   <button className="portal-button" onClick={() => setDialog(null)}>Annuleren</button>
                   <button className="portal-button portal-button--primary" disabled={!signerName.trim() || !termsAccepted || submitting} onClick={() => void submitDecision("approved")}>{submitting ? "Opslaan…" : "Goedkeuren"}</button>

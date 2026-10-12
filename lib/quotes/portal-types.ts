@@ -2,6 +2,8 @@ export type PortalDecision = {
   decision: "approved" | "rejected";
   signerName: string | null;
   rejectionReason: string | null;
+  termsVersion: string | null;
+  termsAcceptedAt: string | null;
   actionAt: string;
 };
 
