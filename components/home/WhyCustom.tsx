@@ -23,6 +23,8 @@ export function WhyCustom() {
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (media.matches) {
+      // Respect the user's reduced-motion preference immediately.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveCount(WORDS.length);
       return;
     }

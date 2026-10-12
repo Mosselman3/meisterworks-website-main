@@ -23,6 +23,8 @@ export function QuoteThankYou({
       router.replace(fallbackHref);
       return;
     }
+    // Hydrate the confirmation view from browser storage.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThanks({ quoteNumber: stored.quoteNumber, doorCount: stored.doorCount });
   }, [fallbackHref, router, source]);
 

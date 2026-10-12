@@ -72,8 +72,12 @@ export function SiteHeader() {
   const foldIndex = links.findIndex((link) => link.foldWhenTight);
 
   useEffect(() => {
+    // Reset navigation state when the route changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpen(false);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDesktopMenu(null);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMobileMenu(null);
   }, [pathname]);
 

@@ -920,6 +920,7 @@ export function Configurator() {
   const [glassLook, setGlassLook] = useState<string | null | undefined>(
     undefined,
   );
+  const [colorLook, setColorLook] = useState<string | null>(null);
   const quoteAutoShown = useRef(false);
   const panelFollowRef = useRef<HTMLDivElement>(null);
   const glassFollowRef = useRef<HTMLDivElement>(null);
@@ -937,6 +938,8 @@ export function Configurator() {
     if (!productParam) {
       const draft = readConfiguratorDraft();
       if (draft) {
+        // Draft restoration intentionally updates React state after reading browser storage.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setState(draft.state);
         setDoors(draft.doors);
         setActiveIndex(draft.activeIndex);
@@ -953,6 +956,8 @@ export function Configurator() {
 
   useEffect(() => {
     if (!draftReady || state.openSection !== "vlak" || state.answered.vlak) return;
+    // This synchronizes the initial panel defaults after draft/product restoration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState((current) => {
       if (current.openSection !== "vlak" || current.answered.vlak) return current;
       if (getProduct(current.productId).doorTypeCode === "vast_paneel") return current;
@@ -1574,9 +1579,9 @@ export function Configurator() {
   }, [state.kleur]);
 
   useEffect(() => {
-    if (state.kleur !== "design_kleur") return;
+    if (colorLook !== "design") return;
     scrollFollowUpIntoView(designColorFollowRef.current);
-  }, [state.kleur]);
+  }, [colorLook]);
 
   useEffect(() => {
     if (skipProductScroll.current) {
@@ -1589,6 +1594,8 @@ export function Configurator() {
 
   useEffect(() => {
     if (missingStep && isStepConfirmed(missingStep, state, product)) {
+      // Clear validation feedback once the step becomes valid.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMissingStep(null);
     }
   }, [missingStep, state, product]);
@@ -1596,6 +1603,8 @@ export function Configurator() {
   useEffect(() => {
     if (!allDone) {
       quoteAutoShown.current = false;
+      // Keep the quote modal closed until all required steps are complete.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuoteOpen(false);
       return;
     }
@@ -2680,6 +2689,62 @@ export function Configurator() {
 
     if (id === "kleur") {
       const selectedSwatch = findRalSwatch(state.ralCode);
+      if (colorLook === "design") {
+        return (
+          <div ref={designColorFollowRef} className="ral-picker">
+            <button
+              type="button"
+              onClick={() => setColorLook(null)}
+              style={{
+                marginBottom: 4,
+                padding: 0,
+                border: "none",
+                background: "transparent",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                fontSize: 13,
+                color: "oklch(0.4 0.008 60)",
+              }}
+            >
+              ← Kleuren
+            </button>
+            <p className="ral-picker__intro">
+              Kies één van de beschikbare designkleuren.
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                gap: 12,
+              }}
+              role="listbox"
+              aria-label="Designkleuren"
+            >
+              {DESIGN_COLORS.map((designColor) => (
+                <OptionCard
+                  key={designColor.code}
+                  label={designColor.name}
+                  desc="Iconica designafwerking."
+                  selected={state.designColorCode === designColor.code}
+                  thumbStyle={{
+                    height: 72,
+                    borderRadius: 9,
+                    background: designColor.hex,
+                  }}
+                  onClick={() => {
+                    setState((s) => ({
+                      ...s,
+                      designColorCode: designColor.code,
+                      answered: { ...s.answered, kleur: true },
+                    }));
+                    advanceFrom("kleur");
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      }
       return (
         <div>
           <div
@@ -2719,6 +2784,7 @@ export function Configurator() {
                       designColorCode: "",
                       answered: { ...s.answered, kleur: false },
                     }));
+                    setColorLook("design");
                     return;
                   }
                   setState((s) => ({
@@ -2733,44 +2799,6 @@ export function Configurator() {
               />
             ))}
           </div>
-          {state.kleur === "design_kleur" ? (
-            <div ref={designColorFollowRef} className="ral-picker">
-              <p className="ral-picker__intro">
-                Kies één van de beschikbare designkleuren.
-              </p>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-                  gap: 12,
-                }}
-                role="listbox"
-                aria-label="Designkleuren"
-              >
-                {DESIGN_COLORS.map((designColor) => (
-                  <OptionCard
-                    key={designColor.code}
-                    label={designColor.name}
-                    desc="Iconica designafwerking."
-                    selected={state.designColorCode === designColor.code}
-                    thumbStyle={{
-                      height: 72,
-                      borderRadius: 9,
-                      background: designColor.hex,
-                    }}
-                    onClick={() => {
-                      setState((s) => ({
-                        ...s,
-                        designColorCode: designColor.code,
-                        answered: { ...s.answered, kleur: true },
-                      }));
-                      advanceFrom("kleur");
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : null}
           {state.kleur === "afwijkende_ral" ? (
             <div ref={ralFollowRef} className="ral-picker">
               <p className="ral-picker__intro">
