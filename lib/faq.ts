@@ -198,21 +198,13 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     ],
   },
   {
-    id: "vergunning",
-    category: "vervolg",
-    products: [],
-    question: "Heb ik een vergunning nodig?",
-    answer: [
-      "Of een vergunning nodig is, bepaalt de gemeente aan de hand van uw pand en de ingreep. Leg die vraag bij twijfel aan de gemeente voor. In het adviesgesprek kijken we naar de deur en de opening.",
-    ],
-  },
-  {
     id: "montage-duur",
     category: "vervolg",
     products: [],
     question: "Hoe lang duurt de montage ter plaatse?",
     answer: [
-      "Montage hoort bij het traject. Hoe lang we op locatie bezig zijn, hangt af van het type deur en van de opening. Dat stemmen we af voordat we komen, zodat u weet wat u kunt verwachten.",
+      "Montage hoort bij het traject. Gemiddeld zijn we ter plaatse 1 à 2 uur bezig. Bij meerdere deuren loopt dat op.",
+      "Hoe lang we precies nodig hebben, hangt af van het type deur en van de opening. Dat stemmen we af voordat we komen, zodat u weet wat u kunt verwachten.",
     ],
   },
   {
@@ -222,6 +214,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     question: "Hoe draait een taatsdeur?",
     answer: [
       "De deur draait om een as die verzonken zit in de vloer en in de bovenkant. Er is geen zichtbaar scharnier aan een kozijn. Daardoor hangt de deur los en draait ze als een vlak.",
+      "Het scharnier zit in de deur zelf. Het staat op een vloerplaat, en boven zit een pen die op het plafond wordt gemonteerd.",
     ],
   },
   {
@@ -239,7 +232,8 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     products: ["taatsdeur"],
     question: "Kies ik bij een taatsdeur een draairichting?",
     answer: [
-      "Bij de taatsdeur kiest u geen links- of rechtsdraaiend, zoals bij de scharnierdeur. De deur draait om haar as. Hoe die as in uw opening komt, bepalen we bij het inmeten.",
+      "Bij de taatsdeur kiest u geen links- of rechtsdraaiend, zoals bij de scharnierdeur. De deur draait om haar as.",
+      "Bij het inmeten kijken we naar de beste positie van het scharnierpunt. Daarbij houden we rekening met lichtschakelaars, vloerverwarming, stopcontacten en wat er verder in de opening zit.",
     ],
   },
   {
@@ -248,7 +242,8 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     products: ["taatsdeur"],
     question: "Kan een taatsdeur als er vloerverwarming ligt?",
     answer: [
-      "De as zit verzonken in de vloer. Of dat bij uw vloeropbouw kan, ook met vloerverwarming, beoordelen we aan de hand van de situatie. In het adviesgesprek en bij het inmeten kijken we daarnaar voordat er iets in de vloer komt.",
+      "Het scharnier zit in de deur en staat op een vloerplaat. Of dat bij uw vloeropbouw kan, ook met vloerverwarming, beoordelen we aan de hand van de situatie.",
+      "Voor situaties waarin vloerverwarming een thema is, hebben we speciale vloerplaten met een minimale boordiepte van 8 mm. In het adviesgesprek en bij het inmeten kijken we daarnaar voordat er iets in de vloer komt.",
     ],
   },
   {
