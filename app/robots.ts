@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
         "/offerte/bedankt",
         "/configurator/bedankt",
+        "/afspraak/bedankt",
         "/offerte/p/",
         "/design-preview",
         "/_design",

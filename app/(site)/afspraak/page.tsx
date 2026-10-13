@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CalendlyEmbed } from "@/components/afspraak/CalendlyEmbed";
 import { HeroLoad, Reveal } from "@/components/motion/Reveal";
 import { REVIEW_COUNT, REVIEW_SCORE } from "@/lib/content";
 import { CONTACT, ROUTES } from "@/lib/site";
+
+const calendlyUrl = process.env.NEXT_PUBLIC_CALENDLY_URL?.trim();
 
 export const metadata: Metadata = {
   title: "Adviesgesprek plannen",
@@ -82,44 +85,47 @@ export default function AfspraakPage() {
         style={{ gridTemplateColumns: "minmax(0, 1.5fr) minmax(0, 1fr)" }}
       >
         <div>
-          <div className="flex min-h-[640px] items-center justify-center rounded-[18px] border-[1.5px] border-dashed border-[oklch(0.8_0.006_75)] bg-white p-12">
-            <div className="max-w-[380px] text-center">
-              <div className="mx-auto mb-[18px] flex h-12 w-12 items-center justify-center rounded-full bg-[oklch(0.95_0.004_75)]">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <rect
-                    x="3"
-                    y="5"
-                    width="18"
-                    height="16"
-                    rx="2"
-                    stroke="oklch(0.45 0.008 60)"
-                    strokeWidth="1.6"
-                  />
-                  <path
-                    d="M3 9h18M8 3v4M16 3v4"
-                    stroke="oklch(0.45 0.008 60)"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                </svg>
+          {calendlyUrl ? (
+            <CalendlyEmbed url={calendlyUrl} thankYouPath={ROUTES.afspraakBedankt} />
+          ) : (
+            <div className="flex min-h-[640px] items-center justify-center rounded-[18px] border-[1.5px] border-dashed border-[oklch(0.8_0.006_75)] bg-white p-12">
+              <div className="max-w-[380px] text-center">
+                <div className="mx-auto mb-[18px] flex h-12 w-12 items-center justify-center rounded-full bg-[oklch(0.95_0.004_75)]">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect
+                      x="3"
+                      y="5"
+                      width="18"
+                      height="16"
+                      rx="2"
+                      stroke="oklch(0.45 0.008 60)"
+                      strokeWidth="1.6"
+                    />
+                    <path
+                      d="M3 9h18M8 3v4M16 3v4"
+                      stroke="oklch(0.45 0.008 60)"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+                <div className="font-serif-display mb-2.5 text-[19px]">
+                  Agenda nog niet gekoppeld
+                </div>
+                <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
+                  De planningslink ontbreekt nog. Tot die tijd kunt u mailen naar{" "}
+                  <a href={`mailto:${CONTACT.email}`} className="underline">
+                    {CONTACT.email}
+                  </a>{" "}
+                  of bellen naar{" "}
+                  <a href={CONTACT.phoneHref} className="underline">
+                    {CONTACT.phoneDisplay}
+                  </a>
+                  .
+                </p>
               </div>
-              <div className="font-serif-display mb-2.5 text-[19px]">
-                Agenda nog niet gekoppeld
-              </div>
-              <p className="m-0 text-[14px] leading-[1.6] text-[oklch(0.45_0.008_60)]">
-                Zodra Calendly is gekoppeld, verschijnt hier de live
-                planningsagenda. Tot die tijd kunt u mailen naar{" "}
-                <a href={`mailto:${CONTACT.email}`} className="underline">
-                  {CONTACT.email}
-                </a>
-                .
-              </p>
             </div>
-          </div>
-          <p className="mt-4 mb-0 text-[12px] leading-[1.5] text-[oklch(0.55_0.008_60)]">
-            Deze sectie is voorbereid op een Calendly-embed. Zodra de link is
-            ingesteld, verschijnt hier de volledige planningsagenda.
-          </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-5">

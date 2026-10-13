@@ -17,14 +17,22 @@ export const ROUTES = {
   offerteBedankt: "/offerte/bedankt",
   algemeneVoorwaarden: "/algemene-voorwaarden",
   afspraak: "/afspraak",
+  afspraakBedankt: "/afspraak/bedankt",
   configurator: "/configurator",
   configuratorBedankt: "/configurator/bedankt",
 } as const;
 
 export const CONTACT = {
   email: "info@meisterworks.nl",
+  phoneDisplay: "+31(0)636340675",
+  phoneHref: "tel:+31636340675",
+  addressLine: "Hoolstraat 19 F3",
+  postalCity: "6006 SL Weert",
+  mapsHref:
+    "https://www.google.com/maps/search/?api=1&query=Hoolstraat%2019%20F3%2C%206006%20SL%20Weert",
   instagram: "https://www.instagram.com/meister_works/",
   instagramHandle: "@meister_works",
+  facebook: "https://www.facebook.com/MeisterWorksNL",
 } as const;
 
 export type Product = {

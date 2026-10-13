@@ -12,7 +12,7 @@ import {
   generalFaqs,
   PRODUCT_FAQ_COPY,
 } from "@/lib/faq";
-import { PRODUCTS, ROUTES } from "@/lib/site";
+import { CONTACT, PRODUCTS, ROUTES } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Veelgestelde vragen",
@@ -124,6 +124,23 @@ export default function FaqPage() {
               <ArrowIcon />
             </Link>
           </div>
+          <p className="m-0 mt-8 text-[14px] leading-[1.7] text-[oklch(0.72_0.008_75)]">
+            Bel{" "}
+            <a href={CONTACT.phoneHref} className="underline">
+              {CONTACT.phoneDisplay}
+            </a>{" "}
+            of mail{" "}
+            <a href={`mailto:${CONTACT.email}`} className="underline">
+              {CONTACT.email}
+            </a>
+            .
+            <span className="mt-2 block">
+              Bezoekadres atelier:{" "}
+              <a href={CONTACT.mapsHref} target="_blank" rel="noreferrer" className="underline">
+                {CONTACT.addressLine}, {CONTACT.postalCity}
+              </a>
+            </span>
+          </p>
         </Reveal>
       </section>
     </main>
