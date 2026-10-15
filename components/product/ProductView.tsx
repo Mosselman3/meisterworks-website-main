@@ -488,24 +488,26 @@ export function ProductView({
         />
       ) : null}
 
-      <section className="mx-auto max-w-[700px] px-7 py-[90px] text-center">
+      <section className="bg-[oklch(0.93_0.006_75)] px-7 py-[90px] text-center">
         <Reveal>
-          <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
-            Volgende stap
-          </div>
-          <h2 className="font-serif-display m-0 mb-[18px] text-[clamp(26px,3.6vw,38px)] font-normal">
-            Stel deze samenstelling samen in de configurator.
-          </h2>
-          <p className="m-0 mb-9 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
-            Liever eerst persoonlijk meedenken? Plan een vrijblijvend adviesgesprek.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href={configureHref} className="btn-accent btn-accent-lg">
-              {page.composeCta}
-            </Link>
-            <Link href={ROUTES.afspraak} className="btn-outline">
-              Adviesgesprek plannen
-            </Link>
+          <div className="mx-auto max-w-[700px]">
+            <div className="mb-[14px] text-[13px] tracking-[0.16em] text-[oklch(0.5_0.01_60)] uppercase">
+              Volgende stap
+            </div>
+            <h2 className="font-serif-display m-0 mb-[18px] text-[clamp(26px,3.6vw,38px)] font-normal">
+              Stel deze samenstelling samen in de configurator.
+            </h2>
+            <p className="m-0 mb-9 text-[16px] leading-[1.7] text-[oklch(0.42_0.008_60)]">
+              Liever eerst persoonlijk meedenken? Plan een vrijblijvend adviesgesprek.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href={configureHref} className="btn-accent btn-accent-lg">
+                {page.composeCta}
+              </Link>
+              <Link href={ROUTES.afspraak} className="btn-outline">
+                Adviesgesprek plannen
+              </Link>
+            </div>
           </div>
         </Reveal>
       </section>

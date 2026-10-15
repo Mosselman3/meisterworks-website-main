@@ -76,6 +76,7 @@ import {
   hasPanels,
   isDoorComplete,
   isStepConfirmed,
+  openStepTitles,
   joinedCountLabel,
   joinedPanelCount,
   joinedPanelCountThumb,
@@ -740,6 +741,94 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
   };
 }
 
+function blankQuoteConfiguration(): QuoteConfiguration {
+  return {
+    doorTypeCode: null,
+    clientWidthMm: null,
+    clientHeightMm: null,
+    windowCount: 0,
+    glassCode: null,
+    colorCode: null,
+    ralCode: null,
+    hardwareCode: null,
+    sluitwerkCode: null,
+    hasFixedPanel: false,
+    fixedPanelSquareMetres: 0,
+    panelLayout: null,
+    panelSide: null,
+    leftPanelSquareMetres: 0,
+    rightPanelSquareMetres: 0,
+    leftPanelWidthMm: 0,
+    rightPanelWidthMm: 0,
+    panelLiggers: 0,
+    panelStaanders: 0,
+    liggers: 0,
+    staanders: 0,
+    barPositions: null,
+    vlakMode: null,
+    vlakPreset: "",
+    openingDirection: null,
+  };
+}
+
+function confirmedProductId(state: ConfiguratorState): string | null {
+  const product = getProduct(state.productId);
+  return isStepConfirmed("product", state, product) ? product.id : null;
+}
+
+function quoteConfigurationForQuote(state: ConfiguratorState): QuoteConfiguration {
+  const full = quoteConfigurationFromState(state);
+  if (isDoorComplete(state)) return full;
+
+  const product = getProduct(state.productId);
+  if (!isStepConfirmed("product", state, product)) return blankQuoteConfiguration();
+
+  const confirmed = (id: StepId) => isStepConfirmed(id, state, product);
+  const maat = confirmed("maat");
+  const vlak = confirmed("vlak");
+  const kleur = confirmed("kleur");
+  const paneel = confirmed("paneel");
+
+  return {
+    ...full,
+    clientWidthMm: maat ? full.clientWidthMm : null,
+    clientHeightMm: maat ? full.clientHeightMm : null,
+    glassCode: confirmed("glas") ? full.glassCode : null,
+    colorCode: kleur ? full.colorCode : null,
+    ralCode: kleur ? full.ralCode : null,
+    hardwareCode: confirmed("beslag") ? full.hardwareCode : null,
+    sluitwerkCode: confirmed("handgreep") ? full.sluitwerkCode : null,
+    openingDirection: confirmed("richting") ? full.openingDirection : null,
+    windowCount: vlak ? full.windowCount : 0,
+    liggers: vlak ? full.liggers : 0,
+    staanders: vlak ? full.staanders : 0,
+    barPositions: vlak ? full.barPositions : null,
+    vlakMode: vlak ? full.vlakMode : null,
+    vlakPreset: vlak ? full.vlakPreset : "",
+    hasFixedPanel: paneel ? full.hasFixedPanel : false,
+    fixedPanelSquareMetres: paneel ? full.fixedPanelSquareMetres : 0,
+    panelLayout: paneel ? full.panelLayout : null,
+    panelSide: paneel ? full.panelSide : null,
+    leftPanelSquareMetres: paneel ? full.leftPanelSquareMetres : 0,
+    rightPanelSquareMetres: paneel ? full.rightPanelSquareMetres : 0,
+    leftPanelWidthMm: paneel ? full.leftPanelWidthMm : 0,
+    rightPanelWidthMm: paneel ? full.rightPanelWidthMm : 0,
+    panelLiggers: paneel ? full.panelLiggers : 0,
+    panelStaanders: paneel ? full.panelStaanders : 0,
+  };
+}
+
+const EARLY_QUOTE_LABEL =
+  "Lukt het niet om alles in te vullen? Stuur alvast uw gegevens.";
+
+function EarlyQuoteLink({ onClick }: { onClick: () => void }) {
+  return (
+    <button type="button" className="cfg-early-quote" onClick={onClick}>
+      {EARLY_QUOTE_LABEL}
+    </button>
+  );
+}
+
 function DoorGlyph({ plus = false }: { plus?: boolean }) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
@@ -922,6 +1011,7 @@ export function Configurator() {
   );
   const [colorLook, setColorLook] = useState<string | null>(null);
   const quoteAutoShown = useRef(false);
+  const partialQuote = useRef(false);
   const panelFollowRef = useRef<HTMLDivElement>(null);
   const glassFollowRef = useRef<HTMLDivElement>(null);
   const ralFollowRef = useRef<HTMLDivElement>(null);
@@ -1354,12 +1444,23 @@ export function Configurator() {
     [doors, activeIndex, state],
   );
   const canAddDoor = committedDoors.length < MAX_DOORS;
-  const quoteConfiguration = quoteConfigurationFromState(state);
+  const quoteConfiguration = quoteConfigurationForQuote(state);
+  const configurationComplete = committedDoors.every((door) => isDoorComplete(door));
+  const pendingSteps = committedDoors
+    .map((door, index) => {
+      const open = openStepTitles(door);
+      if (open.length === 0) return null;
+      return committedDoors.length > 1
+        ? `Deur ${index + 1}: ${open.join(", ")}`
+        : open.join(", ");
+    })
+    .filter((part): part is string => Boolean(part))
+    .join(". ");
   const quoteDoors = useMemo(
     () =>
       committedDoors.map((door) => ({
-        productId: getProduct(door.productId).id,
-        configuration: quoteConfigurationFromState(door),
+        productId: confirmedProductId(door),
+        configuration: quoteConfigurationForQuote(door),
         summary: doorSummaryRows(door),
       })),
     [committedDoors],
@@ -1424,7 +1525,20 @@ export function Configurator() {
     </div>
   );
 
+  const closeQuote = useCallback(() => {
+    partialQuote.current = false;
+    setQuoteOpen(false);
+  }, []);
+
   const openQuote = useCallback(() => {
+    partialQuote.current = false;
+    setMissingStep(null);
+    setQuoteOpen(true);
+    setState((s) => ({ ...s, summaryOpen: false }));
+  }, []);
+
+  const openPartialQuote = useCallback(() => {
+    partialQuote.current = true;
     setMissingStep(null);
     setQuoteOpen(true);
     setState((s) => ({ ...s, summaryOpen: false }));
@@ -1452,6 +1566,7 @@ export function Configurator() {
         liveSummaryOpen: current.liveSummaryOpen,
         summaryOpen: current.summaryOpen,
       }));
+      partialQuote.current = false;
       setQuoteOpen(false);
       setGlassLook(undefined);
       setProductConfirmId(null);
@@ -1487,6 +1602,7 @@ export function Configurator() {
     setDoors([fresh]);
     setActiveIndex(0);
     setState(fresh);
+    partialQuote.current = false;
     setQuoteOpen(false);
     setGlassLook(undefined);
     setProductConfirmId(null);
@@ -1603,11 +1719,15 @@ export function Configurator() {
   useEffect(() => {
     if (!allDone) {
       quoteAutoShown.current = false;
-      // Keep the quote modal closed until all required steps are complete.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setQuoteOpen(false);
+      if (!partialQuote.current) {
+        // Keep the quote modal closed until all required steps are complete,
+        // unless the visitor chose to send the unfinished configuration.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setQuoteOpen(false);
+      }
       return;
     }
+    partialQuote.current = false;
     if (quoteAutoShown.current) return;
     quoteAutoShown.current = true;
     setQuoteOpen(true);
@@ -1615,9 +1735,9 @@ export function Configurator() {
   }, [allDone]);
 
   useEffect(() => {
-    if (!quoteOpen || !allDone) return;
+    if (!quoteOpen) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setQuoteOpen(false);
+      if (event.key === "Escape") closeQuote();
     };
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -1626,7 +1746,7 @@ export function Configurator() {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKey);
     };
-  }, [quoteOpen]);
+  }, [closeQuote, quoteOpen]);
 
   const stepBars = (
     key: "liggers" | "staanders" | "panelLiggers" | "panelStaanders",
@@ -3194,6 +3314,8 @@ export function Configurator() {
 
   return (
     <div
+      data-cfg-root
+      data-early-quote={allDone ? undefined : "true"}
       style={{
         color: "var(--foreground)",
         background: "var(--background)",
@@ -3268,6 +3390,7 @@ export function Configurator() {
             >
               Gratis en zonder verplichtingen
             </div>
+            {!allDone ? <EarlyQuoteLink onClick={openPartialQuote} /> : null}
           </div>
         </div>
       </div>
@@ -3682,6 +3805,7 @@ export function Configurator() {
           boxShadow: "0 -2px 12px oklch(0 0 0 / 0.06)",
         }}
       >
+        {!allDone ? <EarlyQuoteLink onClick={openPartialQuote} /> : null}
         <div style={{ display: "flex", alignItems: "stretch", gap: 10 }}>
           <button
             type="button"
@@ -3749,6 +3873,7 @@ export function Configurator() {
           }}
         >
           <div
+            data-cfg-summary-sheet
             onClick={(e) => e.stopPropagation()}
             style={{
               width: "100%",
@@ -3862,11 +3987,12 @@ export function Configurator() {
                 </span>
               </button>
             ))}
+            {!allDone ? <EarlyQuoteLink onClick={openPartialQuote} /> : null}
           </div>
         </div>
       ) : null}
 
-      {allDone ? (
+      {allDone || quoteOpen ? (
         <div
           data-cfg-quote-overlay
           data-open={quoteOpen ? "true" : "false"}
@@ -3874,7 +4000,7 @@ export function Configurator() {
           aria-modal={quoteOpen}
           aria-hidden={!quoteOpen}
           aria-labelledby="cfg-quote-overlay-title"
-          onClick={() => setQuoteOpen(false)}
+          onClick={closeQuote}
         >
           <div
             data-cfg-quote-panel
@@ -3890,17 +4016,19 @@ export function Configurator() {
                   Uw gegevens
                 </div>
                 <p className="cfg-quote-overlay-intro">
-                  {product.custom
-                    ? "Deze aanvraag valt buiten de vier standaardproducten. Vul uw gegevens in, dan maken we een voorstel."
-                    : committedDoors.length > 1
-                      ? `Uw ${committedDoors.length} deuren zijn compleet. Vul uw gegevens in en ontvang vrijblijvend een offerte.`
-                      : "Uw samenstelling is compleet. Vul uw gegevens in en ontvang vrijblijvend een offerte."}
+                  {!allDone
+                    ? "U hoeft de configurator niet af te ronden. We nemen contact op met wat u al hebt ingevuld."
+                    : product.custom
+                      ? "Deze aanvraag valt buiten de vier standaardproducten. Vul uw gegevens in, dan maken we een voorstel."
+                      : committedDoors.length > 1
+                        ? `Uw ${committedDoors.length} deuren zijn compleet. Vul uw gegevens in en ontvang vrijblijvend een offerte.`
+                        : "Uw samenstelling is compleet. Vul uw gegevens in en ontvang vrijblijvend een offerte."}
                 </p>
               </div>
               <button
                 type="button"
                 aria-label="Overlay sluiten"
-                onClick={() => setQuoteOpen(false)}
+                onClick={closeQuote}
                 className="cfg-quote-overlay-close"
               >
                 ×
@@ -3908,9 +4036,11 @@ export function Configurator() {
             </div>
             <QuoteForm
               summaryRows={quoteDoors[0]?.summary ?? summaryRows}
-              productId={quoteDoors[0]?.productId ?? product.id}
+              productId={quoteDoors[0]?.productId ?? confirmedProductId(state)}
               configuration={quoteDoors[0]?.configuration ?? quoteConfiguration}
               doors={quoteDoors}
+              incomplete={!configurationComplete}
+              pendingSteps={pendingSteps}
               file={attachment}
               onFileChange={setAttachment}
               onSubmitted={clearConfiguratorDraft}

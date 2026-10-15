@@ -927,6 +927,27 @@ export function isDoorComplete(state: ConfiguratorState): boolean {
   return firstUnconfirmedStep(state, getProduct(state.productId)) === "overzicht";
 }
 
+export function openStepTitles(state: ConfiguratorState): string[] {
+  const product = getProduct(state.productId);
+  const titles: Record<string, string> = {
+    product: "Product",
+    richting: product.doorTypeCode === "schuifdeur" ? "Schuifrichting" : "Draairichting",
+    paneel: product.doorTypeCode === "vast_paneel" ? "Panelen" : "Vast paneel",
+    maat: "Afmeting",
+    vlak: "Vlakverdeling",
+    glas: "Glas",
+    kleur: "Kleur",
+    handgreep: "Handgreep",
+    beslag: "Sluitwerk",
+  };
+  return STEP_ORDER.filter(
+    (id) =>
+      id !== "overzicht" &&
+      stepApplies(id, product, state.sluitwerk) &&
+      !isStepConfirmed(id, state, product),
+  ).map((id) => titles[id]);
+}
+
 export function snapshotDoor(state: ConfiguratorState): ConfiguratorState {
   const vastPaneel = getProduct(state.productId).doorTypeCode === "vast_paneel";
   return {

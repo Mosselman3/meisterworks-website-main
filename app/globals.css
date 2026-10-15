@@ -2055,6 +2055,12 @@ body[data-nav-open="true"] [data-cfg-nav-mobile] {
   [data-cfg-nav-mobile] {
     display: block !important;
   }
+  [data-cfg-root][data-early-quote="true"] [data-cfg-shell] {
+    padding-bottom: 180px !important;
+  }
+  [data-cfg-root][data-early-quote="true"] [data-cfg-summary-float] {
+    bottom: calc(112px + env(safe-area-inset-bottom));
+  }
   [data-cfg-confirm] {
     display: none !important;
   }
@@ -2148,6 +2154,39 @@ body[data-nav-open="true"] [data-cfg-nav-mobile] {
   font-size: 14px;
   line-height: 1.55;
   color: oklch(0.42 0.008 60);
+}
+.cfg-early-quote {
+  display: block;
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  color: oklch(0.45 0.008 60);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  text-align: inherit;
+}
+[data-cfg-nav-mobile] .cfg-early-quote,
+[data-cfg-summary-sheet] .cfg-early-quote {
+  text-align: center;
+}
+[data-cfg-nav-mobile] .cfg-early-quote {
+  width: 100%;
+  margin: 0 0 8px;
+  font-size: 12px;
+}
+[data-cfg-summary-sheet] .cfg-early-quote {
+  margin-top: 18px;
+}
+.cfg-quote-pending {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: oklch(0.45 0.008 60);
 }
 .cfg-quote-overlay-close {
   flex-shrink: 0;

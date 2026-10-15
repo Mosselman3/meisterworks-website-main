@@ -14,7 +14,7 @@ type SummaryRow = {
 };
 
 export type QuoteConfiguration = {
-  doorTypeCode: string;
+  doorTypeCode: string | null;
   clientWidthMm: number | null;
   clientHeightMm: number | null;
   windowCount: number;
@@ -25,7 +25,7 @@ export type QuoteConfiguration = {
   sluitwerkCode: string | null;
   hasFixedPanel: boolean;
   fixedPanelSquareMetres: number;
-  panelLayout: "geen" | "een" | "beide";
+  panelLayout: "geen" | "een" | "beide" | null;
   panelSide: "links" | "rechts" | "beide" | null;
   leftPanelSquareMetres: number;
   rightPanelSquareMetres: number;
@@ -49,13 +49,13 @@ export type QuoteConfiguration = {
       staanderPositions: number[] | null;
     }[] | null;
   } | null;
-  vlakMode: "zelf" | "ontwerp";
+  vlakMode: "zelf" | "ontwerp" | null;
   vlakPreset: string;
   openingDirection: "links" | "rechts" | null;
 };
 
 export type QuoteDoor = {
-  productId: string;
+  productId: string | null;
   configuration: QuoteConfiguration;
   summary: SummaryRow[];
 };
@@ -122,14 +122,18 @@ export function QuoteForm({
   productId,
   configuration,
   doors,
+  incomplete = false,
+  pendingSteps = "",
   onSubmitted,
   file,
   onFileChange,
 }: {
   summaryRows: SummaryRow[];
-  productId: string;
+  productId: string | null;
   configuration: QuoteConfiguration;
   doors?: QuoteDoor[];
+  incomplete?: boolean;
+  pendingSteps?: string;
   onSubmitted?: () => void;
   file: File | null;
   onFileChange: (file: File | null) => void;
@@ -166,6 +170,7 @@ export function QuoteForm({
       const result = await submitQuoteRequest(
         {
           source: "website_configurator",
+          configurationComplete: !incomplete,
           contact: fields,
           productId,
           configuration,
@@ -295,6 +300,11 @@ export function QuoteForm({
               ),
             )}
           </div>
+          {incomplete ? (
+            <p className="cfg-quote-pending">
+              {pendingSteps ? `Nog open: ${pendingSteps}.` : "Nog geen keuzes bevestigd."}
+            </p>
+          ) : null}
         </>
       ) : null}
 
