@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AppointmentThankYouAnalytics } from "@/components/afspraak/AppointmentThankYouAnalytics";
 import { ROUTES } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default function AfspraakBedanktPage() {
   return (
     <main>
+      <AppointmentThankYouAnalytics />
       <div className="mx-auto max-w-[760px] px-7 py-16">
         <div className="cfg-quote-success">
           <div className="cfg-quote-success-icon" aria-hidden>

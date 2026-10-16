@@ -5,3 +5,10 @@ export const GENERAL_TERMS_PDF = "/algemene-voorwaarden.pdf";
 
 export const QUOTE_VAT_COPY =
   "Alle bedragen op deze offerte zijn exclusief btw, tenzij uitdrukkelijk anders vermeld. De btw wordt berekend over het subtotaal en afzonderlijk vermeld. Het totaal inclusief btw is het door u te betalen totaalbedrag.";
+
+export const QUOTE_PAYMENT_COPY = [
+  "Om dit project te starten en te waarborgen, hanteren wij een gefaseerde betaling:",
+  "40% bij akkoord en verstrekking van de opdracht (aanbetaling)",
+  "40% bij de start van de productie",
+  "20% na succesvolle plaatsing en oplevering",
+] as const;

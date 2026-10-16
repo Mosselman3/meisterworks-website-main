@@ -5,7 +5,9 @@ import { HeroLoad, Reveal } from "@/components/motion/Reveal";
 import { REVIEW_COUNT, REVIEW_SCORE } from "@/lib/content";
 import { CONTACT, ROUTES } from "@/lib/site";
 
-const calendlyUrl = process.env.NEXT_PUBLIC_CALENDLY_URL?.trim();
+const calendlyUrl =
+  process.env.NEXT_PUBLIC_CALENDLY_URL?.trim() ||
+  "https://calendly.com/meisterworks-info/30min?hide_event_type_details=1&hide_gdpr_banner=1&background_color=f9f9f9&primary_color=a67c52";
 
 export const metadata: Metadata = {
   title: "Adviesgesprek plannen",

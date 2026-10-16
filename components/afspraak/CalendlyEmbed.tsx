@@ -6,6 +6,13 @@ type CalendlyWidget = {
   initInlineWidget: (options: { url: string; parentElement: HTMLElement }) => void;
 };
 
+type CalendlyMessage = {
+  event?: string;
+  payload?: {
+    height?: number;
+  };
+};
+
 declare global {
   interface Window {
     Calendly?: CalendlyWidget;
@@ -53,10 +60,29 @@ export function CalendlyEmbed({
 
     function onMessage(event: MessageEvent) {
       if (event.origin !== "https://calendly.com") return;
-      const data = event.data as { event?: string } | null;
+      const data = event.data as CalendlyMessage | null;
+      if (data?.event === "calendly.page_height") {
+        const height = data.payload?.height;
+        if (
+          parent &&
+          typeof height === "number" &&
+          Number.isFinite(height)
+        ) {
+          const widgetHeight = `${Math.max(700, Math.ceil(height))}px`;
+          parent.style.height = widgetHeight;
+          parent.querySelector<HTMLIFrameElement>("iframe")?.style.setProperty(
+            "height",
+            widgetHeight,
+          );
+        }
+        return;
+      }
       if (data?.event !== "calendly.event_scheduled") return;
-      window.dataLayer = window.dataLayer ?? [];
-      window.dataLayer.push({ event: "calendly_scheduled" });
+      try {
+        window.sessionStorage.setItem("meisterworks_appointment_scheduled", "true");
+      } catch {
+        // Continue to the confirmation page if storage is unavailable.
+      }
       window.location.assign(thankYouPath);
     }
 
@@ -70,7 +96,8 @@ export function CalendlyEmbed({
   return (
     <div
       ref={parentRef}
-      className="min-h-[700px] overflow-hidden rounded-[18px] bg-white"
+      className="min-h-[700px] overflow-hidden rounded-[18px] bg-[#F9F9F9]"
+      style={{ height: "700px" }}
     />
   );
 }

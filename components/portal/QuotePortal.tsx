@@ -5,6 +5,7 @@ import {
   GENERAL_TERMS_LABEL,
   GENERAL_TERMS_PDF,
   GENERAL_TERMS_VERSION,
+  QUOTE_PAYMENT_COPY,
   QUOTE_VAT_COPY,
 } from "@/lib/legal/terms";
 import type { QuotePortal as QuotePortalData } from "@/lib/quotes/portal-types";
@@ -113,7 +114,7 @@ export function QuotePortal({ token }: { token: string }) {
 
   const decision = portal.decision;
   const addressLines = portal.customer.address.split(/\r?\n|,\s*/).filter(Boolean);
-  const depositCents = Math.round(portal.totalInclVatCents / 2);
+  const depositCents = Math.round(portal.totalInclVatCents * 0.4);
 
   return (
     <main className="portal-page">
@@ -133,8 +134,8 @@ export function QuotePortal({ token }: { token: string }) {
             </div>
             <address>
               <strong>Meisterworks</strong>
-              <span>Venloseweg 16</span>
-              <span>6005 NJ Weert</span>
+              <span>Hoolstraat 19, F3</span>
+              <span>6006 SL Weert</span>
               <span>info@meisterworks.nl</span>
             </address>
           </header>
@@ -185,6 +186,17 @@ export function QuotePortal({ token }: { token: string }) {
               <div className="portal-document__total"><dt>Totaal incl. btw</dt><dd>{formatEuro(portal.totalInclVatCents)}</dd></div>
             </dl>
             <p className="portal-document__vat-note">{QUOTE_VAT_COPY}</p>
+            <div className="portal-document__payment">
+              <p>{QUOTE_PAYMENT_COPY[0]}</p>
+              <p>
+                {QUOTE_PAYMENT_COPY.slice(1).map((line) => (
+                  <span key={line}>
+                    {line}
+                    <br />
+                  </span>
+                ))}
+              </p>
+            </div>
           </section>
         </article>
 
@@ -195,7 +207,7 @@ export function QuotePortal({ token }: { token: string }) {
             <span>incl. {portal.vatPercentage}% btw</span>
             <dl>
               <div><dt>Excl. btw</dt><dd>{formatEuro(portal.subtotalExclVatCents)}</dd></div>
-              <div><dt>Aanbetaling na akkoord (50%)</dt><dd>{formatEuro(depositCents)}</dd></div>
+              <div><dt>Aanbetaling na akkoord (40%)</dt><dd>{formatEuro(depositCents)}</dd></div>
               <div><dt>Gemiddelde levertijd</dt><dd>6–8 weken</dd></div>
             </dl>
 

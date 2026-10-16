@@ -374,6 +374,15 @@ nextjs-portal {
   color: #505050;
 }
 
+.portal-document__payment {
+  margin-top: 24px;
+  color: #505050;
+}
+
+.portal-document__payment p {
+  margin: 0 0 8px;
+}
+
 .portal-document__custom {
   padding: 10px 12px;
   border-left: 2px solid #171717;
