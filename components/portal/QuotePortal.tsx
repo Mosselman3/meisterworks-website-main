@@ -63,6 +63,7 @@ export function QuotePortal({ token }: { token: string }) {
   const [signerName, setSignerName] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [approvalError, setApprovalError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -103,6 +104,7 @@ export function QuotePortal({ token }: { token: string }) {
   }, [token, isPreview]);
 
   async function submitDecision(decision: "approved" | "rejected") {
+    if (submitting) return;
     setSubmitting(true);
     setError("");
     try {
@@ -360,28 +362,40 @@ export function QuotePortal({ token }: { token: string }) {
 
               {/* BEGIN: ReassuranceCallout */}
               <div
-                className="mb-6 flex items-start gap-2.5 px-1 text-xs leading-relaxed text-stone-500"
+                className="flex items-start gap-2.5 px-1 text-xs leading-relaxed text-stone-600"
                 data-purpose="reassurance-note"
               >
                 <svg
-                  className="mt-0.5 h-4 w-4 shrink-0 text-stone-400"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <div>
+                  Vakkundige inmeting ter plaatse, product start na definitief akkoord klant.
+                </div>
+              </div>
+              {/* END: ReassuranceCallout */}
+
+              {/* Delivery Notice */}
+              <div className="mt-3 mb-6 flex items-center gap-2.5 px-1 py-1 text-xs text-stone-600">
+                <svg
+                  className="h-4 w-4 shrink-0 text-stone-900"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={1.75}
                   viewBox="0 0 24 24"
                 >
-                  <path
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M3 6h11v9H3zM14 9h4l3 3v3h-7zM6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M16 10h2l2 2h-4z" fill="white" stroke="none" />
                 </svg>
-                <div>
-                  <span className="font-medium text-stone-700">Geen zorgen over de afmetingen:</span>{" "}
-                  De maten op deze offerte zijn indicatief. Wij komen altijd eerst vakkundig inmeten, en pas na uw definitieve akkoord starten we de productie.
-                </div>
+                <span>
+                  De levertijd van <strong className="font-semibold text-stone-800">6–8 weken</strong> gaat direct in na de inmeting.
+                </span>
               </div>
-              {/* END: ReassuranceCallout */}
 
               {/* BEGIN: ApprovalForm */}
               <form
@@ -389,11 +403,34 @@ export function QuotePortal({ token }: { token: string }) {
                 data-purpose="signature-form"
                 onSubmit={(event) => {
                   event.preventDefault();
-                  if (signerName.trim() && termsAccepted && !submitting) {
-                    void submitDecision("approved");
+                  if (submitting) return;
+
+                  const missing: string[] = [];
+                  if (!signerName.trim()) {
+                    missing.push("Vul uw volledige naam in.");
                   }
+                  if (!termsAccepted) {
+                    missing.push("Accepteer de algemene voorwaarden.");
+                  }
+
+                  if (missing.length > 0) {
+                    setApprovalError(missing.join(" "));
+                    return;
+                  }
+
+                  setApprovalError("");
+                  void submitDecision("approved");
                 }}
               >
+                {approvalError ? (
+                  <div
+                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs leading-relaxed text-red-800"
+                    role="alert"
+                  >
+                    {approvalError}
+                  </div>
+                ) : null}
+
                 {/* Name Input */}
                 <div>
                   <label
@@ -408,10 +445,12 @@ export function QuotePortal({ token }: { token: string }) {
                       id="fullName"
                       name="fullName"
                       placeholder="bijv. Jan de Vries"
-                      required
                       type="text"
                       value={signerName}
-                      onChange={(event) => setSignerName(event.target.value)}
+                      onChange={(event) => {
+                        setSignerName(event.target.value);
+                        setApprovalError("");
+                      }}
                       autoComplete="name"
                     />
                   </div>
@@ -428,10 +467,12 @@ export function QuotePortal({ token }: { token: string }) {
                         className="h-4.5 w-4.5 rounded border-stone-300 text-taupe-600 accent-taupe-600 transition focus:ring-taupe-400/50 focus:ring-offset-0"
                         id="terms"
                         name="terms"
-                        required
                         type="checkbox"
                         checked={termsAccepted}
-                        onChange={(event) => setTermsAccepted(event.target.checked)}
+                        onChange={(event) => {
+                          setTermsAccepted(event.target.checked);
+                          setApprovalError("");
+                        }}
                       />
                     </div>
                     <div className="text-xs leading-normal text-stone-600 sm:text-[13px]">
@@ -449,30 +490,10 @@ export function QuotePortal({ token }: { token: string }) {
                   </label>
                 </div>
 
-                {/* Delivery Notice */}
-                <div className="flex items-center gap-2.5 px-1 py-1 text-xs text-stone-600">
-                  <svg
-                    className="h-4 w-4 shrink-0 text-amber-600"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <span>
-                    De levertijd van <strong className="font-semibold text-stone-800">6–8 weken</strong> gaat direct in na de inmeting.
-                  </span>
-                </div>
-
                 {/* Action Buttons */}
                 <div className="flex flex-col-reverse items-center justify-end gap-3 pt-3 sm:flex-row">
                   <button
-                    className="w-full cursor-pointer rounded-full border border-stone-200 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-stone-600 transition hover:bg-stone-50 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-200 sm:w-auto"
+                    className="btn-outline w-full cursor-pointer sm:w-auto"
                     data-purpose="cancel-button"
                     type="button"
                     onClick={() => setDialog(null)}
@@ -480,25 +501,12 @@ export function QuotePortal({ token }: { token: string }) {
                     Annuleren
                   </button>
                   <button
-                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-taupe-500 px-7 py-3 text-xs font-semibold uppercase tracking-wider text-white shadow-sm transition-all duration-150 hover:bg-taupe-600 active:bg-taupe-700 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-taupe-400 focus:ring-offset-2 sm:w-auto"
+                    className="portal-button portal-button--primary portal-button--approval w-full sm:w-auto"
                     data-purpose="submit-button"
                     type="submit"
-                    disabled={!signerName.trim() || !termsAccepted || submitting}
+                    aria-busy={submitting}
                   >
-                    <span>{submitting ? "Opslaan…" : "Offerte bevestigen & inmeting inplannen"}</span>
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M14 5l7 7m0 0l-7 7m7-7H3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    {submitting ? "Opslaan…" : "Offerte goedkeuren"}
                   </button>
                 </div>
               </form>

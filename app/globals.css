@@ -230,7 +230,8 @@ nextjs-portal {
 }
 
 .portal-page {
-  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
   background: oklch(0.16 0.006 60);
   color: var(--ink);
 }
@@ -297,6 +298,8 @@ nextjs-portal {
 
 .portal-layout {
   display: flex;
+  width: 100%;
+  min-width: 0;
   max-width: 1220px;
   margin: 0 auto;
   padding: 48px 28px;
@@ -307,6 +310,7 @@ nextjs-portal {
 
 .portal-document {
   width: min(794px, 100%);
+  min-width: 0;
   min-height: 1123px;
   flex: 1 1 794px;
   padding: 68px 62px 52px;
@@ -409,7 +413,9 @@ nextjs-portal {
 }
 
 .portal-document__table-wrap {
+  max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid #d7d7d7;
 }
 
@@ -477,6 +483,7 @@ nextjs-portal {
 .portal-sidebar {
   position: sticky;
   top: 24px;
+  min-width: 0;
   width: min(360px, 100%);
   flex: 1 1 300px;
 }
@@ -551,6 +558,12 @@ nextjs-portal {
   border-color: var(--accent);
   background: var(--accent);
   color: white;
+}
+
+.portal-button--approval {
+  min-width: 180px;
+  min-height: 53px;
+  padding: 15px 30px;
 }
 
 .portal-button--dark {
@@ -706,7 +719,7 @@ nextjs-portal {
   margin-top: 22px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .portal-layout {
     flex-direction: column;
     align-items: stretch;
@@ -729,6 +742,19 @@ nextjs-portal {
     padding: 16px;
   }
 
+  .portal-layout {
+    padding: 16px 12px 28px;
+  }
+
+  .portal-document {
+    padding: 28px 16px;
+    font-size: 12px;
+  }
+
+  .portal-document__brand img {
+    width: 130px;
+  }
+
   .portal-document__header,
   .portal-document__intro {
     flex-direction: column;
@@ -745,10 +771,15 @@ nextjs-portal {
 
   .portal-document__intro address {
     min-width: 0;
+    padding-left: 14px;
   }
 
   .portal-document__totals {
     width: 100%;
+  }
+
+  .portal-document table {
+    min-width: 540px;
   }
 
   .portal-dialog-backdrop {
