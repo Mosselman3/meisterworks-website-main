@@ -33,6 +33,25 @@
   --color-gallery: #f9f9f9;
   --font-sans: var(--font-body);
   --font-serif: var(--font-display);
+
+  --color-taupe-50: #FBF9F7;
+  --color-taupe-100: #F5F1EC;
+  --color-taupe-200: #E8E0D7;
+  --color-taupe-300: #D5C7B7;
+  --color-taupe-400: #BCA792;
+  --color-taupe-500: #A38B75;
+  --color-taupe-600: #8C735E;
+  --color-taupe-700: #6E5948;
+  --color-taupe-800: #544437;
+  --color-taupe-900: #3D3128;
+
+  --color-warmgray-50: #FAF9F8;
+  --color-warmgray-100: #F3F2F0;
+  --color-warmgray-200: #E7E5E2;
+  --color-warmgray-600: #686561;
+  --color-warmgray-900: #1C1B1A;
+
+  --shadow-modal: 0 25px 60px -15px rgba(28, 27, 26, 0.12), 0 10px 20px -5px rgba(28, 27, 26, 0.04);
 }
 
 * {
@@ -631,6 +650,21 @@ nextjs-portal {
   line-height: 1.55;
 }
 
+@keyframes modalZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-modal-zoom {
+  animation: modalZoomIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .portal-dialog label:not(.portal-check) {
   display: grid;
   gap: 6px;
@@ -715,6 +749,16 @@ nextjs-portal {
 
   .portal-document__totals {
     width: 100%;
+  }
+
+  .portal-dialog-backdrop {
+    align-items: start;
+    padding: 14px;
+    overflow-y: auto;
+  }
+
+  .portal-dialog {
+    padding: 24px;
   }
 }
 
