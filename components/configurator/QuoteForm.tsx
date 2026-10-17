@@ -21,6 +21,7 @@ export type QuoteConfiguration = {
   glassCode: string | null;
   colorCode: string | null;
   ralCode: string | null;
+  designColorCode: string | null;
   hardwareCode: string | null;
   sluitwerkCode: string | null;
   hasFixedPanel: boolean;
@@ -174,9 +175,6 @@ export function QuoteForm({
           contact: fields,
           productId,
           configuration,
-          summary: summaryRows,
-          configurations: (doors ?? []).map((door) => door.configuration),
-          summaries: (doors ?? []).map((door) => door.summary),
           doors: doors ?? [],
         },
         file,

@@ -658,6 +658,17 @@ function withActiveDoors(
   );
 }
 
+const QUOTE_DESIGN_WINDOW_COUNTS: Record<string, number> = {
+  minimal: 2,
+  linea: 4,
+  classic: 4,
+  grid: 4,
+  frame: 6,
+  asymmetry: 5,
+  arco: 3,
+  grande: 9,
+};
+
 function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfiguration {
   const product = getProduct(state.productId);
   if (product.custom) {
@@ -669,6 +680,7 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
       glassCode: null,
       colorCode: null,
       ralCode: null,
+      designColorCode: null,
       hardwareCode: null,
       sluitwerkCode: null,
       hasFixedPanel: false,
@@ -693,10 +705,14 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
     doorTypeCode: product.doorTypeCode,
     clientWidthMm: state.breedte,
     clientHeightMm: state.hoogte,
-    windowCount: windowCountFromBars(state.liggers, state.staanders),
+    windowCount:
+      product.doorTypeCode !== "vast_paneel" && state.vlakMode === "ontwerp"
+        ? QUOTE_DESIGN_WINDOW_COUNTS[state.vlakPreset] ?? 1
+        : windowCountFromBars(state.liggers, state.staanders),
     glassCode: state.glas,
     colorCode: state.kleur,
     ralCode: state.kleur === "afwijkende_ral" ? normalizeRalCode(state.ralCode) || null : null,
+    designColorCode: state.kleur === "design_kleur" ? state.designColorCode || null : null,
     hardwareCode:
       product.hasHardware && state.sluitwerk === "deurklink" && state.beslag
         ? state.beslag
@@ -750,6 +766,7 @@ function blankQuoteConfiguration(): QuoteConfiguration {
     glassCode: null,
     colorCode: null,
     ralCode: null,
+    designColorCode: null,
     hardwareCode: null,
     sluitwerkCode: null,
     hasFixedPanel: false,
@@ -796,6 +813,7 @@ function quoteConfigurationForQuote(state: ConfiguratorState): QuoteConfiguratio
     glassCode: confirmed("glas") ? full.glassCode : null,
     colorCode: kleur ? full.colorCode : null,
     ralCode: kleur ? full.ralCode : null,
+    designColorCode: kleur ? full.designColorCode : null,
     hardwareCode: confirmed("beslag") ? full.hardwareCode : null,
     sluitwerkCode: confirmed("handgreep") ? full.sluitwerkCode : null,
     openingDirection: confirmed("richting") ? full.openingDirection : null,
