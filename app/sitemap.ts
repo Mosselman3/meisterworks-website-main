@@ -13,8 +13,13 @@ const PUBLIC_PATHS = [
   ...PRODUCTS.map((product) => `/deuren/${product.slug}`),
 ];
 
+function absoluteUrl(path: string) {
+  if (path === "/") return SITE_URL;
+  return new URL(path, SITE_URL).href;
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   return PUBLIC_PATHS.map((path) => ({
-    url: new URL(path, SITE_URL).href,
+    url: absoluteUrl(path),
   }));
 }

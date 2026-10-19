@@ -2,8 +2,10 @@ import { PRODUCTS, getProduct, productPath } from "./site";
 
 export type ProductPageCopy = {
   slug: string;
+  heroKicker?: string;
   heroTitle: string;
   heroLead: string;
+  metaDescription?: string;
   heroImage: string;
   heroAlt: string;
   introLead: string;
@@ -61,15 +63,18 @@ export const PRODUCT_PAGES: ProductPageCopy[] = [
   },
   {
     slug: "vast-paneel",
-    heroTitle: "Een vlak dat blijft staan.",
+    heroKicker: "Stalen wand of pui",
+    heroTitle: "Een vaste scheiding tussen ruimtes.",
     heroLead:
-      "Alleen een bevestigingsframe, geen mechaniek. Hetzelfde staal en glas als onze deuren, zonder bewegend deel.",
+      "Een wand of pui van staal en glas, zonder deur. Hetzelfde staal en glas als onze deuren, in een bevestigingsframe dat de opening dichthoudt.",
+    metaDescription:
+      "Een stalen wand of pui met glas, op maat gemaakt. Stel afmeting, vlakverdeling, glas en kleur samen in de configurator.",
     heroImage: getProduct("vast-paneel")!.imageLandscape,
     heroAlt: "Vast paneel in stalen frame",
     introLead:
-      "Het vaste paneel is een los product. Het vult een opening met staal en glas wanneer er geen deur hoeft te bewegen.",
+      "Gebruik het vaste paneel als glaswand, als pui of als doorlopend vlak in een grote opening.",
     introBody:
-      "Afmeting, aantal panelen, vlakverdeling, glas en kleur kiest u in de configurator. Panelen kunnen aaneengesloten staan, elk met een eigen verdeling van liggers en staanders. Er is geen sluitwerk, geen handgreep en geen mechanisme.",
+      "Afmeting, aantal panelen, vlakverdeling, glas en kleur stelt u samen in de configurator. Panelen kunnen aaneengesloten staan, elk met een eigen verdeling van liggers en staanders.",
     composeCta: "Paneel samenstellen",
     hasHardware: false,
     hasFixedPanel: false,

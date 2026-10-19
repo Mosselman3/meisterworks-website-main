@@ -90,6 +90,9 @@ export function SiteFooter() {
             >
               Algemene voorwaarden
             </a>
+            <a href="/sitemap.xml" className="footer-link">
+              Sitemap
+            </a>
           </div>
         </div>
         <div>

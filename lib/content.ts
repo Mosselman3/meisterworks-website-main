@@ -24,8 +24,8 @@ export const HOME_PRODUCTS = [
   },
   {
     slug: "vast-paneel",
-    title: "Vast paneel (los)",
-    blurb: "Alleen een bevestigingsframe, zonder mechaniek.",
+    title: "Vast paneel",
+    blurb: "Stalen wand of pui met glas. Zonder deur.",
     alt: "Vast paneel in stalen frame",
   },
 ].map((item) => {

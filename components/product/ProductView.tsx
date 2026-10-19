@@ -174,7 +174,7 @@ export function ProductView({
         <div className="relative z-[2] max-w-[720px] px-11 pb-14">
           <HeroLoad>
             <div className="mb-4 text-[13px] font-medium tracking-[0.18em] text-[var(--accent)] uppercase">
-              {product?.title}
+              {page.heroKicker ?? product?.title}
             </div>
           </HeroLoad>
           <HeroLoad stagger={1}>

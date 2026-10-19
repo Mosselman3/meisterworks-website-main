@@ -18,9 +18,12 @@ export async function generateMetadata({
   const product = getProduct(slug);
   const page = getProductPage(slug);
   if (!product || !page) return {};
+  const description = page.metaDescription ?? page.heroLead;
   return {
     title: product.title,
-    description: page.heroLead,
+    description,
+    openGraph: { description },
+    twitter: { description },
     alternates: { canonical: `/deuren/${slug}` },
   };
 }

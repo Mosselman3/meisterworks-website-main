@@ -306,7 +306,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     products: ["vast_paneel"],
     question: "Wanneer kies ik een los vast paneel?",
     answer: [
-      "Wanneer de opening staal en glas moet krijgen, zonder een deel dat beweegt. Het paneel gebruikt hetzelfde staal en hetzelfde glas als de deuren, met alleen een bevestigingsframe.",
+      "Wanneer u een stalen wand of pui wilt, zonder deur die opent. Het paneel heeft hetzelfde staal en glas als onze deuren en wordt bevestigd in een frame.",
     ],
   },
   {
