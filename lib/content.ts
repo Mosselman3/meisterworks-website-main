@@ -30,7 +30,9 @@ export const HOME_PRODUCTS = [
   },
 ].map((item) => {
   const product = PRODUCTS.find((entry) => entry.slug === item.slug)!;
-  return { ...item, image: product.image, href: productPath(item.slug) };
+  const image =
+    item.slug === "schuifdeur" ? product.imageLandscape : product.image;
+  return { ...item, image, href: productPath(item.slug) };
 });
 
 export const PRODUCT_STORIES = [
