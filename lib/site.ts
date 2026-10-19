@@ -74,7 +74,7 @@ export const PRODUCTS: Product[] = [
     slug: "schuifdeur",
     title: "Schuifdeur",
     image: "/assets/doors/schuifdeur-portrait.jpg",
-    imageLandscape: "/assets/doors/schuifdeur-landscape.jpg",
+    imageLandscape: "/assets/doors/schuifdeur-hero.jpg",
     detailImage: "/assets/doors/schuifdeur-detail.jpg",
     detailAlt: "Bovenrail van een stalen schuifdeur",
     detailTitle: "De rail",

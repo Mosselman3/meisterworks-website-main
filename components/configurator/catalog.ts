@@ -297,7 +297,7 @@ export const DESIGN_COLORS: readonly DesignColor[] = [
   { code: "anodic_brown", name: "Anodic Brown", hex: "#5e4b41" },
   { code: "earth_clay", name: "Earth clay", hex: "#986d58" },
   { code: "cast_iron", name: "Cast iron", hex: "#3d3d39" },
-  { code: "smoked_steel", name: "Smoked Steel", hex: "#6d706f" },
+  { code: "smoked_steel", name: "Smoked Steel", hex: "#755C49" },
 ];
 
 export type ColorOption = {

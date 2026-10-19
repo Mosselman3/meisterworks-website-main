@@ -10,6 +10,7 @@ export function CoverImage({
   priority = false,
   sizes = "(min-width: 1280px) 640px, 100vw",
   fit = "cover",
+  position,
 }: {
   src: string;
   alt: string;
@@ -18,6 +19,7 @@ export function CoverImage({
   priority?: boolean;
   sizes?: string;
   fit?: "cover" | "contain";
+  position?: string;
 }) {
   return (
     <div
@@ -28,7 +30,11 @@ export function CoverImage({
         src={src}
         alt={alt}
         fill
-        className={fit === "contain" ? "object-contain" : "object-cover"}
+        className={
+          fit === "contain"
+            ? `object-contain ${position || "object-center"}`
+            : `object-cover ${position || "object-center"}`
+        }
         sizes={sizes}
         priority={priority}
       />
