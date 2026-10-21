@@ -7,6 +7,8 @@ export const DEFAULT_OG_IMAGE = "/assets/doors/taatsdeur-landscape.jpg";
 
 export const ROUTES = {
   home: "/",
+  stalenDeuren: "/stalen-deuren",
+  stalenDeurZwart: "/stalen-deur-zwart",
   deuren: "/#deuren",
   projecten: "/#projecten",
   vakmanschap: "/#vakmanschap",

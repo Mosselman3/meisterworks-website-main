@@ -3,6 +3,8 @@ import { PRODUCTS, ROUTES, SITE_URL } from "@/lib/site";
 
 const PUBLIC_PATHS = [
   ROUTES.home,
+  ROUTES.stalenDeuren,
+  ROUTES.stalenDeurZwart,
   ROUTES.inspiratie,
   ROUTES.reviews,
   ROUTES.faq,

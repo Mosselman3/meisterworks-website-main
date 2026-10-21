@@ -71,7 +71,14 @@ export function HomePage() {
             Stalen deuren voor elke ruimte. Eindeloos maatwerk.
           </h2>
           <p className="m-0 text-[16px] leading-[1.6] text-[oklch(0.42_0.008_60)]">
-            Elk model met de hand vervaardigd op basis van uw wensen.
+            Elk model met de hand vervaardigd op basis van uw wensen. Lees meer over{" "}
+            <Link
+              href={ROUTES.stalenDeuren}
+              className="text-[oklch(0.32_0.008_60)] underline decoration-[oklch(0.78_0.006_75)] underline-offset-[3px] hover:text-[oklch(0.22_0.008_60)]"
+            >
+              stalen deuren op maat in Limburg
+            </Link>
+            .
           </p>
         </Reveal>
         <div className="home-product-grid">

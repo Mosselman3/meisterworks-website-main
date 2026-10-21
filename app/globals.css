@@ -130,6 +130,10 @@ nextjs-portal {
     gap: 20px;
   }
 
+  .home-product-grid.landing-door-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .home-product-card-body {
     padding: 18px 16px 20px;
   }

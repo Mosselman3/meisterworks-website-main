@@ -67,6 +67,12 @@ export function SiteFooter() {
             <Link href={ROUTES.deuren} className="footer-link">
               Deuren
             </Link>
+            <Link href={ROUTES.stalenDeuren} className="footer-link">
+              Stalen deuren
+            </Link>
+            <Link href={ROUTES.stalenDeurZwart} className="footer-link">
+              Zwarte stalen deur
+            </Link>
             <Link href={ROUTES.projecten} className="footer-link">
               Projecten
             </Link>
