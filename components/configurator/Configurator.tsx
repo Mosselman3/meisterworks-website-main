@@ -2816,6 +2816,8 @@ export function Configurator() {
                   meta={`${variant.thicknessMm} mm dikte`}
                   priceMark={priceTier(variant.pricePerM2, glassPrices)}
                   selected={state.glas === variant.code}
+                  thumbStyle={glassThumb(image)}
+                  previewSrc={image}
                   onClick={() => chooseGlass(variant.code)}
                 />
               );

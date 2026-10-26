@@ -2143,6 +2143,10 @@ body[data-nav-open="true"] [data-cfg-nav-mobile] {
   [data-cfg-nav-mobile] {
     display: block !important;
   }
+  /* Cookiebot's reopen button uses a near-max z-index and covers Vorige stap. */
+  body:has([data-cfg-root]) #CookiebotWidget {
+    z-index: 40 !important;
+  }
   [data-cfg-root][data-early-quote="true"] [data-cfg-shell] {
     padding-bottom: 180px !important;
   }

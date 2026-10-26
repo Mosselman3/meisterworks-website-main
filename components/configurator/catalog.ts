@@ -249,6 +249,7 @@ const GLASS_IMAGE_OVERRIDE: Record<string, string> = {
 export function glassCardImage(code: string, category: string) {
   return (
     GLASS_IMAGE_OVERRIDE[code] ??
+    glassLookFor(code)?.image ??
     GLASS_CATEGORIES.find((item) => item.id === category)?.image ??
     "/assets/glas/helder.jpg"
   );
