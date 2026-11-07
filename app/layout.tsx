@@ -108,6 +108,33 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.setAttribute('d
           {`try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("motion")}catch(e){}`}
         </Script>
         <div className="flex min-h-dvh flex-col">{children}</div>
+        <script
+          id="avanza-chat"
+          dangerouslySetInnerHTML={{
+            __html: `(function(w) {
+    var api = w.AvanzaChat = w.AvanzaChat || {};
+    api.q = api.q || [];
+    api.open = api.open || function(payload) {
+      api.q.push(['open', payload]);
+      return false;
+    };
+    api.executePrompt = api.executePrompt || function(payload) {
+      api.q.push(['executePrompt', payload]);
+      return false;
+    };
+    api.close = api.close || function() {
+      api.q.push(['close']);
+      return false;
+    };
+  })(window);
+
+  window.AVANZACHAT_CONFIG = {
+    organizationId: '1e5ac2c3-97a7-4b97-a007-27dce9f6b325',
+    apiEndpoint: 'https://api.avanza.chat'
+  };`,
+          }}
+        />
+        <script src="https://api.avanza.chat/widget.js" />
       </body>
     </html>
   );
