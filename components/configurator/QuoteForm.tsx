@@ -1,7 +1,6 @@
 "use client";
 
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
 import { ArrowIcon, LockIcon } from "@/components/ui";
 import { storeQuoteThanks } from "@/lib/quotes/thank-you";
@@ -139,7 +138,6 @@ export function QuoteForm({
   file: File | null;
   onFileChange: (file: File | null) => void;
 }) {
-  const router = useRouter();
   const [fields, setFields] = useState(INITIAL_FIELDS);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -191,7 +189,7 @@ export function QuoteForm({
         doorCount: doors?.length ?? 1,
       });
       onSubmitted?.();
-      router.replace(ROUTES.configuratorBedankt);
+      window.location.assign(ROUTES.configuratorBedankt);
     } finally {
       submitLock.current = false;
       setPending(false);

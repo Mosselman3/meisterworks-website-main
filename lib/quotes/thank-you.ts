@@ -6,7 +6,17 @@ export type QuoteThanksRecord = {
   source: QuoteThanksSource;
   quoteNumber: string;
   doorCount: number;
+  tracked?: boolean;
 };
+
+const QUOTE_THANKS_EVENT: Record<QuoteThanksSource, string> = {
+  website_configurator: "configurator_quote_complete",
+  website_snelle_offerte: "offerte_quote_complete",
+};
+
+export function quoteThanksEvent(source: QuoteThanksSource) {
+  return QUOTE_THANKS_EVENT[source];
+}
 
 export function storeQuoteThanks(record: QuoteThanksRecord) {
   sessionStorage.setItem(QUOTE_THANKS_STORAGE_KEY, JSON.stringify(record));
@@ -21,10 +31,24 @@ export function readQuoteThanks(source: QuoteThanksSource): QuoteThanksRecord | 
     if (typeof parsed.quoteNumber !== "string" || parsed.quoteNumber.length === 0) return null;
     const doorCount =
       typeof parsed.doorCount === "number" && parsed.doorCount > 0 ? parsed.doorCount : 1;
-    return { source, quoteNumber: parsed.quoteNumber, doorCount };
+    return {
+      source,
+      quoteNumber: parsed.quoteNumber,
+      doorCount,
+      tracked: parsed.tracked === true,
+    };
   } catch {
     return null;
   }
+}
+
+export function markQuoteThanksTracked(source: QuoteThanksSource) {
+  const record = readQuoteThanks(source);
+  if (!record) return;
+  sessionStorage.setItem(
+    QUOTE_THANKS_STORAGE_KEY,
+    JSON.stringify({ ...record, tracked: true }),
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

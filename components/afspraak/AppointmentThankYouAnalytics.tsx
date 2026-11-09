@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-
-declare global {
-  interface Window {
-    dataLayer?: Array<Record<string, unknown>>;
-  }
-}
+import { pushDataLayerEvent } from "@/lib/analytics";
 
 export function AppointmentThankYouAnalytics() {
   useEffect(() => {
@@ -21,8 +16,7 @@ export function AppointmentThankYouAnalytics() {
     }
     if (!scheduled) return;
 
-    window.dataLayer = window.dataLayer ?? [];
-    window.dataLayer.push({ event: "appointment_booking_complete" });
+    pushDataLayerEvent("appointment_booking_complete");
   }, []);
 
   return null;

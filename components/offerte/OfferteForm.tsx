@@ -2,7 +2,6 @@
 
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
 import { ArrowIcon } from "@/components/ui";
 import { storeQuoteThanks } from "@/lib/quotes/thank-you";
@@ -21,7 +20,6 @@ const INITIAL = {
 };
 
 export function OfferteForm() {
-  const router = useRouter();
   const [values, setValues] = useState(INITIAL);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
@@ -76,7 +74,7 @@ export function OfferteForm() {
         quoteNumber: result.quoteNumber,
         doorCount: 1,
       });
-      router.replace(ROUTES.offerteBedankt);
+      window.location.assign(ROUTES.offerteBedankt);
     } finally {
       submitLock.current = false;
       setPending(false);

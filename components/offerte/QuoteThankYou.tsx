@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { pushDataLayerEvent } from "@/lib/analytics";
 import {
+  markQuoteThanksTracked,
+  quoteThanksEvent,
   readQuoteThanks,
   type QuoteThanksSource,
 } from "@/lib/quotes/thank-you";
@@ -26,6 +29,10 @@ export function QuoteThankYou({
     // Hydrate the confirmation view from browser storage.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setThanks({ quoteNumber: stored.quoteNumber, doorCount: stored.doorCount });
+    if (stored.tracked) return;
+
+    markQuoteThanksTracked(source);
+    pushDataLayerEvent(quoteThanksEvent(source));
   }, [fallbackHref, router, source]);
 
   if (!thanks) return null;
