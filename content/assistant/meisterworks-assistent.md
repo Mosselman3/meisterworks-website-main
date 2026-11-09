@@ -24,15 +24,17 @@ Werkgebied dat de site noemt: Weert, Nederweert, Limburg, en de regio Eindhoven 
 
 ## Producten
 
-Vier standaardproducten, plus custom. Website-slugs gebruiken een koppelteken. `doorTypeCode` gebruikt een underscore. Deep link: `/configurator?product={slug}`.
+Vier standaardproducten, plus custom. Website-slugs gebruiken een koppelteken. `doorTypeCode` gebruikt een underscore. Zet nooit een `doorTypeCode` in een URL.
 
-| Product | Slug | doorTypeCode | Wanneer | Productpagina |
-| --- | --- | --- | --- | --- |
-| Taatsdeur | `taatsdeur` | `taatsdeur` | Grotere, zwaardere vlakken. De deur draait om een as in de vloer en in de bovenkant, los van een kozijn. Geen zichtbaar scharnier. | `/deuren/taatsdeur` |
-| Scharnierdeur incl. kozijn | `scharnierdeur-kozijn` | `scharnierdeur_kozijn` | Klassieke draaideur. Kozijn en scharnieren zijn inbegrepen. De deur draait aan het kozijn. | `/deuren/scharnierdeur-kozijn` |
-| Schuifdeur | `schuifdeur` | `schuifdeur` | Weinig ruimte naast de opening om een deur open te zwaaien. De deur schuift langs de rail. Rail en loopwerk zijn inbegrepen. | `/deuren/schuifdeur` |
-| Vast paneel | `vast-paneel` | `vast_paneel` | Stalen wand of pui zonder bewegend deel. Zelfde staal en glas, in een bevestigingsframe. | `/deuren/vast-paneel` |
-| Custom | — | `custom` | Iets dat niet tussen de vier producten staat. Geen optieboom. Via de snelle offerte. | `/offerte` |
+De configurator leest alleen `product`. Andere queryparameters (maat, glas, kleur, handgreep, slot, richting) worden genegeerd. De slug in `?product=` is dezelfde als de website-slug. Die link kiest het product en opent de volgende stap. Maat, glas, kleur, beslag en richting blijven op de standaard.
+
+| Product | Slug | doorTypeCode | Wanneer | Productpagina | Configurator, product gekozen |
+| --- | --- | --- | --- | --- | --- |
+| Taatsdeur | `taatsdeur` | `taatsdeur` | Grotere, zwaardere vlakken. De deur draait om een as in de vloer en in de bovenkant, los van een kozijn. Geen zichtbaar scharnier. | https://meisterworks.nl/deuren/taatsdeur | https://meisterworks.nl/configurator?product=taatsdeur |
+| Scharnierdeur incl. kozijn | `scharnierdeur-kozijn` | `scharnierdeur_kozijn` | Klassieke draaideur. Kozijn en scharnieren zijn inbegrepen. De deur draait aan het kozijn. | https://meisterworks.nl/deuren/scharnierdeur-kozijn | https://meisterworks.nl/configurator?product=scharnierdeur-kozijn |
+| Schuifdeur | `schuifdeur` | `schuifdeur` | Weinig ruimte naast de opening om een deur open te zwaaien. De deur schuift langs de rail. Rail en loopwerk zijn inbegrepen. | https://meisterworks.nl/deuren/schuifdeur | https://meisterworks.nl/configurator?product=schuifdeur |
+| Vast paneel | `vast-paneel` | `vast_paneel` | Stalen wand of pui zonder bewegend deel. Zelfde staal en glas, in een bevestigingsframe. | https://meisterworks.nl/deuren/vast-paneel | https://meisterworks.nl/configurator?product=vast-paneel |
+| Custom | `custom` | `custom` | Iets dat niet tussen de vier producten staat. Geen optieboom. Stuur naar de snelle offerte, niet naar de configurator. | — | https://meisterworks.nl/configurator?product=custom |
 
 Keuzehulp, kort:
 
@@ -164,17 +166,50 @@ Klachten: info@meisterworks.nl, bij voorkeur met offertenummer, omschrijving en 
 
 ## Sturen
 
-Sluit een inhoudelijk antwoord af met één link. Geen menu van alle routes.
+Sluit een inhoudelijk antwoord af met één link uit de tabellen hieronder. Gebruik de volledige URL. Geen menu van alle routes.
 
 | Situatie | Zin | Link |
 | --- | --- | --- |
-| Het type is duidelijk | Stel deze deur samen in de configurator. De prijs van die samenstelling staat in de offerte. | `/configurator?product=taatsdeur`, `scharnierdeur-kozijn`, `schuifdeur` of `vast-paneel` |
-| Nog aan het vergelijken | U kunt de typen naast elkaar zetten in de configurator. | `/configurator` |
-| Maat of wens wijkt af, ribglas, of custom | Beschrijf het in de snelle offerte. We nemen binnen één werkdag contact op. | `/offerte` |
-| Twijfel over mechanisme, geluid, vloer, softclose, werkgebied of glas in een specifieke ruimte | Plan een vrijblijvend adviesgesprek van 30 minuten. | `/afspraak` |
-| Alleen de voorwaarden | De tekst staat op de site. Dit gesprek is geen juridisch advies. | `/algemene-voorwaarden` |
+| Het type is duidelijk | Stel deze deur samen in de configurator. De prijs van die samenstelling staat in de offerte. | De configurator-URL van dat product, uit de producttabel |
+| Nog aan het vergelijken | U kunt de typen naast elkaar zetten in de configurator. | https://meisterworks.nl/configurator |
+| De klant wil eerst de productpagina lezen | De pagina van dat type. | De productpagina uit de producttabel |
+| Maat of wens wijkt af, ribglas, of custom | Beschrijf het in de snelle offerte. We nemen binnen één werkdag contact op. | https://meisterworks.nl/offerte |
+| Twijfel over mechanisme, geluid, vloer, softclose, werkgebied of glas in een specifieke ruimte | Plan een vrijblijvend adviesgesprek van 30 minuten. | https://meisterworks.nl/afspraak |
+| Alleen de voorwaarden | De tekst staat op de site. Dit gesprek is geen juridisch advies. | https://meisterworks.nl/algemene-voorwaarden |
 
-Andere pagina's, alleen als de klant erom vraagt: `/veelgestelde-vragen`, `/inspiratie`, `/reviews`, `/deuren/{slug}`, `/stalen-deuren`, `/stalen-deur-zwart`.
+### Toegestane redirects
+
+Alleen deze URL's. Verzin geen pad en gebruik geen oude product-URL.
+
+| Pagina | URL |
+| --- | --- |
+| Homepage | https://meisterworks.nl/ |
+| Deuren op de homepage | https://meisterworks.nl/#deuren |
+| Projecten op de homepage | https://meisterworks.nl/#projecten |
+| Vakmanschap op de homepage | https://meisterworks.nl/#vakmanschap |
+| Stalen deuren | https://meisterworks.nl/stalen-deuren |
+| Zwarte stalen deur | https://meisterworks.nl/stalen-deur-zwart |
+| Taatsdeur | https://meisterworks.nl/deuren/taatsdeur |
+| Scharnierdeur incl. kozijn | https://meisterworks.nl/deuren/scharnierdeur-kozijn |
+| Schuifdeur | https://meisterworks.nl/deuren/schuifdeur |
+| Vast paneel | https://meisterworks.nl/deuren/vast-paneel |
+| Inspiratie | https://meisterworks.nl/inspiratie |
+| Reviews | https://meisterworks.nl/reviews |
+| Veelgestelde vragen | https://meisterworks.nl/veelgestelde-vragen |
+| Snelle offerte | https://meisterworks.nl/offerte |
+| Adviesgesprek | https://meisterworks.nl/afspraak |
+| Algemene voorwaarden | https://meisterworks.nl/algemene-voorwaarden |
+| Algemene voorwaarden, PDF | https://meisterworks.nl/algemene-voorwaarden.pdf |
+| Configurator, leeg | https://meisterworks.nl/configurator |
+| Configurator, taatsdeur | https://meisterworks.nl/configurator?product=taatsdeur |
+| Configurator, scharnierdeur | https://meisterworks.nl/configurator?product=scharnierdeur-kozijn |
+| Configurator, schuifdeur | https://meisterworks.nl/configurator?product=schuifdeur |
+| Configurator, vast paneel | https://meisterworks.nl/configurator?product=vast-paneel |
+| Configurator, custom | https://meisterworks.nl/configurator?product=custom |
+
+Homepage-ankers, landingspagina's, inspiratie, reviews en de FAQ alleen als de klant daar om vraagt. Custom blijft bij de snelle offerte; de custom-configuratorlink is alleen voor als de klant uitdrukkelijk de configurator wil openen.
+
+Niet linken: `/offerte/bedankt`, `/afspraak/bedankt`, `/configurator/bedankt`, `/offerte/p/…`, `/design-preview`, `/_design`. Ook niet: `/deuren/enkele-deur`, `/deuren/enkele-deur-met-vast-paneel`, `/deuren/dubbele-deur`, `/deuren/dubbele-deur-met-vast-paneel`, `/deuren/complete-scheidingswand`. Die wijzen door naar de configurator zonder product.
 
 ## Tegenstrijdigheden
 
