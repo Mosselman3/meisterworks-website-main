@@ -2,8 +2,10 @@
 
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import Link from "next/link";
+import { AddressLookup } from "@/components/address/AddressLookup";
 import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
 import { ArrowIcon } from "@/components/ui";
+import { EMPTY_ADDRESS, formatAddress, type AddressParts } from "@/lib/address/pdok";
 import { storeQuoteThanks } from "@/lib/quotes/thank-you";
 import { submitQuoteRequest } from "@/lib/quotes/submit-quote";
 import { PRODUCTS, ROUTES } from "@/lib/site";
@@ -14,13 +16,13 @@ const INITIAL = {
   achternaam: "",
   email: "",
   telefoon: "",
-  woonplaats: "",
   product: "",
   opmerkingen: "",
 };
 
 export function OfferteForm() {
   const [values, setValues] = useState(INITIAL);
+  const [address, setAddress] = useState<AddressParts>(EMPTY_ADDRESS);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -43,6 +45,11 @@ export function OfferteForm() {
       setError("Vul een geldig telefoonnummer in.");
       return;
     }
+    const adres = formatAddress(address);
+    if (!adres) {
+      setError("Vul een adres in.");
+      return;
+    }
     if (submitLock.current) return;
 
     submitLock.current = true;
@@ -57,7 +64,7 @@ export function OfferteForm() {
           achternaam: values.achternaam,
           email: values.email,
           telefoon: values.telefoon,
-          adres: values.woonplaats,
+          adres,
           opmerkingen: values.opmerkingen,
           productId: product?.slug ?? "",
           product: product?.title ?? "",
@@ -159,17 +166,7 @@ export function OfferteForm() {
           </label>
         </div>
 
-        <label className="flex flex-col gap-[7px]">
-          <span className="field-label">Adres</span>
-          <input
-            type="text"
-            required
-            value={values.woonplaats}
-            onChange={update("woonplaats")}
-            className="field-input"
-            placeholder="Postcode"
-          />
-        </label>
+        <AddressLookup variant="site" value={address} onChange={setAddress} />
       </div>
 
       <div className="h-px bg-[oklch(0.93_0.004_75)]" />

@@ -1,8 +1,10 @@
 "use client";
 
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
+import { AddressLookup } from "@/components/address/AddressLookup";
 import { PhoneField, hasPhoneNumber } from "@/components/offerte/PhoneField";
 import { ArrowIcon, LockIcon } from "@/components/ui";
+import { EMPTY_ADDRESS, formatAddress, type AddressParts } from "@/lib/address/pdok";
 import { storeQuoteThanks } from "@/lib/quotes/thank-you";
 import { submitQuoteRequest } from "@/lib/quotes/submit-quote";
 import { ROUTES } from "@/lib/site";
@@ -103,7 +105,6 @@ type ContactFields = {
   achternaam: string;
   email: string;
   telefoon: string;
-  adres: string;
   opmerkingen: string;
 };
 
@@ -113,7 +114,6 @@ const INITIAL_FIELDS: ContactFields = {
   achternaam: "",
   email: "",
   telefoon: "",
-  adres: "",
   opmerkingen: "",
 };
 
@@ -139,6 +139,7 @@ export function QuoteForm({
   onFileChange: (file: File | null) => void;
 }) {
   const [fields, setFields] = useState(INITIAL_FIELDS);
+  const [address, setAddress] = useState<AddressParts>(EMPTY_ADDRESS);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const submitLock = useRef(false);
@@ -161,6 +162,11 @@ export function QuoteForm({
       setError("Vul een geldig telefoonnummer in.");
       return;
     }
+    const adres = formatAddress(address);
+    if (!adres) {
+      setError("Vul een adres in.");
+      return;
+    }
     if (submitLock.current) return;
 
     submitLock.current = true;
@@ -170,7 +176,7 @@ export function QuoteForm({
         {
           source: "website_configurator",
           configurationComplete: !incomplete,
-          contact: fields,
+          contact: { ...fields, adres },
           productId,
           configuration,
           doors: doors ?? [],
@@ -258,16 +264,11 @@ export function QuoteForm({
         </label>
       </div>
 
-      <label>
-        <span>Adres *</span>
-        <input
-          required
-          value={fields.adres}
-          onChange={update("adres")}
-          autoComplete="street-address"
-          placeholder="Postcode"
-        />
-      </label>
+      <AddressLookup
+        variant="configurator"
+        value={address}
+        onChange={setAddress}
+      />
 
       {(doors ?? [{ productId, configuration, summary: summaryRows }]).length >
       0 ? (
