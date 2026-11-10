@@ -54,6 +54,7 @@ export type QuoteConfiguration = {
   vlakMode: "zelf" | "ontwerp" | null;
   vlakPreset: string;
   openingDirection: "links" | "rechts" | null;
+  doubleDoor: boolean;
 };
 
 export type QuoteDoor = {

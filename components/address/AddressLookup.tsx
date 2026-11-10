@@ -9,6 +9,8 @@ import {
   useState,
 } from "react";
 import {
+  EMPTY_ADDRESS,
+  formatAddress,
   type AddressParts,
   type AddressSuggestion,
 } from "@/lib/address/pdok";
@@ -92,13 +94,15 @@ export function AddressLookup({
   const rootRef = useRef<HTMLDivElement>(null);
   const dismissRef = useRef(false);
   const lookupRef = useRef<AbortController | null>(null);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState<string | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [status, setStatus] = useState<"idle" | "loading" | "empty" | "error">("idle");
 
   useEffect(() => {
+    if (query === null) return;
     const q = query.trim();
     if (q.length < 3) return;
 
@@ -165,6 +169,9 @@ export function AddressLookup({
   function update(key: keyof AddressParts) {
     return (event: ChangeEvent<HTMLInputElement>) => {
       lookupRef.current?.abort();
+      setQuery(null);
+      setPicked(null);
+      setOpen(false);
       setStatus("idle");
       onChange({ ...value, [key]: event.target.value });
     };
@@ -173,6 +180,8 @@ export function AddressLookup({
   async function choose(suggestion: AddressSuggestion) {
     dismissRef.current = true;
     setOpen(false);
+    setQuery(null);
+    setPicked(suggestion.label);
     lookupRef.current?.abort();
     const controller = new AbortController();
     lookupRef.current = controller;
@@ -186,26 +195,51 @@ export function AddressLookup({
       const address = readAddress(await response.json().catch(() => null));
       if (controller.signal.aborted) return;
       if (!response.ok || !address) {
+        setPicked(null);
         setStatus("error");
         return;
       }
       onChange(address);
+      setPicked(null);
       setStatus("idle");
     } catch (error) {
       if (isAbort(error)) return;
+      setPicked(null);
       setStatus("error");
     }
+  }
+
+  function closeList() {
+    setSuggestions([]);
+    setActiveIndex(-1);
+    setOpen(false);
   }
 
   function onQueryChange(event: ChangeEvent<HTMLInputElement>) {
     dismissRef.current = false;
     lookupRef.current?.abort();
     const next = event.target.value;
-    setQuery(next);
     setStatus("idle");
-    setSuggestions([]);
-    setActiveIndex(-1);
-    setOpen(false);
+    closeList();
+
+    setPicked(null);
+
+    if (!next.trim()) {
+      setQuery(null);
+      onChange(EMPTY_ADDRESS);
+      return;
+    }
+
+    if (next === formatAddress(value)) {
+      setQuery(null);
+      return;
+    }
+
+    setQuery(next);
+  }
+
+  function onQueryBlur() {
+    if (query !== null && formatAddress(value)) setQuery(null);
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -241,6 +275,8 @@ export function AddressLookup({
 
   const activeId =
     open && activeIndex >= 0 ? optionId(activeIndex) : undefined;
+  const addressValue =
+    query !== null ? query : (picked ?? formatAddress(value));
 
   return (
     <div
@@ -250,7 +286,7 @@ export function AddressLookup({
     >
       <div className="address-lookup-field">
         <label htmlFor={`${listId}-query`}>
-          Zoek uw adres{variant === "configurator" ? " *" : ""}
+          Adres{variant === "configurator" ? " *" : ""}
         </label>
         <input
           id={`${listId}-query`}
@@ -260,8 +296,9 @@ export function AddressLookup({
           aria-controls={listId}
           aria-autocomplete="list"
           aria-activedescendant={activeId}
-          value={query}
+          value={addressValue}
           onChange={onQueryChange}
+          onBlur={onQueryBlur}
           onKeyDown={onKeyDown}
           autoComplete="off"
           placeholder="Postcode en huisnummer, of straatnaam"

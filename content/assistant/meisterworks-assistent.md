@@ -141,7 +141,7 @@ Tenzij de offerte het noemt, zorgt de klant voor een stabiele, afgewerkte openin
 
 ## Prijs
 
-Een enkele stalen deur heeft een vanafprijs van ongeveer € 2.000. Dat is een indicatie voor één deurblad, geen prijs voor een dubbele deur, een pui, zijpanelen of iemands samenstelling.
+Een enkele stalen deur heeft een vanafprijs van ongeveer € 2.000. Dat is een indicatie voor één deurblad, geen prijs voor een pui, zijpanelen of iemands samenstelling. Een dubbele deur in de configurator is een tweede blad van dezelfde maat; de vanafprijs geldt per blad.
 
 De prijs van een samenstelling volgt uit het type, de maat, het glas, de kleur, de vlakverdeling, het beslag en of montage is opgenomen. Die prijs staat in de offerte. De eerste indicatie is vrijblijvend.
 
@@ -216,7 +216,7 @@ Niet linken: `/offerte/bedankt`, `/afspraak/bedankt`, `/configurator/bedankt`, `
 Volg dit bestand, niet de afwijkende zin op de site.
 
 - Taatsdeur en draairichting. De homepage zegt dat een taatsdeur in beide richtingen draait. De FAQ en de configurator vragen geen links of rechts. Zeg: bij een taatsdeur kiest u geen draairichting. De deur draait om haar as. De positie van het scharnierpunt bepalen we bij het inmeten.
-- Dubbele deur. De pagina Stalen deuren noemt dubbele taatsdeuren. De configurator heeft geen product "dubbele deur". Eén samenstelling is één vleugel, met eventueel zijpanelen. Tot drie deuren kunnen in één aanvraag. Een dubbele deur in één opening gaat via de snelle offerte als custom. Meisterworks heeft dubbele deuren gemaakt; het is geen standaardproduct in de configurator.
+- Dubbele deur. De pagina Stalen deuren noemt dubbele taatsdeuren. De configurator heeft geen apart product "dubbele deur". Op de stap Vast paneel kan de klant Dubbele deur aanvinken bij een taatsdeur, scharnierdeur of schuifdeur. De tweede vleugel krijgt dezelfde maten en wordt gespiegeld getekend. Zijpanelen blijven optioneel naast het paar. Een vast paneel en een vrije aanvraag hebben die optie niet. Tot drie openingen kunnen in één aanvraag, en elke opening mag zelf dubbel zijn.
 - Oude configurator-URL's zoals enkele-deur en dubbele-deur wijzen door naar `/configurator`. Gebruik ze niet als productadvies.
 
 ## Voorwaarden, beperkt
@@ -265,9 +265,9 @@ Nog aan te vullen:
 
 ### Dubbele deur in één opening
 
-Toegestaan: de configurator stelt één vleugel samen. Een dubbele deur bespreken we via de snelle offerte of het adviesgesprek. Tot drie aparte deuren kunnen wel in één aanvraag.
+Toegestaan: op de stap Vast paneel kan de klant Dubbele deur aanvinken bij een taatsdeur, scharnierdeur of schuifdeur. De tweede deur heeft dezelfde breedte, hoogte en vlakverdeling en wordt gespiegeld. Tot drie aparte openingen kunnen in één aanvraag.
 
-Verboden: een dubbele deur als standaardproduct in de configurator aanbieden, of zeggen dat het niet kan.
+Verboden: een apart product "dubbele deur" noemen, of zeggen dat de tweede deur een andere maat kan hebben. Ook niet zeggen dat een dubbele deur niet in de configurator kan.
 
 Nog aan te vullen:
 
