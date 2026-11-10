@@ -1380,24 +1380,24 @@ export function doorDesignMarks(code: string): PreviewDesignMark[] {
   });
   switch (code) {
     case "minimal":
-      return [h(0.674)];
+      return [h(0.675)];
     case "linea":
-      return [h(0.674), v(0.856)];
+      return [h(0.675), v(0.863)];
     case "classic":
-      return [h(0.227), h(0.49), h(0.745)];
+      return [h(0.225), h(0.489), h(0.746)];
     case "grid":
-      return [h(0.49), v(0.5)];
+      return [h(0.75), v(0.502)];
     case "frame":
-      return [h(0.153), h(0.846), v(0.889, 0, 0.851)];
+      return [h(0.151), h(0.848), v(0.75)];
     case "asymmetry":
-      return [h(0.287), h(0.541), v(0.497, 0, 0.293), v(0.627, 0.534, 1)];
+      return [h(0.285), h(0.541), v(0.498, 0, 0.292), v(0.631, 0.534, 1)];
     case "arco":
       return [
-        v(0.17),
-        { kind: "arc", cx: 0.17, cy: 0.361, rx: 0.693, ry: 0.278 },
+        v(0.167),
+        { kind: "arc", cx: 0.167, cy: 0.361, rx: 0.704, ry: 0.278 },
       ];
     case "grande":
-      return [v(0.085), v(0.19), h(0.674), h(0.754)];
+      return [v(0.081), v(0.187), h(0.675), h(0.756)];
     default:
       return [];
   }
