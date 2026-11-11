@@ -6,6 +6,7 @@ import {
 } from "@/components/configurator/catalog";
 import {
   configurationProgress,
+  doubleDoorApplies,
   getProduct,
   INITIAL_STATE,
   MAX_DOORS,
@@ -80,6 +81,9 @@ function asState(value: unknown): ConfiguratorState | null {
     customDoorBars: record.customDoorBars === true,
     customPanelBars: record.customPanelBars === true,
     mirrorPanelStaanders: record.mirrorPanelStaanders === true,
+    doubleDoor:
+      record.doubleDoor === true &&
+      doubleDoorApplies(getProduct(record.productId).doorTypeCode),
     liggerPositions: percentList(record.liggerPositions),
     staanderPositions: percentList(record.staanderPositions),
     panelLiggerPositions: percentList(record.panelLiggerPositions),

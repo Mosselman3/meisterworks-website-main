@@ -1,30 +1,45 @@
 declare global {
   interface Window {
     dataLayer?: Array<Record<string, unknown>>;
+    Cookiebot?: {
+      consent?: {
+        marketing?: boolean;
+        statistics?: boolean;
+        preferences?: boolean;
+      };
+    };
   }
 }
 
-const GTM_READY_EVENT = "gtm.load";
-const GTM_READY_TIMEOUT_MS = 4000;
+function hasMeasurementConsent() {
+  const consent = window.Cookiebot?.consent;
+  return consent?.marketing === true && consent?.statistics === true;
+}
 
-export function pushDataLayerEvent(event: string) {
-  const payload = { event };
-  window.dataLayer = window.dataLayer ?? [];
-  if (hasEvent(window.dataLayer, GTM_READY_EVENT)) {
-    window.dataLayer.push(payload);
-    return;
-  }
+export function pushDataLayerEvent(event: string, onPushed?: () => void) {
+  let pushed = false;
 
-  const started = Date.now();
-  const timer = window.setInterval(() => {
+  const tryPush = () => {
+    if (pushed || !hasMeasurementConsent()) return false;
+    pushed = true;
     window.dataLayer = window.dataLayer ?? [];
-    const ready = hasEvent(window.dataLayer, GTM_READY_EVENT);
-    if (!ready && Date.now() - started < GTM_READY_TIMEOUT_MS) return;
-    window.clearInterval(timer);
-    window.dataLayer.push(payload);
-  }, 50);
-}
+    window.dataLayer.push({ event });
+    onPushed?.();
+    return true;
+  };
 
-function hasEvent(dataLayer: Array<Record<string, unknown>>, event: string) {
-  return dataLayer.some((entry) => entry.event === event);
+  if (tryPush()) return () => {};
+
+  const onReady = () => {
+    if (!tryPush()) return;
+    window.removeEventListener("CookiebotOnConsentReady", onReady);
+    window.removeEventListener("CookiebotOnAccept", onReady);
+  };
+
+  window.addEventListener("CookiebotOnConsentReady", onReady);
+  window.addEventListener("CookiebotOnAccept", onReady);
+  return () => {
+    window.removeEventListener("CookiebotOnConsentReady", onReady);
+    window.removeEventListener("CookiebotOnAccept", onReady);
+  };
 }

@@ -52,6 +52,7 @@ export type Bay = {
   staanders?: number;
   liggerPositions?: number[] | null;
   staanderPositions?: number[] | null;
+  mirrored?: boolean;
 };
 
 export type PanelLayout = "geen" | "een" | "beide";
@@ -102,6 +103,8 @@ export type ConfiguratorState = {
   sluitwerk: string;
   panelLayout: PanelLayout;
   panelSide: PanelSide;
+  /** Second leaf, same size as the first and drawn mirrored. */
+  doubleDoor: boolean;
   richting: "links" | "rechts" | "";
   leftPanelBreedte: number;
   rightPanelBreedte: number;
@@ -139,6 +142,7 @@ export const INITIAL_STATE: ConfiguratorState = {
   sluitwerk: "recht_hoekgreep",
   panelLayout: "geen",
   panelSide: "rechts",
+  doubleDoor: false,
   richting: "",
   leftPanelBreedte: 700,
   rightPanelBreedte: 700,
@@ -423,6 +427,22 @@ export const STEP_ORDER = [
 
 export type StepId = (typeof STEP_ORDER)[number];
 
+export function doubleDoorApplies(doorTypeCode: string | null | undefined) {
+  return (
+    doorTypeCode === "taatsdeur" ||
+    doorTypeCode === "scharnierdeur_kozijn" ||
+    doorTypeCode === "schuifdeur"
+  );
+}
+
+export function doorLeafCount(
+  state: Pick<ConfiguratorState, "doubleDoor" | "productId">,
+) {
+  return state.doubleDoor && doubleDoorApplies(getProduct(state.productId).doorTypeCode)
+    ? 2
+    : 1;
+}
+
 export function directionApplies(product: ConfigProduct) {
   return (
     product.doorTypeCode === "scharnierdeur_kozijn" || product.doorTypeCode === "schuifdeur"
@@ -694,7 +714,7 @@ export function bayWidth(_state: ConfiguratorState, bay: Bay): number {
 
 export function totalWidth(state: ConfiguratorState): number {
   return (
-    (state.breedte || 0) +
+    doorLeafCount(state) * (state.breedte || 0) +
     (leftPanelActive(state) ? state.leftPanelBreedte : 0) +
     (rightPanelActive(state) ? state.rightPanelBreedte : 0)
   );
@@ -748,7 +768,13 @@ export function maatLabel(state: ConfiguratorState) {
     });
     return parts.join(" · ");
   }
-  const parts = [`Deur ${state.breedte} × ${hoogte} mm`];
+  const parts =
+    doorLeafCount(state) === 2
+      ? [
+          `Deur 1 ${state.breedte} × ${hoogte} mm`,
+          `Deur 2 ${state.breedte} × ${hoogte} mm`,
+        ]
+      : [`Deur ${state.breedte} × ${hoogte} mm`];
   if (leftPanelActive(state)) {
     parts.push(`paneel links ${state.leftPanelBreedte} × ${hoogte} mm`);
   }
@@ -770,7 +796,7 @@ export function totalOpeningM2(state: ConfiguratorState) {
     getProduct(state.productId).doorTypeCode === "vast_paneel"
       ? state.joinedPanels.reduce((sum, panel) => sum + panelAreaM2(panel.widthMm, state.hoogte), 0)
       : 0;
-  return panelAreaM2(state.breedte, state.hoogte) + totalPanelM2(state) + extra;
+  return doorLeafCount(state) * panelAreaM2(state.breedte, state.hoogte) + totalPanelM2(state) + extra;
 }
 
 export type SizeLine = { label: string; widthMm: number; heightMm: number };
@@ -798,7 +824,12 @@ export function sizeLines(state: ConfiguratorState): SizeLine[] {
       heightMm: hoogte,
     });
   }
-  lines.push({ label: "Deur", widthMm: state.breedte, heightMm: hoogte });
+  if (doorLeafCount(state) === 2) {
+    lines.push({ label: "Deur 1", widthMm: state.breedte, heightMm: hoogte });
+    lines.push({ label: "Deur 2", widthMm: state.breedte, heightMm: hoogte });
+  } else {
+    lines.push({ label: "Deur", widthMm: state.breedte, heightMm: hoogte });
+  }
   if (rightPanelActive(state)) {
     lines.push({
       label: "Paneel rechts",
@@ -812,21 +843,38 @@ export function sizeLines(state: ConfiguratorState): SizeLine[] {
 export function panelLayoutThumb(
   kind: PanelLayout,
   side: "links" | "rechts" = "rechts",
+  doubleDoor = false,
 ): React.CSSProperties {
+  const panel = (x: number, width: number) =>
+    `<rect x="${x}" y="12" width="${width}" height="176" fill="#e3e9e8" stroke="#2f4a63" stroke-width="3"/><text x="${x + width / 2}" y="178" text-anchor="middle" font-size="9" fill="#2f4a63" fill-opacity="0.55" font-family="monospace">VAST</text>`;
+  const leaf = (x: number, width: number, gripOnRight: boolean) => {
+    const gripX = gripOnRight ? x + width - 8 : x + 5;
+    return `<rect x="${x}" y="12" width="${width}" height="176" fill="#ffffff" stroke="#2f4a63" stroke-width="4"/><rect x="${gripX}" y="90" width="3" height="22" fill="#2f4a63"/>`;
+  };
   const door =
     '<rect x="70" y="12" width="60" height="176" fill="#ffffff" stroke="#2f4a63" stroke-width="4"/>';
-  const left =
-    '<rect x="12" y="12" width="50" height="176" fill="#e3e9e8" stroke="#2f4a63" stroke-width="3"/><text x="37" y="178" text-anchor="middle" font-size="9" fill="#2f4a63" fill-opacity="0.55" font-family="monospace">VAST</text>';
-  const right =
-    '<rect x="138" y="12" width="50" height="176" fill="#e3e9e8" stroke="#2f4a63" stroke-width="3"/><text x="163" y="178" text-anchor="middle" font-size="9" fill="#2f4a63" fill-opacity="0.55" font-family="monospace">VAST</text>';
-  const parts =
-    kind === "geen"
-      ? door
-      : kind === "een"
-        ? side === "links"
-          ? `${left}${door}`
-          : `${door}${right}`
-        : `${left}${door}${right}`;
+  const left = panel(12, 50);
+  const right = panel(138, 50);
+  let parts: string;
+  if (!doubleDoor) {
+    parts =
+      kind === "geen"
+        ? door
+        : kind === "een"
+          ? side === "links"
+            ? `${left}${door}`
+            : `${door}${right}`
+          : `${left}${door}${right}`;
+  } else if (kind === "geen") {
+    parts = `${leaf(52, 46, true)}${leaf(102, 46, false)}`;
+  } else if (kind === "een") {
+    parts =
+      side === "links"
+        ? `${panel(12, 40)}${leaf(58, 40, true)}${leaf(102, 40, false)}`
+        : `${leaf(16, 40, true)}${leaf(60, 40, false)}${panel(108, 40)}`;
+  } else {
+    parts = `${panel(10, 34)}${leaf(48, 36, true)}${leaf(88, 36, false)}${panel(128, 34)}`;
+  }
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f4f2ef"/>${parts}</svg>`;
   return {
     height: 96,
@@ -954,6 +1002,7 @@ export function snapshotDoor(state: ConfiguratorState): ConfiguratorState {
     ...state,
     ...(vastPaneel ? { vlakMode: "zelf" as const, vlakPreset: "" } : {}),
     joinedPanels: vastPaneel ? normalizeJoinedPanels(state.joinedPanels) : [],
+    doubleDoor: doubleDoorApplies(getProduct(state.productId).doorTypeCode) && state.doubleDoor,
     answered: { ...state.answered },
     groupOpen: { ...state.groupOpen },
     summaryOpen: false,
@@ -986,7 +1035,12 @@ export function doorSummaryRows(
         }
       : null,
     product.hasFixedPanel && a.paneel
-      ? { label: "Vast paneel", value: paneelLabel(state) }
+      ? {
+          label: "Vast paneel",
+          value: state.doubleDoor
+            ? `${paneelLabel(state)} · dubbele deur`
+            : paneelLabel(state),
+        }
       : null,
     a.maat ? { label: "Afmeting", value: maatLabel(state) } : null,
     a.vlak ? { label: "Vlakverdeling", value: vlakLabel(state) } : null,
@@ -1301,6 +1355,28 @@ export type PreviewDesignMark =
   | { kind: "line"; x1: number; y1: number; x2: number; y2: number }
   | { kind: "arc"; cx: number; cy: number; rx: number; ry: number };
 
+export function mirrorDesignMark(mark: PreviewDesignMark): PreviewDesignMark {
+  if (mark.kind === "line") {
+    return { ...mark, x1: 1 - mark.x1, x2: 1 - mark.x2 };
+  }
+  return { ...mark, cx: 1 - mark.cx };
+}
+
+/**
+ * Arco and Grande keep their side strip opposite the hinge.
+ * The cards draw that strip on the left, so a left hinge mirrors the model.
+ * A door without a side hinge uses the same flip, and the second leaf mirrors it back.
+ */
+export function previewMirrorsDesign(
+  code: string,
+  leafMirrored: boolean,
+  hingeOnLeft: boolean | null,
+) {
+  if (code !== "arco" && code !== "grande") return leafMirrored;
+  if (hingeOnLeft === null) return !leafMirrored;
+  return hingeOnLeft;
+}
+
 /** Fractions of the door glass, matching the ontwerp cards. */
 export function doorDesignMarks(code: string): PreviewDesignMark[] {
   const h = (y: number, x1 = 0, x2 = 1): PreviewDesignMark => ({
@@ -1319,24 +1395,24 @@ export function doorDesignMarks(code: string): PreviewDesignMark[] {
   });
   switch (code) {
     case "minimal":
-      return [h(0.674)];
+      return [h(0.675)];
     case "linea":
-      return [h(0.674), v(0.856)];
+      return [h(0.675), v(0.863)];
     case "classic":
-      return [h(0.227), h(0.49), h(0.745)];
+      return [h(0.225), h(0.489), h(0.746)];
     case "grid":
-      return [h(0.49), v(0.5)];
+      return [h(0.75), v(0.502)];
     case "frame":
-      return [h(0.153), h(0.846), v(0.889, 0, 0.851)];
+      return [h(0.151), h(0.848), v(0.75)];
     case "asymmetry":
-      return [h(0.287), h(0.541), v(0.497, 0, 0.293), v(0.627, 0.534, 1)];
+      return [h(0.285), h(0.541), v(0.498, 0, 0.292), v(0.631, 0.534, 1)];
     case "arco":
       return [
-        v(0.17),
-        { kind: "arc", cx: 0.17, cy: 0.361, rx: 0.693, ry: 0.278 },
+        v(0.167),
+        { kind: "arc", cx: 0.167, cy: 0.361, rx: 0.704, ry: 0.278 },
       ];
     case "grande":
-      return [v(0.085), v(0.19), h(0.674), h(0.754)];
+      return [v(0.081), v(0.187), h(0.675), h(0.756)];
     default:
       return [];
   }
@@ -1384,6 +1460,7 @@ export function laborWindowCount(
     | "panelStaanders"
     | "joinedPanels"
     | "productId"
+    | "doubleDoor"
   >,
 ) {
   const panels = fixedPanelCount(state.panelLayout);
@@ -1396,7 +1473,7 @@ export function laborWindowCount(
           0,
         )
       : 0;
-  return doorPaneCount(state) + panels * panelPanes + joined;
+  return doorLeafCount(state) * doorPaneCount(state) + panels * panelPanes + joined;
 }
 
 /** Panes beyond the one included pane on the door and on each fixed panel. */
@@ -1412,6 +1489,7 @@ export function extraLaborPanes(
     | "panelStaanders"
     | "joinedPanels"
     | "productId"
+    | "doubleDoor"
   >,
 ) {
   const panels = fixedPanelCount(state.panelLayout);
@@ -1423,7 +1501,11 @@ export function extraLaborPanes(
           return sum + Math.max(0, panes - 1);
         }, 0)
       : 0;
-  return Math.max(0, doorPaneCount(state) - 1) + panels * Math.max(0, panelPanes - 1) + joined;
+  return (
+    doorLeafCount(state) * Math.max(0, doorPaneCount(state) - 1) +
+    panels * Math.max(0, panelPanes - 1) +
+    joined
+  );
 }
 
 export function buildPreviewSvg(
@@ -1442,6 +1524,14 @@ export function buildPreviewSvg(
   const leftWidth = leftPanelActive(state) ? state.leftPanelBreedte : 0;
   const rightWidth = rightPanelActive(state) ? state.rightPanelBreedte : 0;
   const joined = product.doorTypeCode === "vast_paneel" ? state.joinedPanels : [];
+  const leaves = doorLeafCount(state);
+  const doorBay = (key: string, label: string, mirrored = false): Bay => ({
+    type: "door",
+    key,
+    label,
+    defaultWidth: doorWidth,
+    mirrored,
+  });
   const bays: Bay[] = joined.length
     ? [
         {
@@ -1471,7 +1561,11 @@ export function buildPreviewSvg(
         ...(leftWidth
           ? [{ type: "panel" as const, key: "links", label: "Paneel links", defaultWidth: leftWidth }]
           : []),
-        { type: "door", key: "deur", label: "Deur", defaultWidth: doorWidth },
+        doorBay(
+          "deur",
+          leaves === 2 ? "Deur 1" : product.doorTypeCode === "vast_paneel" ? "Paneel" : "Deur",
+        ),
+        ...(leaves === 2 ? [doorBay("deur-2", "Deur 2", true)] : []),
         ...(rightWidth
           ? [{ type: "panel" as const, key: "rechts", label: "Paneel rechts", defaultWidth: rightWidth }]
           : []),
@@ -1600,10 +1694,11 @@ export function buildPreviewSvg(
     }
     const drawStaanders = panelStaanderDrawPercents(
       staanderPcts,
-      bay.type === "panel" &&
-        bay.key === "rechts" &&
-        state.panelLayout === "beide" &&
-        state.mirrorPanelStaanders,
+      bay.mirrored === true ||
+        (bay.type === "panel" &&
+          bay.key === "rechts" &&
+          state.panelLayout === "beide" &&
+          state.mirrorPanelStaanders),
     );
     for (const pct of drawStaanders) {
       const sx = gx + gw * (pct / 100);
@@ -1620,8 +1715,21 @@ export function buildPreviewSvg(
       );
     }
 
+    const gripLeft =
+      bay.type === "door" && product.doorTypeCode !== "vast_paneel"
+        ? handleOnLeft(product.doorTypeCode, state.richting) !== (bay.mirrored === true)
+        : false;
+    const hingeOnLeft =
+      bay.type === "door" && product.doorTypeCode === "scharnierdeur_kozijn" ? !gripLeft : null;
+    const mirrorLeaf = previewMirrorsDesign(
+      designOnDoor ? state.vlakPreset : "",
+      bay.mirrored === true,
+      hingeOnLeft,
+    );
+
     if (designOnDoor) {
-      for (const mark of doorDesignMarks(state.vlakPreset)) {
+      for (const source of doorDesignMarks(state.vlakPreset)) {
+        const mark = mirrorLeaf ? mirrorDesignMark(source) : source;
         if (mark.kind === "line") {
           e.push(
             React.createElement("line", {
@@ -1639,10 +1747,12 @@ export function buildPreviewSvg(
           const ay = gy + mark.cy * gh;
           const rx = mark.rx * gw;
           const ry = mark.ry * gh;
+          const endX = mirrorLeaf ? ax - rx : ax + rx;
+          const sweep = mirrorLeaf ? 0 : 1;
           e.push(
             React.createElement("path", {
               key: key(ki++),
-              d: `M ${ax} ${ay - ry} A ${rx} ${ry} 0 0 1 ${ax + rx} ${ay} L ${ax + rx} ${gy + gh}`,
+              d: `M ${ax} ${ay - ry} A ${rx} ${ry} 0 0 ${sweep} ${endX} ${ay} L ${endX} ${gy + gh}`,
               fill: "none",
               stroke: frameHex,
               strokeWidth: mullion,
@@ -1671,20 +1781,37 @@ export function buildPreviewSvg(
       );
     }
 
-    if (bay.type === "door" && product.hasHardware && !designOnDoor) {
-      const gripLeft = handleOnLeft(product.doorTypeCode, state.richting);
-      const hx = gripLeft ? gx + 10 : gx + gw - 12;
-      e.push(
-        React.createElement("rect", {
-          key: key(ki++),
-          x: hx - 2,
-          y: gy + gh / 2 - 15,
-          width: 4,
-          height: 30,
-          rx: 2,
-          fill: frameHex,
-        }),
-      );
+    if (bay.type === "door" && product.doorTypeCode !== "vast_paneel") {
+      if (product.hasHardware && !designOnDoor) {
+        const hx = gripLeft ? gx + 10 : gx + gw - 12;
+        e.push(
+          React.createElement("rect", {
+            key: key(ki++),
+            x: hx - 2,
+            y: gy + gh / 2 - 15,
+            width: 4,
+            height: 30,
+            rx: 2,
+            fill: frameHex,
+          }),
+        );
+      }
+      if (product.doorTypeCode === "scharnierdeur_kozijn" && hingeOnLeft !== null) {
+        const hingeX = hingeOnLeft ? gx + 4 : gx + gw - 7;
+        for (const frac of [0.18, 0.5, 0.82]) {
+          e.push(
+            React.createElement("rect", {
+              key: key(ki++),
+              x: hingeX,
+              y: gy + gh * frac - 7,
+              width: 3,
+              height: 14,
+              rx: 1,
+              fill: frameHex,
+            }),
+          );
+        }
+      }
     }
 
     if (bay.type === "door" && product.doorTypeCode === "taatsdeur") {
@@ -1709,23 +1836,10 @@ export function buildPreviewSvg(
           fillOpacity: 0.75,
         }),
       );
-    } else if (bay.type === "door" && product.doorTypeCode === "schuifdeur") {
-      e.push(
-        React.createElement("line", {
-          key: key(ki++),
-          x1: x0,
-          y1: y0 - 4,
-          x2: x0 + W,
-          y2: y0 - 4,
-          stroke: frameHex,
-          strokeWidth: 3,
-          strokeOpacity: 0.6,
-        }),
-      );
     }
 
     const sizeName =
-      bay.type === "door" ? "Deur" : bay.key === "links" ? "Links" : "Rechts";
+      bay.type === "door" ? bay.label : bay.key === "links" ? "Links" : "Rechts";
     e.push(
       React.createElement(
         "text",
@@ -1759,6 +1873,21 @@ export function buildPreviewSvg(
 
     cx += bw;
   });
+
+  if (product.doorTypeCode === "schuifdeur") {
+    e.push(
+      React.createElement("line", {
+        key: key(ki++),
+        x1: x0,
+        y1: y0 - 4,
+        x2: x0 + W,
+        y2: y0 - 4,
+        stroke: frameHex,
+        strokeWidth: 3,
+        strokeOpacity: 0.6,
+      }),
+    );
+  }
 
   const dimColor = "#555";
   const badge = (cx2: number, cy2: number, text2: string, rw: number) => {

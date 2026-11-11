@@ -31,8 +31,9 @@ export function QuoteThankYou({
     setThanks({ quoteNumber: stored.quoteNumber, doorCount: stored.doorCount });
     if (stored.tracked) return;
 
-    markQuoteThanksTracked(source);
-    pushDataLayerEvent(quoteThanksEvent(source));
+    return pushDataLayerEvent(quoteThanksEvent(source), () => {
+      markQuoteThanksTracked(source);
+    });
   }, [fallbackHref, router, source]);
 
   if (!thanks) return null;

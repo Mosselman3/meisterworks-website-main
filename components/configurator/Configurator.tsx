@@ -63,6 +63,7 @@ import {
   buildPreviewSvg,
   configurationProgress,
   directionApplies,
+  doubleDoorApplies,
   directionChoiceLabel,
   directionOptions,
   lockApplies,
@@ -699,6 +700,7 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
       vlakMode: "zelf",
       vlakPreset: "",
       openingDirection: null,
+      doubleDoor: false,
     };
   }
   return {
@@ -754,6 +756,7 @@ function quoteConfigurationFromState(state: ConfiguratorState): QuoteConfigurati
       (state.richting === "links" || state.richting === "rechts")
         ? state.richting
         : null,
+    doubleDoor: doubleDoorApplies(product.doorTypeCode) && state.doubleDoor,
   };
 }
 
@@ -785,6 +788,7 @@ function blankQuoteConfiguration(): QuoteConfiguration {
     vlakMode: null,
     vlakPreset: "",
     openingDirection: null,
+    doubleDoor: false,
   };
 }
 
@@ -833,6 +837,7 @@ function quoteConfigurationForQuote(state: ConfiguratorState): QuoteConfiguratio
     rightPanelWidthMm: paneel ? full.rightPanelWidthMm : 0,
     panelLiggers: paneel ? full.panelLiggers : 0,
     panelStaanders: paneel ? full.panelStaanders : 0,
+    doubleDoor: paneel ? full.doubleDoor : false,
   };
 }
 
@@ -1845,6 +1850,7 @@ export function Configurator() {
                     ? { vlakMode: "zelf" as const, vlakPreset: "" }
                     : {}),
                   richting: directionApplies(o) ? s.richting : "",
+                  doubleDoor: doubleDoorApplies(o.doorTypeCode) ? s.doubleDoor : false,
                   beslag: lockApplies(o, s.sluitwerk) ? s.beslag : "",
                   answered: {
                     ...s.answered,
@@ -2572,7 +2578,7 @@ export function Configurator() {
               ? state.joinedPanels.length > 0
                 ? `Paneel 1 heeft ${windows} ${windows === 1 ? "raam" : "ramen"}.`
                 : `Het paneel heeft ${windows} ${windows === 1 ? "raam" : "ramen"}.`
-              : `De deur heeft ${windows} ${windows === 1 ? "raam" : "ramen"}.`}
+              : `${state.doubleDoor ? "Elke deur heeft" : "De deur heeft"} ${windows} ${windows === 1 ? "raam" : "ramen"}.`}
             {hasPanels(state)
               ? ` ${state.panelLayout === "beide" ? "De vaste panelen hebben" : "Het vaste paneel heeft"} ${panelWindows} ${panelWindows === 1 ? "raam" : "ramen"}.`
               : ""}
@@ -2608,9 +2614,11 @@ export function Configurator() {
               label={
                 product.doorTypeCode === "vast_paneel" && state.joinedPanels.length > 0
                   ? "Breedte paneel 1 (mm)"
-                  : hasPanels(state)
-                    ? "Breedte deur (mm)"
-                    : "Breedte (mm)"
+                  : state.doubleDoor
+                    ? "Breedte per deur (mm)"
+                    : hasPanels(state)
+                      ? "Breedte deur (mm)"
+                      : "Breedte (mm)"
               }
               value={state.breedte}
               min={300}
@@ -2687,6 +2695,18 @@ export function Configurator() {
               {totW} mm
             </span>
           </div>
+          {state.doubleDoor ? (
+            <p
+              style={{
+                fontSize: 13,
+                color: "oklch(0.5 0.008 60)",
+                lineHeight: 1.6,
+                margin: "10px 0 0",
+              }}
+            >
+              Geldt voor beide deuren. De tweede deur krijgt dezelfde breedte en hoogte.
+            </p>
+          ) : null}
           <p
             style={{
               fontSize: 13,
@@ -3141,6 +3161,7 @@ export function Configurator() {
           </>
         );
       }
+      const pair = state.doubleDoor;
       const layouts: {
         id: PanelLayout;
         label: string;
@@ -3149,12 +3170,12 @@ export function Configurator() {
         {
           id: "geen",
           label: "Geen vast paneel",
-          desc: "Alleen de deur.",
+          desc: pair ? "Alleen de deuren." : "Alleen de deur.",
         },
         {
           id: "een",
           label: "Eén vast paneel",
-          desc: "Links of rechts van de deur.",
+          desc: pair ? "Links of rechts van de deuren." : "Links of rechts van de deur.",
         },
         {
           id: "beide",
@@ -3164,6 +3185,28 @@ export function Configurator() {
       ];
       return (
         <>
+          <label className="cfg-bar-pos-toggle" style={{ marginBottom: 8 }}>
+            <input
+              type="checkbox"
+              role="switch"
+              checked={pair}
+              onChange={(event) =>
+                setState((current) => ({ ...current, doubleDoor: event.target.checked }))
+              }
+            />
+            <span className="cfg-switch" aria-hidden="true" />
+            <span>Dubbele deur</span>
+          </label>
+          <p
+            style={{
+              fontSize: 13,
+              color: "oklch(0.5 0.008 60)",
+              lineHeight: 1.5,
+              margin: "0 0 16px",
+            }}
+          >
+            Tweede deur met dezelfde maten, gespiegeld.
+          </p>
           <div
             style={{
               display: "grid",
@@ -3177,7 +3220,7 @@ export function Configurator() {
                 label={option.label}
                 desc={option.desc}
                 selected={state.panelLayout === option.id}
-                thumbStyle={panelLayoutThumb(option.id)}
+                thumbStyle={panelLayoutThumb(option.id, state.panelSide, pair)}
                 onClick={() =>
                   setState((s) => ({
                     ...s,
@@ -3216,7 +3259,13 @@ export function Configurator() {
                         : "oklch(0.45 0.008 60)",
                     }}
                   >
-                    {side === "links" ? "Links van de deur" : "Rechts van de deur"}
+                    {side === "links"
+                      ? pair
+                        ? "Links van de deuren"
+                        : "Links van de deur"
+                      : pair
+                        ? "Rechts van de deuren"
+                        : "Rechts van de deur"}
                   </button>
                 );
               })}
@@ -4193,9 +4242,11 @@ function BarPositionControl({
       <label className="cfg-bar-pos-toggle">
         <input
           type="checkbox"
+          role="switch"
           checked={custom}
           onChange={(event) => onCustom(event.target.checked)}
         />
+        <span className="cfg-switch" aria-hidden="true" />
         <span>{label}</span>
       </label>
       {custom ? (
@@ -4243,10 +4294,12 @@ function BarPositionControl({
                 <label className="cfg-bar-pos-toggle cfg-bar-pos-mirror">
                   <input
                     type="checkbox"
+                    role="switch"
                     checked={mirrored}
                     aria-label="Zelfde staanders op beide panelen"
                     onChange={(event) => onMirror?.(event.target.checked)}
                   />
+                  <span className="cfg-switch" aria-hidden="true" />
                   <span>Spiegelen</span>
                 </label>
               ) : null}
