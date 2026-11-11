@@ -1362,6 +1362,21 @@ export function mirrorDesignMark(mark: PreviewDesignMark): PreviewDesignMark {
   return { ...mark, cx: 1 - mark.cx };
 }
 
+/**
+ * Arco and Grande keep their side strip opposite the hinge.
+ * The cards draw that strip on the left, so a left hinge mirrors the model.
+ * A door without a side hinge uses the same flip, and the second leaf mirrors it back.
+ */
+export function previewMirrorsDesign(
+  code: string,
+  leafMirrored: boolean,
+  hingeOnLeft: boolean | null,
+) {
+  if (code !== "arco" && code !== "grande") return leafMirrored;
+  if (hingeOnLeft === null) return !leafMirrored;
+  return hingeOnLeft;
+}
+
 /** Fractions of the door glass, matching the ontwerp cards. */
 export function doorDesignMarks(code: string): PreviewDesignMark[] {
   const h = (y: number, x1 = 0, x2 = 1): PreviewDesignMark => ({
@@ -1700,9 +1715,21 @@ export function buildPreviewSvg(
       );
     }
 
+    const gripLeft =
+      bay.type === "door" && product.doorTypeCode !== "vast_paneel"
+        ? handleOnLeft(product.doorTypeCode, state.richting) !== (bay.mirrored === true)
+        : false;
+    const hingeOnLeft =
+      bay.type === "door" && product.doorTypeCode === "scharnierdeur_kozijn" ? !gripLeft : null;
+    const mirrorLeaf = previewMirrorsDesign(
+      designOnDoor ? state.vlakPreset : "",
+      bay.mirrored === true,
+      hingeOnLeft,
+    );
+
     if (designOnDoor) {
       for (const source of doorDesignMarks(state.vlakPreset)) {
-        const mark = bay.mirrored ? mirrorDesignMark(source) : source;
+        const mark = mirrorLeaf ? mirrorDesignMark(source) : source;
         if (mark.kind === "line") {
           e.push(
             React.createElement("line", {
@@ -1720,8 +1747,8 @@ export function buildPreviewSvg(
           const ay = gy + mark.cy * gh;
           const rx = mark.rx * gw;
           const ry = mark.ry * gh;
-          const endX = bay.mirrored ? ax - rx : ax + rx;
-          const sweep = bay.mirrored ? 0 : 1;
+          const endX = mirrorLeaf ? ax - rx : ax + rx;
+          const sweep = mirrorLeaf ? 0 : 1;
           e.push(
             React.createElement("path", {
               key: key(ki++),
@@ -1755,8 +1782,6 @@ export function buildPreviewSvg(
     }
 
     if (bay.type === "door" && product.doorTypeCode !== "vast_paneel") {
-      const gripLeft =
-        handleOnLeft(product.doorTypeCode, state.richting) !== (bay.mirrored === true);
       if (product.hasHardware && !designOnDoor) {
         const hx = gripLeft ? gx + 10 : gx + gw - 12;
         e.push(
@@ -1771,9 +1796,8 @@ export function buildPreviewSvg(
           }),
         );
       }
-      if (product.doorTypeCode === "scharnierdeur_kozijn") {
-        const hingeLeft = !gripLeft;
-        const hingeX = hingeLeft ? gx + 4 : gx + gw - 7;
+      if (product.doorTypeCode === "scharnierdeur_kozijn" && hingeOnLeft !== null) {
+        const hingeX = hingeOnLeft ? gx + 4 : gx + gw - 7;
         for (const frac of [0.18, 0.5, 0.82]) {
           e.push(
             React.createElement("rect", {
