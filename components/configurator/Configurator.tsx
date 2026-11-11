@@ -3188,11 +3188,13 @@ export function Configurator() {
           <label className="cfg-bar-pos-toggle" style={{ marginBottom: 8 }}>
             <input
               type="checkbox"
+              role="switch"
               checked={pair}
               onChange={(event) =>
                 setState((current) => ({ ...current, doubleDoor: event.target.checked }))
               }
             />
+            <span className="cfg-switch" aria-hidden="true" />
             <span>Dubbele deur</span>
           </label>
           <p
@@ -4240,9 +4242,11 @@ function BarPositionControl({
       <label className="cfg-bar-pos-toggle">
         <input
           type="checkbox"
+          role="switch"
           checked={custom}
           onChange={(event) => onCustom(event.target.checked)}
         />
+        <span className="cfg-switch" aria-hidden="true" />
         <span>{label}</span>
       </label>
       {custom ? (
@@ -4290,10 +4294,12 @@ function BarPositionControl({
                 <label className="cfg-bar-pos-toggle cfg-bar-pos-mirror">
                   <input
                     type="checkbox"
+                    role="switch"
                     checked={mirrored}
                     aria-label="Zelfde staanders op beide panelen"
                     onChange={(event) => onMirror?.(event.target.checked)}
                   />
+                  <span className="cfg-switch" aria-hidden="true" />
                   <span>Spiegelen</span>
                 </label>
               ) : null}
