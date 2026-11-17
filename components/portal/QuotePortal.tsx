@@ -202,8 +202,8 @@ export function QuotePortal({ token }: { token: string }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {portal.lines.map((line) => (
-                    <tr key={`${line.title}-${line.details.join("-")}`}>
+                  {portal.lines.map((line, index) => (
+                    <tr key={`${index}-${line.title}-${line.details.join("-")}`}>
                       <td><strong>{line.title}</strong><ul>{line.details.map((detail) => <li key={detail}>{detail}</li>)}</ul></td>
                       <td>{line.quantity}</td>
                       <td>{formatEuro(line.unitPriceExclVatCents)}</td>
